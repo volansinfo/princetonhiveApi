@@ -164,3 +164,21 @@ exports.changePassword = async (req, res) => {
     res.status(500).send({ success: false, message: error.message })
   }
 }
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const userEmail = req.body.email
+    const user = await User.findOne({
+      where: {
+        email: userEmail
+      }
+    })
+
+    if(!user){
+      return res.status(404).send({ success: false, message: "Email does not exist!" });
+    }
+
+  } catch (e) {
+    res.status(500).send({ success: false, message: error.message })
+  }
+}

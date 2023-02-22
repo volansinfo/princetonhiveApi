@@ -30,6 +30,8 @@ module.exports = function (app) {
       verifySignUp.validatePwdAndConfirmPwd,
       verifySignUp.passwordValidation
     ],
-    controller.changePassword)
+    controller.changePassword);
+
+    app.post("/app/user/forgotPassword",controller.forgotPassword);
 
 };

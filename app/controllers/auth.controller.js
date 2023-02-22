@@ -2,7 +2,7 @@ const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
-
+const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
 
@@ -10,6 +10,7 @@ const { verifySignUp } = require("../middleware");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { where } = require("sequelize");
 
 exports.signup = async (req, res) => {
   // Save User to Database
@@ -174,9 +175,25 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    if(!user){
+    if (!user) {
       return res.status(404).send({ success: false, message: "Email does not exist!" });
     }
+
+    let generatedPwd = await generator.generate({
+      length: 6,
+      numbers: true,
+    })
+
+    await User.update({
+      password: bcrypt.hashSync(generatedPwd, 8),
+      actualPassword: generatedPwd
+    }, {
+      where: {
+        email: userEmail
+      }
+    })
+
+    res.status(200).send({ success: false, message: `Your new password is: ${generatedPwd}` })
 
   } catch (e) {
     res.status(500).send({ success: false, message: error.message })

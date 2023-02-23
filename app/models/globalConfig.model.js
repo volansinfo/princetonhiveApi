@@ -1,6 +1,4 @@
-const { INTEGER } = require("sequelize")
-
-module.exports = (sequelize, Sequelize, DataTypes) =>{
+module.exports = (sequelize, Sequelize, DataTypes) => {
     const globalConfig = sequelize.define("hiv_global_config",{
         id:{
             type:DataTypes.INTEGER,
@@ -9,7 +7,7 @@ module.exports = (sequelize, Sequelize, DataTypes) =>{
         },
         hostName:{
             type: Sequelize.TEXT,
-            allowNull: true,
+            allowNull: false,
             validate: {
                 notEmpty: false,
 
@@ -17,10 +15,38 @@ module.exports = (sequelize, Sequelize, DataTypes) =>{
         },
         portNumber:{
             type:DataTypes.INTEGER,
-            allowNull:true,
+            allowNull:false,
             validate:{
                 notEmpty:false
             }
+        },
+        authUser:{
+            type:Sequelize.STRING,
+            allowNull:false,
+            validate:{
+                notEmpty:false
+            }
+        },
+        authPassword:{
+            type:Sequelize.STRING,
+            allowNull:false,
+            validate:{
+                notEmpty:false
+            }
+        },
+        hostType:{
+            type:Sequelize.STRING,
+            allowNull:false,
+            validate:{
+                notEmpty:false
+            }
+        },
+        status:{
+            type: Sequelize.ENUM('0','1'),
+            defaultValue:'0',
+            comment: "0-deactive,1-active"
         }
     })
+
+    return globalConfig;
 }

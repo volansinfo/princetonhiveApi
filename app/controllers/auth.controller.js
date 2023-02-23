@@ -2,6 +2,7 @@ const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
+const globalConfig = db.globalConfig
 const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
@@ -170,6 +171,7 @@ exports.changePassword = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const userEmail = req.body.email
+    const hostType = req.body.hostType
     const user = await User.findOne({
       where: {
         email: userEmail
@@ -185,6 +187,16 @@ exports.forgotPassword = async (req, res) => {
       numbers: true,
     })
 
+    const smtpServer = await globalConfig.findOne({
+      where:{
+          hostType:hostType
+      }
+  })
+  
+  if(!smtpServer){
+    return res.status(404).send({success:false,message:"SMTP server not configured!"})
+  }
+
     await User.update({
       password: bcrypt.hashSync(generatedPwd, 8),
       actualPassword: generatedPwd
@@ -194,7 +206,7 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    sendMail(userEmail, generatedPwd)
+    sendMail(userEmail, generatedPwd,smtpServer)
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 

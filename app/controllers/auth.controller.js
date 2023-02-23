@@ -2,14 +2,17 @@ const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
-
+const globalConfig = db.globalConfig
+const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
+const sendMail = require("./sendmail.controller")
 
 
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { where } = require("sequelize");
 
 exports.signup = async (req, res) => {
   // Save User to Database
@@ -168,15 +171,44 @@ exports.changePassword = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const userEmail = req.body.email
+    const hostType = req.body.hostType
     const user = await User.findOne({
       where: {
         email: userEmail
       }
     })
 
-    if(!user){
-      return res.status(404).send({ success: false, message: "Email does not exist!" });
+    if (!user) {
+      return res.status(404).send({ success: false, message: "User does not exist!" });
     }
+
+    let generatedPwd = await generator.generate({
+      length: 6,
+      numbers: true,
+    })
+
+    const smtpServer = await globalConfig.findOne({
+      where:{
+          hostType:hostType
+      }
+  })
+  
+  if(!smtpServer){
+    return res.status(404).send({success:false,message:"SMTP server not configured!"})
+  }
+
+    await User.update({
+      password: bcrypt.hashSync(generatedPwd, 8),
+      actualPassword: generatedPwd
+    }, {
+      where: {
+        email: userEmail
+      }
+    })
+
+    sendMail(userEmail, generatedPwd,smtpServer)
+
+    res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 
   } catch (e) {
     res.status(500).send({ success: false, message: error.message })

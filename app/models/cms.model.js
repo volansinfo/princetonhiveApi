@@ -4,33 +4,33 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
-          },
-        title:{
+        },
+        title: {
             type: Sequelize.TEXT,
             allowNull: true,
             validate: {
                 notEmpty: false,
-                
-              }
+
+            }
         },
 
-        description:{
+        description: {
             type: Sequelize.TEXT,
             allowNull: true,
             validate: {
                 notEmpty: false,
-              }
+            }
         },
 
-        pageSlug:{
+        pageSlug: {
             type: Sequelize.TEXT,
             allowNull: true,
             validate: {
                 notEmpty: false,
-              }
+            }
         },
 
-        fileSrc:{
+        fileSrc: {
             type: Sequelize.TEXT,
             allowNull: true,
         },
@@ -41,23 +41,22 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         },
 
         metaDescription: {
-             type: DataTypes.TEXT,
-             allowNull: true,
+            type: DataTypes.TEXT,
+            allowNull: true,
         },
 
-        metaKeywords:{
+        metaKeywords: {
             type: DataTypes.TEXT,
             allowNull: true
         },
 
-    status: {
-        type:   Sequelize.ENUM('0', '1'),
-        defaultValue: '0',
-        comment: "0-pending,1-active"
-      }
-     
+        status: {
+            type: Sequelize.ENUM('0', '1'),
+            defaultValue: '0',
+            comment: "0-pending,1-active"
+        }
+
     });
-  
+
     return CmsPage;
-  };
-  
+};

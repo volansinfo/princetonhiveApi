@@ -5,6 +5,7 @@ const Role = db.role;
 const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
+const sendMail = require("./sendmail.controller")
 
 
 
@@ -176,7 +177,7 @@ exports.forgotPassword = async (req, res) => {
     })
 
     if (!user) {
-      return res.status(404).send({ success: false, message: "Email does not exist!" });
+      return res.status(404).send({ success: false, message: "User does not exist!" });
     }
 
     let generatedPwd = await generator.generate({
@@ -193,7 +194,9 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    res.status(200).send({ success: false, message: `Your new password is: ${generatedPwd}` })
+    sendMail(userEmail, generatedPwd)
+
+    res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 
   } catch (e) {
     res.status(500).send({ success: false, message: error.message })

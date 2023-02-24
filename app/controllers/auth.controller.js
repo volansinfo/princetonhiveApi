@@ -18,46 +18,44 @@ exports.signup = async (req, res) => {
   // Save User to Database
   try {
 
-    const uuid = generateUUID()
+    const uuid = await generateUUID(req)
 
-    console.log(uuid)
+    // res.status(200).send({ message: "User registered successfully!" });
 
-    res.status(200).send({ message: "User registered successfully!" });
+    const user = await User.create({
+      fname: req.body.fname,
+      lname: req.body.lname,
+      password: bcrypt.hashSync(req.body.password, 8),
+      actualPassword: req.body.password,
+      email: req.body.email,
+      mnumber: req.body.mnumber,
+      address: req.body.address,
+      city: req.body.city,
+      state: req.body.state,
+      pincode: req.body.pincode,
+      country: req.body.country,
+      status: req.body.status,
+      uuid:uuid
+      // username: req.body.username,
+      // email: req.body.email,
+      // password: bcrypt.hashSync(req.body.password, 8),
+    });
 
-    // const user = await User.create({
-
-    //   fname: req.body.fname,
-    //   lname: req.body.lname,
-    //   password: bcrypt.hashSync(req.body.password, 8),
-    //   actualPassword: req.body.password,
-    //   email: req.body.email,
-    //   mnumber: req.body.mnumber,
-    //   address: req.body.address,
-    //   city: req.body.city,
-    //   state: req.body.state,
-    //   pincode: req.body.pincode,
-    //   country: req.body.country,
-    //   status: req.body.status
-    //   // username: req.body.username,
-    //   // email: req.body.email,
-    //   // password: bcrypt.hashSync(req.body.password, 8),
-    // });
-
-    // if (req.body.roles) {
-    //   const roles = await Role.findAll({
-    //     where: {
-    //       name: {
-    //         [Op.or]: req.body.roles,
-    //       },
-    //     },
-    //   });
-    //   const result = user.setRoles(roles);
-    //   if (result) res.status(200).send({ message: "User registered successfully!" });
-    // } else {
-    //   // user has role = 1
-    //   const result = user.setRoles([1]);
-    //   if (result) res.status(200).send({ message: "User registered successfully!" });
-    // }
+    if (req.body.roles) {
+      const roles = await Role.findAll({
+        where: {
+          name: {
+            [Op.or]: req.body.roles,
+          },
+        },
+      });
+      const result = user.setRoles(roles);
+      if (result) res.status(200).send({ message: "User registered successfully!" });
+    } else {
+      // user has role = 1
+      const result = user.setRoles([1]);
+      if (result) res.status(200).send({ message: "User registered successfully!" });
+    }
 
   } catch (error) {
     res.status(500).send({ message: error.message });

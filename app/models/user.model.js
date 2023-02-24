@@ -21,18 +21,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             allowNull: true
         },
 
-        username: {
+        uuid: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: {
-                msg: 'This username is already taken.'
-            },
-            validate: {
-                len: {
-                    args: [5, 50],
-                    msg: 'Your username may be 5 to 50 characters only.'
-                }
-            }
+            
         },
 
         password: {

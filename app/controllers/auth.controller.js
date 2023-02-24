@@ -7,54 +7,59 @@ const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
 const sendMail = require("./sendmail.controller")
+const generateUUID = require("./uuid.controller")
 
 
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { where } = require("sequelize");
 
 exports.signup = async (req, res) => {
   // Save User to Database
   try {
-    const user = await User.create({
 
-      fname: req.body.fname,
-      lname: req.body.lname,
-      username: req.body.username,
-      password: bcrypt.hashSync(req.body.password, 8),
-      actualPassword: req.body.password,
-      email: req.body.email,
-      mnumber: req.body.mnumber,
-      address: req.body.address,
-      city: req.body.city,
-      state: req.body.state,
-      pincode: req.body.pincode,
-      country: req.body.country,
-      status: req.body.status
-      // username: req.body.username,
-      // email: req.body.email,
-      // password: bcrypt.hashSync(req.body.password, 8),
-    });
+    const uuid = generateUUID()
 
-    if (req.body.roles) {
-      const roles = await Role.findAll({
-        where: {
-          name: {
-            [Op.or]: req.body.roles,
-          },
-        },
-      });
-      const result = user.setRoles(roles);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
-    } else {
-      // user has role = 1
-      const result = user.setRoles([1]);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
-    }
+    console.log(uuid)
+
+    res.status(200).send({ message: "User registered successfully!" });
+
+    // const user = await User.create({
+
+    //   fname: req.body.fname,
+    //   lname: req.body.lname,
+    //   password: bcrypt.hashSync(req.body.password, 8),
+    //   actualPassword: req.body.password,
+    //   email: req.body.email,
+    //   mnumber: req.body.mnumber,
+    //   address: req.body.address,
+    //   city: req.body.city,
+    //   state: req.body.state,
+    //   pincode: req.body.pincode,
+    //   country: req.body.country,
+    //   status: req.body.status
+    //   // username: req.body.username,
+    //   // email: req.body.email,
+    //   // password: bcrypt.hashSync(req.body.password, 8),
+    // });
+
+    // if (req.body.roles) {
+    //   const roles = await Role.findAll({
+    //     where: {
+    //       name: {
+    //         [Op.or]: req.body.roles,
+    //       },
+    //     },
+    //   });
+    //   const result = user.setRoles(roles);
+    //   if (result) res.status(200).send({ message: "User registered successfully!" });
+    // } else {
+    //   // user has role = 1
+    //   const result = user.setRoles([1]);
+    //   if (result) res.status(200).send({ message: "User registered successfully!" });
+    // }
 
   } catch (error) {
-
     res.status(500).send({ message: error.message });
   }
 };
@@ -63,7 +68,7 @@ exports.signin = async (req, res) => {
   try {
     const user = await User.findOne({
       where: {
-        username: req.body.username,
+        email: req.body.email,
       },
     });
     if (!user) {
@@ -105,7 +110,7 @@ exports.signin = async (req, res) => {
 
     return res.status(200).send({
       id: user.id,
-      username: user.username,
+      uuid: user.uuid,
       email: user.email,
       roles: authorities,
       accessToken: tokenKey,

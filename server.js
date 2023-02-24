@@ -37,7 +37,7 @@ require('./app/routes/menu.routes')(app);
 require('./app/routes/role.routes')(app);
 require('./app/routes/globalConfig.routes')(app);
 require('./app/routes/widget.routes')(app);
-
+require("./app/routes/stateCountry.routes")(app);
 app.listen(port,()=>{
         console.log(`Connection is setup at ${port}`);
 });

@@ -32,6 +32,6 @@ module.exports = function (app) {
     ],
     controller.changePassword);
 
-    app.post("/app/user/forgotPassword",controller.forgotPassword);
+    app.post("/api/user/forgotPassword",controller.forgotPassword);
 
 };

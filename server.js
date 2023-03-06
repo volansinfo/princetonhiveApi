@@ -39,7 +39,10 @@ require('./app/routes/globalConfig.routes')(app);
 require('./app/routes/widget.routes')(app);
 require("./app/routes/stateCountry.routes")(app);
 require("./app/routes/admin.routes")(app);
-
+require("./app/routes/student.routes")(app)
+require("./app/routes/teacher.routes")(app)
+require("./app/routes/university.routes")(app)
+require("./app/routes/support.routes")(app)
 app.listen(port, () => {
         console.log(`Connection is setup at ${port}`);
 });

@@ -76,13 +76,6 @@ exports.userdelete = async (req, res) => {
 
       if (num == 1) {
 
-        const userRole = Role.destroy({
-          where: {
-            userId: userId
-          }
-
-        });
-
         res.status(200).send({ message: "User was deleted successfully." });
       } else {
         res.status(500).send({ message: "Cannot delete User. Maybe User was not found!" });

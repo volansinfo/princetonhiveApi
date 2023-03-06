@@ -65,13 +65,6 @@ exports.allAccess = (req, res) => {
        }).then(num=>{
 
         if(num == 1){
-
-          const userRole = Role.destroy({
-            where: {
-              userId: userId
-            }
-          
-           });
            
           res.status(200).send({message:"User was deleted successfully."});
         }else{

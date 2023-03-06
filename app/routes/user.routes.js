@@ -1,8 +1,8 @@
 const { authJwt } = require("../middleware");
 const controller = require("../controllers/user.controller");
 
-module.exports = function(app) {
-  app.use(function(req, res, next) {
+module.exports = function (app) {
+  app.use(function (req, res, next) {
     res.header(
       "Access-Control-Allow-Headers",
       "x-access-token, Origin, Content-Type, Accept"
@@ -10,7 +10,7 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/vol/all", controller.allAccess);
+  app.get("/api/vol/all", [authJwt.verifyToken], controller.allAccess);
 
   app.get(
     "/api/vol/user",
@@ -34,18 +34,18 @@ module.exports = function(app) {
   app.delete("/api/vol/user/:id",
     [authJwt.verifyToken, authJwt.isSupportOrAdmin],
     controller.userdelete
-   );
+  );
 
-   // status a User with id
+  // status a User with id
   app.patch("/api/vol/user/:id",
-  [authJwt.verifyToken, authJwt.isSupportOrAdmin],
-  controller.userstatus
- );
+    [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+    controller.userstatus
+  );
 
- // Update a User data using id
- app.post("/api/vol/user/:id",
- [authJwt.verifyToken, authJwt.isSupportOrAdmin],
- controller.updateUserData
-);
+  // Update a User data using id
+  app.post("/api/vol/user/:id",
+    [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+    controller.updateUserData
+  );
 
 };

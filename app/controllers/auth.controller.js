@@ -25,8 +25,8 @@ exports.signup = async (req, res) => {
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
-      password: bcrypt.hashSync(req.body.password, 8),
-      actualPassword: req.body.password,
+      // password: bcrypt.hashSync(req.body.password, 8),
+      // actualPassword: req.body.password,
       email: req.body.email,
       mnumber: req.body.mnumber,
       address: req.body.address,
@@ -35,11 +35,30 @@ exports.signup = async (req, res) => {
       pincode: req.body.pincode,
       country: req.body.country,
       status: req.body.status,
-      uuid:uuid
+      uuid: uuid
       // username: req.body.username,
       // email: req.body.email,
       // password: bcrypt.hashSync(req.body.password, 8),
     });
+    const userEmail = req.body.email
+    const hostType = req.body.hostType
+    let generatedPwd = await generator.generate({
+      length: 6,
+      numbers: true,
+    })
+
+    const smtpServer = await globalConfig.findOne({
+      where: {
+        hostType: hostType
+      }
+    })
+
+    if (!smtpServer) {
+      return res.status(404).send({ success: false, message: "SMTP server not configured!" })
+    }
+
+
+    sendMail(userEmail, generatedPwd, smtpServer, 'signup')
 
     if (req.body.roles) {
       const roles = await Role.findAll({
@@ -50,12 +69,18 @@ exports.signup = async (req, res) => {
         },
       });
       const result = user.setRoles(roles);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
+      if (result)
+        res.status(200).send({ message: `User registered successfully & Your password has been sent to mail : ${userEmail}` });
     } else {
       // user has role = 1
       const result = user.setRoles([1]);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
+      if (result)
+        res.status(200).send({ success: true, message: `User registered successfully & Your password has been sent to mail : ${userEmail}` })
+      // res.status(200).send({ message: "User registered successfully!" });
     }
+
+
+
 
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -191,14 +216,14 @@ exports.forgotPassword = async (req, res) => {
     })
 
     const smtpServer = await globalConfig.findOne({
-      where:{
-          hostType:hostType
+      where: {
+        hostType: hostType
       }
-  })
-  
-  if(!smtpServer){
-    return res.status(404).send({success:false,message:"SMTP server not configured!"})
-  }
+    })
+
+    if (!smtpServer) {
+      return res.status(404).send({ success: false, message: "SMTP server not configured!" })
+    }
 
     await User.update({
       password: bcrypt.hashSync(generatedPwd, 8),
@@ -209,7 +234,7 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    sendMail(userEmail, generatedPwd,smtpServer)
+    sendMail(userEmail, generatedPwd, smtpServer, 'signin')
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 

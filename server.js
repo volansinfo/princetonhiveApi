@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/vol/img",express.static('uploads'));
+app.use("/vol/img", express.static('uploads'));
 global.__basedir = __dirname;
 
 // app.use(
@@ -38,6 +38,8 @@ require('./app/routes/role.routes')(app);
 require('./app/routes/globalConfig.routes')(app);
 require('./app/routes/widget.routes')(app);
 require("./app/routes/stateCountry.routes")(app);
-app.listen(port,()=>{
+require("./app/routes/admin.routes")(app);
+
+app.listen(port, () => {
         console.log(`Connection is setup at ${port}`);
 });

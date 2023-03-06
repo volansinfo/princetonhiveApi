@@ -73,9 +73,9 @@ exports.allAccess = (req, res) => {
           
            });
            
-          res.status(200).send({message:"User was deleted successfully!"});
+          res.status(200).send({message:"User was deleted successfully."});
         }else{
-          res.status(500).send({message:"Cannot delete User. Maybe User was not found!!"});
+          res.status(500).send({message:"Cannot delete User. Maybe User was not found!"});
         }
 
        });
@@ -98,14 +98,14 @@ exports.allAccess = (req, res) => {
           { where: {id: userId } }
         )
 
-        res.status(200).send({message:"User has bee active!"});
+        res.status(200).send({message:"User has been active."});
       }else{
 
         const result = await User.update(
           { status:userStatus},
           { where: {id: userId } }
         )
-        res.status(200).send({message:"User has bee deactivate!"});
+        res.status(200).send({message:"User has been deactivate."});
       }
      
       
@@ -118,7 +118,6 @@ exports.allAccess = (req, res) => {
   exports.updateUserData = async(req,res)=>{
     try{
       const userId = req.params.id;
-      console.log(req.body);
       const result = await User.update({ 
         fname:req.body.fname,
         lname:req.body.lname,
@@ -131,11 +130,15 @@ exports.allAccess = (req, res) => {
         state:req.body.state,
         pincode:req.body.pincode,
         country:req.body.country,
-        status:req.body.state,
+        status:req.body.status,
       },
-        { where: {id: userId } }
+        { where: 
+          {
+            id: userId
+           } 
+          }
       );
-      res.status(200).send({message:"User data updated successfully!"});
+      res.status(200).send({message:"User data updated successfully."});
     } catch (error){
       return res.status(500).send({ message: error.message });
     }

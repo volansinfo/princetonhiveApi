@@ -142,14 +142,14 @@ exports.pagestatus = async(req, res)=>{
           { where: {id: pageId } }
         )
 
-        res.status(200).send({message:"Page has bee active!"});
+        res.status(200).send({message:"Page has been active!"});
       }else{
 
         const result = await Page.update(
           { status:pageStatus},
           { where: {id: pageId } }
         )
-        res.status(200).send({message:"Page has bee deactivate!"});
+        res.status(200).send({message:"Page has been deactivate!"});
       }
      
     } catch (error){

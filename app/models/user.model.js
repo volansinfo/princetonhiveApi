@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             validate: {
                 len: {
                     args: [3, 50],
-                    msg: 'Your full name may be 3 to 50 characters only.'
+                    msg: 'Please enter first name.'
                 }
             }
         },

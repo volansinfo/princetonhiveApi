@@ -13,6 +13,7 @@ const generateUUID = require("./uuid.controller")
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { where } = require("sequelize");
 
 exports.signup = async (req, res) => {
   // Save User to Database
@@ -35,7 +36,7 @@ exports.signup = async (req, res) => {
       pincode: req.body.pincode,
       country: req.body.country,
       status: req.body.status,
-      uuid:uuid
+      uuid: uuid
       // username: req.body.username,
       // email: req.body.email,
       // password: bcrypt.hashSync(req.body.password, 8),
@@ -106,6 +107,14 @@ exports.signin = async (req, res) => {
     //let tokenKey =  req.session.token = token;
     let tokenKey = token;
 
+    await User.update({
+      tokenKey: token,
+    }, {
+      where: {
+        id: user.id
+      }
+    })
+
     return res.status(200).send({
       id: user.id,
       uuid: user.uuid,
@@ -120,12 +129,30 @@ exports.signin = async (req, res) => {
 
 exports.signout = async (req, res) => {
   try {
-    req.session = null;
+    let token = req.headers["x-access-token"];
+    let newToken ="Sign out"
+
+    const tokenData = jwt.decode(token);
+
+    const user = await User.findOne({
+      where: {
+        id: tokenData.id,
+      },
+    });
+
+    await User.update({
+      tokenKey: newToken,
+    }, {
+      where: {
+        id: user.id
+      }
+    })
     return res.status(200).send({
-      message: "You've been signed out!"
+      message: "Sign out successfully."
     });
   } catch (err) {
-    this.next(err);
+    return res.status(500).send({ message: error.message });
+  }
   }
 };
 
@@ -191,14 +218,14 @@ exports.forgotPassword = async (req, res) => {
     })
 
     const smtpServer = await globalConfig.findOne({
-      where:{
-          hostType:hostType
+      where: {
+        hostType: hostType
       }
-  })
-  
-  if(!smtpServer){
-    return res.status(404).send({success:false,message:"SMTP server not configured!"})
-  }
+    })
+
+    if (!smtpServer) {
+      return res.status(404).send({ success: false, message: "SMTP server not configured!" })
+    }
 
     await User.update({
       password: bcrypt.hashSync(generatedPwd, 8),
@@ -209,7 +236,7 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    sendMail(userEmail, generatedPwd,smtpServer)
+    sendMail(userEmail, generatedPwd, smtpServer)
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 

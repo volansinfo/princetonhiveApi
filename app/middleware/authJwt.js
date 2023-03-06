@@ -3,25 +3,40 @@ const config = require("../config/auth.config.js");
 const db = require("../models");
 const User = db.user;
 
-verifyToken = (req, res, next) => {
- // let token = req.session.token;
- let token = req.headers["x-access-token"];
+verifyToken = async (req, res, next) => {
+  try {
+    let token = req.headers["x-access-token"];
 
-  if (!token) {
-    return res.status(403).send({
-      message: "No token provided!",
-    });
-  }
-
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Unauthorized!",
+    if (!token) {
+      return res.status(403).send({
+        message: "No token provided!",
       });
     }
-    req.userId = decoded.id;
-    next();
-  });
+
+    const tokenData = jwt.decode(token);
+
+    const user = await User.findOne({
+      where: {
+        id: tokenData.id
+      }
+    })
+
+    if (user.tokenKey == token) {
+      jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({
+            message: "Unauthorized!",
+          });
+        }
+        req.userId = decoded.id;
+        next();
+      });
+    } else {
+      return res.status(401).send({ success: false, message: "User token not matched!" });
+    }
+  } catch (e) {
+    return res.status(500).send({ success: false, message: e.message });
+  }
 };
 
 isAdmin = async (req, res, next) => {

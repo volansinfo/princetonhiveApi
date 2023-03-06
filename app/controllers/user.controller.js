@@ -14,11 +14,12 @@ exports.allAccess = (req, res) => {
   exports.userBoard = async (req, res) => {
 
     try{
-
       //Get token key
-      const token = req.session.token;
+      const token = req.headers["x-access-token"]
       //Decode the token data
       const tokenData = jwt.decode(token);
+
+      
 
       const userId = tokenData.id;
 

@@ -261,7 +261,7 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    sendMail(userEmail, generatedPwd, smtpServer, 'signin')
+    sendMail(userEmail, generatedPwd, smtpServer, 'forgotPassword')
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 

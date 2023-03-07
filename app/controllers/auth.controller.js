@@ -46,13 +46,10 @@ exports.signup = async (req, res) => {
       // password: bcrypt.hashSync(req.body.password, 8),
     });
     const userEmail = req.body.email
-    const hostType = req.body.hostType
+    // const hostType = req.body.hostType
 
 
     const smtpServer = await globalConfig.findOne({
-      where: {
-        hostType: hostType
-      }
     })
 
     if (!smtpServer) {
@@ -118,7 +115,7 @@ exports.signin = async (req, res) => {
     );
     if (passwordIsValid == "") {
       return res.status(401).send({
-        message: "Please enter password!",
+        message: "Please enter valid password!",
       });
     }
     else if (!passwordIsValid) {

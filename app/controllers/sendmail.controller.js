@@ -16,6 +16,9 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
     // let info = await transporter.sendMail({
     //     from: '"Hive Step  "<support@princetonhive.com>',
     //     to: userEmail,
+
+    /**
+     * connect with the smpt
     //     subject: "Hive Step new password",
     //     text: "Hello from the Hive Step side.",
     //     html: `Your password has been changed and your new password is:<b><h1> ${generatedPwd}</h1></b>`
@@ -25,17 +28,17 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
      * connect with the smpt
     */
     let transporter = await nodemailer.createTransport({
-        host: smtpServer.hostName,
-        port: smtpServer.portNumber,
+        host: "smtp.ethereal.email",
+        port: 587,
         auth: {
-            user: smtpServer.authUser,
-            pass: smtpServer.authPassword
+            user: "wellington.cronin@ethereal.email",
+            pass: "C3MYg54KTtmXgfx3Mg"
         }
     })
     let info
     if (type != 'signup') {
         info = await transporter.sendMail({
-            from: `"Hive Step  "<${smtpServer.authUser}>`,
+            from: `"Hive Step  "<wellington.cronin@ethereal.email>`,
             to: userEmail,
             subject: "Hive Step new password",
             text: "Hello from the Hive Step side.",
@@ -44,7 +47,7 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
     }
     else {
         info = await transporter.sendMail({
-            from: `"Hive Step  "<${smtpServer.authUser}>`,
+            from: `"Hive Step  "<wellington.cronin@ethereal.email>`,
             to: userEmail,
             subject: "Hive Step new password",
             text: "Hello from the Hive Step side.",

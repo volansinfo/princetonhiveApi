@@ -6,6 +6,7 @@ const globalConfig = db.globalConfig
 const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
+
 const sendMail = require("./sendmail.controller")
 const generateUUID = require("./uuid.controller")
 
@@ -22,12 +23,15 @@ exports.signup = async (req, res) => {
     const uuid = await generateUUID(req)
 
     // res.status(200).send({ message: "User registered successfully!" });
-
+    let generatedPwd = await generator.generate({
+      length: 6,
+      numbers: true,
+    })
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
-      // password: bcrypt.hashSync(req.body.password, 8),
-      // actualPassword: req.body.password,
+      password: bcrypt.hashSync(generatedPwd, 8),
+      actualPassword: generatedPwd,
       email: req.body.email,
       mnumber: req.body.mnumber,
       address: req.body.address,
@@ -43,10 +47,7 @@ exports.signup = async (req, res) => {
     });
     const userEmail = req.body.email
     const hostType = req.body.hostType
-    let generatedPwd = await generator.generate({
-      length: 6,
-      numbers: true,
-    })
+
 
     const smtpServer = await globalConfig.findOne({
       where: {
@@ -95,7 +96,10 @@ exports.signin = async (req, res) => {
         email: req.body.email,
       },
     });
-    if (!user) {
+    if (user == null) {
+      return res.status(404).send({ message: "Please enter email address!" });
+    }
+    else if (!user) {
       return res.status(404).send({ message: "User Not found!" });
     }
 
@@ -112,8 +116,12 @@ exports.signin = async (req, res) => {
       req.body.password,
       user.password
     );
-
-    if (!passwordIsValid) {
+    if (passwordIsValid == "") {
+      return res.status(401).send({
+        message: "Please enter password!",
+      });
+    }
+    else if (!passwordIsValid) {
       return res.status(401).send({
         message: "Invalid Password!",
       });

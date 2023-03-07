@@ -81,7 +81,7 @@ passwordValidation = async (req, res, next) => {
 
 validatefname = [
   check('fname').trim().not().isEmpty().withMessage('first name is required.')
-    .isLength({ min: 3, max: 50 }).withMessage('Please enter first name!')
+    .isLength({ min: 3, max: 50 }).withMessage('first name must be 3 to 50 characters long!')
 ]
 
 fnameValidation = async (req, res, next) => {
@@ -120,7 +120,7 @@ mnumberValidation = async (req, res, next) => {
 
 validatePincode = [
   check('pincode').trim().not().isEmpty().withMessage('Please enter pincode!')
-    .isLength({ min: 5, max: 10 }).withMessage('Please enter valid pincode!')
+    .isLength({ min: 5, max: 10 }).withMessage('pincode must be 5 to 10 characters long!')
 ]
 
 pincodeValidation = async (req, res, next) => {

@@ -4,46 +4,46 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
-          },
-          moduleName:{
+        },
+        moduleName: {
             type: Sequelize.TEXT,
             allowNull: false,
             validate: {
                 len: {
-                    args: [3, 50],
-                    msg: 'Your module name may be 3 to 50 characters only.'
+                    args: [1, 50],
+                    msg: 'Please enter module name!'
                 }
             }
         },
 
-        displayName:{
+        displayName: {
             type: Sequelize.STRING,
             allowNull: false,
             validate: {
                 len: {
-                    args: [3, 50],
-                    msg: 'Your display name may be 3 to 50 characters only.'
+                    args: [1, 50],
+                    msg: 'Please enter display name!'
                 }
             }
         },
 
         isParent: {
-            type:   Sequelize.ENUM('0', '1'),
+            type: Sequelize.ENUM('0', '1'),
             defaultValue: '0',
             comment: "0-no,1-yes"
         },
 
         parentId: {
-             type: Sequelize.INTEGER,
-             allowNull: true
+            type: Sequelize.INTEGER,
+            allowNull: true
         },
 
-        iconTag:{
+        iconTag: {
             type: Sequelize.TEXT,
             allowNull: true,
         },
 
-        iconImage:{
+        iconImage: {
             type: Sequelize.TEXT,
             allowNull: true
         },
@@ -53,20 +53,19 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             allowNull: false,
             validate: {
                 len: {
-                    args: [3, 50],
-                    msg: 'Your slug may be 3 to 50 characters only.'
+                    args: [1, 50],
+                    msg: 'Please enter slug!'
                 }
             }
         },
 
-    status: {
-        type:   Sequelize.ENUM('0', '1'),
-        defaultValue: '0',
-        comment: "0-pending,1-active"
-      }
-     
+        status: {
+            type: Sequelize.ENUM('0', '1'),
+            defaultValue: '0',
+            comment: "0-pending,1-active"
+        }
+
     });
-  
+
     return Menu;
-  };
-  
+};

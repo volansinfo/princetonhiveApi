@@ -4,48 +4,47 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
-          },
-        title:{
+        },
+        title: {
             type: Sequelize.STRING,
             allowNull: false,
             validate: {
                 len: {
-                    args: [3, 500],
-                    msg: 'Your title may be 3 to 50 characters only.'
+                    args: [1, 500],
+                    msg: 'Please enter the title!'
                 }
             }
         },
 
-        path:{
+        path: {
             type: Sequelize.TEXT,
             allowNull: true
         },
 
-        fileSrc:{
+        fileSrc: {
             type: Sequelize.TEXT,
             allowNull: false,
             validate: {
                 notEmpty: false,
                 len: {
-                  args: [2, 2000],
-                  msg: 'The type of the uploaded file should be an image!'
+                    args: [2, 2000],
+                    msg: 'The type of the uploaded file should be an image!'
                 }
             }
         },
 
-        urlLink:{
+        urlLink: {
             type: Sequelize.TEXT,
             allowNull: true
         },
 
-    status: {
-        type:   Sequelize.ENUM('0', '1'),
-        defaultValue: '0',
-        comment: "0-pending,1-active"
-      }
-     
+        status: {
+            type: Sequelize.ENUM('0', '1'),
+            defaultValue: '0',
+            comment: "0-pending,1-active"
+        }
+
     });
-  
+
     return Slider;
-  };
-  
+};

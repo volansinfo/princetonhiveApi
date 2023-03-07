@@ -15,7 +15,15 @@ module.exports = function (app) {
     "/api/user/signup",
     [
       verifySignUp.checkDuplicateUsernameOrEmail,
-      verifySignUp.checkRolesExisted
+      verifySignUp.checkRolesExisted,
+      verifySignUp.validatefname,
+      verifySignUp.fnameValidation,
+      verifySignUp.validateEmail,
+      verifySignUp.emailValidation,
+      verifySignUp.validateMnumber,
+      verifySignUp.mnumberValidation,
+      verifySignUp.validatePincode,
+      verifySignUp.pincodeValidation
     ],
     controller.signup
   );
@@ -32,6 +40,6 @@ module.exports = function (app) {
     ],
     controller.changePassword);
 
-    app.post("/api/user/forgotPassword",controller.forgotPassword);
+  app.post("/api/user/forgotPassword", controller.forgotPassword);
 
 };

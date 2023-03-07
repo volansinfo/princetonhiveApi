@@ -4,19 +4,19 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
-          },
-        fname:{
+        },
+        fname: {
             type: Sequelize.STRING,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [3, 50],
-                    msg: 'Your full name may be 3 to 50 characters only.'
-                }
-            }
+            // validate: {
+            //     len: {
+            //         args: [3, 50],
+            //         msg: 'Please enter first name.'
+            //     }
+            // }
         },
 
-        lname:{
+        lname: {
             type: Sequelize.STRING,
             allowNull: true
         },
@@ -24,13 +24,14 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         uuid: {
             type: DataTypes.STRING,
             allowNull: false,
-            
+
         },
 
         password: {
-             type: Sequelize.STRING,
-             allowNull: false,
-             validate: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            require: false,
+            validate: {
                 len: {
                     args: [5, 72],
                     msg: 'Your password may be 5 to 72 characters only.'
@@ -38,12 +39,14 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             }
         },
 
-        actualPassword:{
+        actualPassword: {
             type: Sequelize.STRING,
-            allowNull: true
+            allowNull: true,
+            require: false
+
         },
 
-        tokenKey:{
+        tokenKey: {
             type: Sequelize.TEXT,
             allowNull: true
         },
@@ -54,58 +57,57 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             unique: {
                 msg: 'This email is already taken.'
             },
+            // validate: {
+            //     isEmail: {
+            //         msg: 'Email address must be valid.'
+            //     }
+            // }
+        },
+
+        mnumber: {
+            type: Sequelize.STRING,
+            allowNull: false,
             validate: {
-                isEmail: {
-                    msg: 'Email address must be valid.'
-                }
+                notNull: { args: true, msg: "You must enter Phone Number" },
+                len: { args: [10, 10], msg: 'Phone Number is invalid' },
+                isInt: { args: true, msg: "You must enter Phone Number" },
             }
         },
 
-      mnumber:{
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-            notNull: { args: true, msg: "You must enter Phone Number" },
-            len: { args: [10,10], msg: 'Phone Number is invalid' },
-            isInt: { args: true, msg: "You must enter Phone Number" },
-          }
-    },
+        address: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
 
-    address:{
-        type: Sequelize.TEXT,
-        allowNull: true
-    },
-    
-    city:{
-        type: Sequelize.STRING,
-        allowNull: true
-    },
+        city: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
 
-    state:{
-        type: Sequelize.STRING,
-        allowNull: true
-    },
+        state: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
 
-    pincode:{
-        type: Sequelize.STRING,
-        validate: {
-            isNumeric: true
-          }
-    },
+        pincode: {
+            type: Sequelize.STRING,
+            // validate: {
+            //     isNumeric: true
+            // }
+        },
 
-    country:{
-        type: Sequelize.STRING,
-        allowNull: true
-    },
+        country: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
 
-    status: {
-        type:   Sequelize.ENUM('0', '1'),
-        defaultValue: '0',
-        comment: "0-pending,1-active"
-      }
-     
+        status: {
+            type: Sequelize.ENUM('0', '1'),
+            defaultValue: '0',
+            comment: "0-pending,1-active"
+        }
+
     });
-  
+
     return User;
-  };
-  
+};

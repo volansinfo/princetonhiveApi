@@ -6,6 +6,7 @@ const globalConfig = db.globalConfig
 const generator = require('generate-password')
 const Op = db.Sequelize.Op;
 const { verifySignUp } = require("../middleware");
+
 const sendMail = require("./sendmail.controller")
 const generateUUID = require("./uuid.controller")
 
@@ -13,6 +14,7 @@ const generateUUID = require("./uuid.controller")
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { where } = require("sequelize");
 
 exports.signup = async (req, res) => {
   // Save User to Database
@@ -21,12 +23,15 @@ exports.signup = async (req, res) => {
     const uuid = await generateUUID(req)
 
     // res.status(200).send({ message: "User registered successfully!" });
-
+    let generatedPwd = await generator.generate({
+      length: 6,
+      numbers: true,
+    })
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
-      password: bcrypt.hashSync(req.body.password, 8),
-      actualPassword: req.body.password,
+      password: bcrypt.hashSync(generatedPwd, 8),
+      actualPassword: generatedPwd,
       email: req.body.email,
       mnumber: req.body.mnumber,
       address: req.body.address,
@@ -35,11 +40,24 @@ exports.signup = async (req, res) => {
       pincode: req.body.pincode,
       country: req.body.country,
       status: req.body.status,
-      uuid:uuid
+      uuid: uuid
       // username: req.body.username,
       // email: req.body.email,
       // password: bcrypt.hashSync(req.body.password, 8),
     });
+    const userEmail = req.body.email
+    // const hostType = req.body.hostType
+
+
+    const smtpServer = await globalConfig.findOne({
+    })
+
+    if (!smtpServer) {
+      return res.status(404).send({ success: false, message: "SMTP server not configured!" })
+    }
+
+
+    sendMail(userEmail, generatedPwd, smtpServer, 'signup')
 
     if (req.body.roles) {
       const roles = await Role.findAll({
@@ -50,12 +68,18 @@ exports.signup = async (req, res) => {
         },
       });
       const result = user.setRoles(roles);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
+      if (result)
+        res.status(200).send({ message: `User registered successfully & Your password has been sent to mail : ${userEmail}` });
     } else {
       // user has role = 1
       const result = user.setRoles([1]);
-      if (result) res.status(200).send({ message: "User registered successfully!" });
+      if (result)
+        res.status(200).send({ success: true, message: `User registered successfully & Your password has been sent to mail : ${userEmail}` })
+      // res.status(200).send({ message: "User registered successfully!" });
     }
+
+
+
 
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -69,7 +93,10 @@ exports.signin = async (req, res) => {
         email: req.body.email,
       },
     });
-    if (!user) {
+    if (user == null) {
+      return res.status(404).send({ message: "Please enter email address!" });
+    }
+    else if (!user) {
       return res.status(404).send({ message: "User Not found!" });
     }
 
@@ -86,8 +113,12 @@ exports.signin = async (req, res) => {
       req.body.password,
       user.password
     );
-
-    if (!passwordIsValid) {
+    if (passwordIsValid == "") {
+      return res.status(401).send({
+        message: "Please enter valid password!",
+      });
+    }
+    else if (!passwordIsValid) {
       return res.status(401).send({
         message: "Invalid Password!",
       });
@@ -106,6 +137,14 @@ exports.signin = async (req, res) => {
     //let tokenKey =  req.session.token = token;
     let tokenKey = token;
 
+    await User.update({
+      tokenKey: token,
+    }, {
+      where: {
+        id: user.id
+      }
+    })
+
     return res.status(200).send({
       id: user.id,
       uuid: user.uuid,
@@ -120,14 +159,32 @@ exports.signin = async (req, res) => {
 
 exports.signout = async (req, res) => {
   try {
-    req.session = null;
+    let token = req.headers["x-access-token"];
+    let newToken = "Sign out"
+
+    const tokenData = jwt.decode(token);
+
+    const user = await User.findOne({
+      where: {
+        id: tokenData.id,
+      },
+    });
+
+    await User.update({
+      tokenKey: newToken,
+    }, {
+      where: {
+        id: user.id
+      }
+    })
     return res.status(200).send({
-      message: "You've been signed out!"
+      message: "Sign out successfully."
     });
   } catch (err) {
-    this.next(err);
+    return res.status(500).send({ message: error.message });
   }
-};
+}
+
 
 exports.changePassword = async (req, res) => {
   try {
@@ -191,14 +248,14 @@ exports.forgotPassword = async (req, res) => {
     })
 
     const smtpServer = await globalConfig.findOne({
-      where:{
-          hostType:hostType
+      where: {
+        hostType: hostType
       }
-  })
-  
-  if(!smtpServer){
-    return res.status(404).send({success:false,message:"SMTP server not configured!"})
-  }
+    })
+
+    if (!smtpServer) {
+      return res.status(404).send({ success: false, message: "SMTP server not configured!" })
+    }
 
     await User.update({
       password: bcrypt.hashSync(generatedPwd, 8),
@@ -209,7 +266,7 @@ exports.forgotPassword = async (req, res) => {
       }
     })
 
-    sendMail(userEmail, generatedPwd,smtpServer)
+    sendMail(userEmail, generatedPwd, smtpServer, 'forgotPassword')
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 

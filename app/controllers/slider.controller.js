@@ -102,7 +102,7 @@ exports.updateSlider = async(req,res)=>{
                 const removeImage = await fs.unlinkSync(__basedir+"/uploads/slider/"+slider.fileSrc);
              }
 
-       return res.status(200).send({ message: 'Slider data updated successfully!' });
+       return res.status(200).send({ message: 'Slider data updated successfully' });
     }catch(error){
     return res.status(500).send({ message: error.message });
 }
@@ -119,14 +119,14 @@ exports.sliderstatus = async(req, res)=>{
           { where: {id: SliderId } }
         )
 
-        res.status(200).send({message:"Slider has bee active!"});
+        res.status(200).send({message:"Slider has been active"});
       }else{
 
         const result = await Slider.update(
           { status:sliderStatus},
           { where: {id: SliderId } }
         )
-        res.status(200).send({message:"Slider has bee deactivate!"});
+        res.status(200).send({message:"Slider has been deactivate"});
       }
      
       

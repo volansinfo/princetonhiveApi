@@ -77,7 +77,7 @@ exports.getAllMenuList = async (req,res) => {
     });
     
   
-     res.status(200).send({message:"Menu was creted successfully!"});
+     res.status(200).send({message:"Menu was creted successfully"});
     
     } catch (err) {
       return res.status(500).send({ message: err.message });
@@ -139,7 +139,7 @@ exports.getAllMenuList = async (req,res) => {
       },
         { where: {id: menuId } }
       );
-      res.status(200).send({message:"Menu data updated successfully!"});
+      res.status(200).send({message:"Menu data updated successfully"});
      
     } catch (err) {
       return res.status(500).send({ message: err.message });
@@ -182,7 +182,7 @@ exports.getAllMenuList = async (req,res) => {
      }
 
 
-      res.status(200).send({message:"Menu was delete successfully!"});
+      res.status(200).send({message:"Menu was delete successfully"});
       
      
     } catch (err) {
@@ -202,14 +202,14 @@ exports.getAllMenuList = async (req,res) => {
           { where: {id: menuId } }
         )
 
-        res.status(200).send({message:"Menu has bee active!"});
+        res.status(200).send({message:"Menu has been active"});
       }else{
 
         const result = await Menu.update(
           { status:menuStatus},
           { where: {id: menuId } }
         )
-        res.status(200).send({message:"Menu has bee deactivate!"});
+        res.status(200).send({message:"Menu has been deactivate"});
       }
      
     } catch (err) {

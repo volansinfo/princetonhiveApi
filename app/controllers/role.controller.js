@@ -39,17 +39,20 @@ exports.deleteRole = async(req,res)=>{
                 id:roleId
             }
         });
+
         if(!role){
             return req.status(404).send({message:"User role doesn't exist."})
         }
 
         const roleDelete = await Role.destroy({
             where:{
-                id:role
+                id:roleId
             }
         })
         res.status(200).send({message:"User role deleted"})
     }catch(error){
+        console.log(error)
+
         res.status(500).send({message:error.message})
     }
 }

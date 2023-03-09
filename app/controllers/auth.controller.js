@@ -93,11 +93,11 @@ exports.signin = async (req, res) => {
         email: req.body.email,
       },
     });
-    if (user == null) {
-      return res.status(404).send({ message: "Please enter email address!" });
+    if (req.body.email == "") {
+      return res.status(400).send({ message: "Please enter email address!" });
     }
     else if (!user) {
-      return res.status(404).send({ message: "User Not found!" });
+      return res.status(400).send({ message: "User Not found!" });
     }
 
     const userStatus = await User.findOne({
@@ -113,9 +113,9 @@ exports.signin = async (req, res) => {
       req.body.password,
       user.password
     );
-    if (passwordIsValid == "") {
-      return res.status(401).send({
-        message: "Please enter valid password!",
+    if (req.body.password == "") {
+      return res.status(400).send({
+        message: "Please enter password!",
       });
     }
     else if (!passwordIsValid) {

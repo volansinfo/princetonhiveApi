@@ -80,7 +80,7 @@ passwordValidation = async (req, res, next) => {
 }
 
 validatefname = [
-  check('fname').trim().not().isEmpty().withMessage('first name is required.')
+  check('fname').trim().not().isEmpty().withMessage('Please enter first name!')
     .isLength({ min: 3, max: 50 }).withMessage('first name must be 3 to 50 characters long!')
 ]
 
@@ -89,12 +89,12 @@ fnameValidation = async (req, res, next) => {
   if (!result.length) return next();
 
   const error = result[0].msg;
-  res.json({ success: false, message: error })
+  res.status(400).json({ success: false, message: error })
 
 }
 
 validateEmail = [
-  check('email').trim().not().isEmpty().withMessage('email is required!')
+  check('email').trim().not().isEmpty().withMessage('Please enter email address!')
     .isEmail().withMessage('Please enter valid email!')
 ]
 
@@ -103,11 +103,11 @@ emailValidation = async (req, res, next) => {
   if (!result.length) return next();
 
   const error = result[0].msg;
-  res.json({ success: false, message: error })
+  res.status(400).json({ success: false, message: error })
 }
 
 validateMnumber = [
-  check('mnumber').trim().not().isEmpty().withMessage('Please enter mobile number !')
+  check('mnumber').trim().not().isEmpty().withMessage('Please enter mobile number!')
 ]
 
 mnumberValidation = async (req, res, next) => {
@@ -115,7 +115,7 @@ mnumberValidation = async (req, res, next) => {
   if (!result.length) return next();
 
   const error = result[0].msg;
-  res.json({ success: false, message: error })
+  res.status(400).json({ success: false, message: error })
 }
 
 validatePincode = [
@@ -127,7 +127,7 @@ pincodeValidation = async (req, res, next) => {
   const result = validationResult(req).array();
   if (!result.length) return next();
   const error = result[0].msg;
-  res.json({ success: false, message: error })
+  res.status(400).json({ success: false, message: error })
 }
 
 

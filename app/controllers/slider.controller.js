@@ -19,6 +19,9 @@ exports.bannerSliderAdd = async (req, res) => {
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
+    if (!(req.body.title)) {
+      return res.status(400).send({ message: "Please enter title!" })
+    }
     const extension = req.file.originalname.split(".")[1]
     if (extension == "jpeg" || extension == "jpg" || extension == "png") {
       const user = await Slider.create({
@@ -31,7 +34,7 @@ exports.bannerSliderAdd = async (req, res) => {
       });
     }
     else {
-      return res.status(401).send({ success: false, message: "File type does not allow" })
+      return res.status(400).send({ success: false, message: "File type does not allow" })
     }
 
     res.status(200).send({ message: "File uploaded successfully:" });

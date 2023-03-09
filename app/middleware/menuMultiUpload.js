@@ -10,9 +10,8 @@ let storage = multer.diskStorage({
 
     var filetype = file.mimetype;
     var fileformate = filetype.split("/")[1];
-
-    var  data = req.body.moduleName;
-    var  num = data.toLowerCase();
+    var data = req.body.moduleName;
+    var num = data.toLowerCase();
     var imageName = num.replace(/\s+/g, '-');
     cb(null, `${file.fieldname}_${imageName}.${fileformate}`);
   },

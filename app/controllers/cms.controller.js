@@ -9,6 +9,7 @@ const Op = db.Sequelize.Op;
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const httpStatus = require("http-status");
 
 exports.pageAdd = async (req, res) => {
   try {
@@ -21,8 +22,8 @@ exports.pageAdd = async (req, res) => {
       var imgName = req.file.filename;
     }
 
-
     var data = req.body.title;
+
     var num = data.toLowerCase();
     var slug = num.replace(/\s+/g, '-');
     const page = await Page.create({

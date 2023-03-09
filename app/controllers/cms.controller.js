@@ -9,7 +9,7 @@ const Op = db.Sequelize.Op;
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const httpStatus = require("http-status");
+//const httpStatus = require("http-status");
 
 exports.pageAdd = async (req, res) => {
   try {

@@ -73,6 +73,13 @@ exports.addMenuList = async (req, res) => {
       var iconTag = null;
     }
 
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_Menu_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_Menu_status" })
+    }
+
     const menu = await Menu.create({
       moduleName: req.body.moduleName,
       displayName: req.body.displayName,
@@ -86,7 +93,7 @@ exports.addMenuList = async (req, res) => {
     });
 
 
-    res.status(200).send({ message: "Menu was creted successfully" });
+    res.status(200).send({ message: "Menu creted successfully" });
 
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -114,6 +121,9 @@ exports.updateMenuList = async (req, res) => {
     } else {
       var iconImage = req.file.filename;
     }
+    if (!(req.body.moduleName)) {
+      return res.status(400).send({ message: "Please enter moduleName!" })
+    }
 
     if (req.body.moduleName != '') {
       var data = req.body.moduleName;
@@ -126,13 +136,28 @@ exports.updateMenuList = async (req, res) => {
     if (req.body.isParent != '') {
       var isParent = req.body.isParent;
     } else {
-      return res.status(500).send({ message: "isParent Not empty!" });
+      return res.status(400).send({ message: "Please enter isParent!" });
     }
-
+    if (!(req.body.parentId)) {
+      return res.status(400).send({ message: "Please enter parentId!" })
+    }
     if (req.body.iconTag != '') {
       var iconTag = req.body.iconTag;
     } else {
       var iconTag = null;
+    }
+    if (!(req.body.displayName)) {
+      return res.status(400).send({ message: "Please enter displayName!" })
+    }
+    else {
+      var displayName = req.body.displayName
+    }
+
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_Menu_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_Menu_status" })
     }
 
 
@@ -191,7 +216,7 @@ exports.deleteMenuList = async (req, res) => {
     }
 
 
-    res.status(200).send({ message: "Menu was delete successfully" });
+    res.status(200).send({ message: "Menu delete successfully" });
 
 
   } catch (err) {
@@ -243,7 +268,7 @@ exports.addUac = async (req, res) => {
     }
 
     const permissiondata = await userPermissions.bulkCreate(allPermissionData)
-    res.status(200).send({ message: "User permissions was creted successfully!" });
+    res.status(200).send({ message: "User permissions creted successfully!" });
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }

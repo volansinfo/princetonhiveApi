@@ -97,7 +97,7 @@ exports.signin = async (req, res) => {
       return res.status(400).send({ message: "Please enter email address!" });
     }
     else if (!user) {
-      return res.status(400).send({ message: "User Not found!" });
+      return res.status(404).send({ message: "User Not found!" });
     }
 
     const userStatus = await User.findOne({
@@ -180,7 +180,7 @@ exports.signout = async (req, res) => {
     return res.status(200).send({
       message: "Sign out successfully."
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(500).send({ message: error.message });
   }
 }

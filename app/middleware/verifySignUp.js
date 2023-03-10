@@ -74,7 +74,7 @@ passwordValidation = async (req, res, next) => {
   if (!result.length) return next();
 
   const error = result[0].msg;
-  res.json({ success: false, message: error })
+  res.status(400).json({ success: false, message: error })
 
 
 }
@@ -108,6 +108,7 @@ emailValidation = async (req, res, next) => {
 
 validateMnumber = [
   check('mnumber').trim().not().isEmpty().withMessage('Please enter mobile number!')
+    .isLength({ min: 10, max: 10 }).withMessage('Please enter valid mobile number!')
 ]
 
 mnumberValidation = async (req, res, next) => {
@@ -120,6 +121,7 @@ mnumberValidation = async (req, res, next) => {
 
 validatePincode = [
   check('pincode').trim().not().isEmpty().withMessage('Please enter pincode!')
+    .isNumeric().withMessage("Please enter integer value!")
     .isLength({ min: 5, max: 10 }).withMessage('pincode must be 5 to 10 characters long!')
 ]
 

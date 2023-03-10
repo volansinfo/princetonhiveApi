@@ -9,7 +9,7 @@ const Op = db.Sequelize.Op;
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-// const httpStatus = require("http-status");
+
 
 exports.pageAdd = async (req, res) => {
   try {
@@ -17,7 +17,7 @@ exports.pageAdd = async (req, res) => {
     await uploadFile(req, res);
     // console.log(req.body);
     if (req.file == undefined) {
-      var imgName = null;
+      return res.status(400).send({ message: "Please upload a file!" });
     } else {
       var imgName = req.file.filename;
     }
@@ -26,17 +26,37 @@ exports.pageAdd = async (req, res) => {
 
     var num = data.toLowerCase();
     var slug = num.replace(/\s+/g, '-');
-    const page = await Page.create({
-      title: req.body.title,
-      description: req.body.description,
-      pageSlug: slug,
-      fileSrc: imgName,
-      metaTitle: req.body.metaTitle,
-      metaDescription: req.body.metaDescription,
-      metaKeywords: req.body.metaKeywords,
-      status: req.body.status
+    // console.log(req.file.originalname.split(".")[1], "************")
+    if (!(req.body.title)) {
+      return res.status(400).send({ message: "Please enter title!" })
+    }
+    if (!(req.body.description)) {
+      return res.status(400).send({ message: "Please enter description!" })
+    }
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_Cms_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_Cmsstatus" })
+    }
+    const extension = req.file.originalname.split(".")[1]
+    if (extension == "jpeg" || extension == "jpg" || extension == "png") {
 
-    });
+      const page = await Page.create({
+        title: req.body.title,
+        description: req.body.description,
+        pageSlug: slug,
+        fileSrc: imgName,
+        metaTitle: req.body.metaTitle,
+        metaDescription: req.body.metaDescription,
+        metaKeywords: req.body.metaKeywords,
+        status: req.body.status
+
+      });
+    }
+    else {
+      return res.status(400).send({ success: false, message: "File type does not allow" })
+    }
     res.status(200).send({ message: "Page add successfully:" });
   } catch (error) {
     return res.status(500).send({ message: error.message });
@@ -108,19 +128,37 @@ exports.updatePage = async (req, res) => {
     var slug = num.replace(/\s+/g, '-');
 
 
-    const page = await Page.update({
-      title: req.body.title,
-      description: req.body.description,
-      pageSlug: slug,
-      fileSrc: imgName,
-      metaTitle: req.body.metaTitle,
-      metaDescription: req.body.metaDescription,
-      metaKeywords: req.body.metaKeywords,
-      status: req.body.status
-    },
-      { where: { id: pageId } }
+    if (!(req.body.title)) {
+      return res.status(400).send({ message: "Please enter title!" })
+    }
+    if (!(req.body.description)) {
+      return res.status(400).send({ message: "Please enter description!" })
+    }
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_Cms_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_Cmsstatus" })
+    }
+    const extension = req.file.originalname.split(".")[1]
+    if (extension == "jpeg" || extension == "jpg" || extension == "png") {
+      const page = await Page.update({
+        title: req.body.title,
+        description: req.body.description,
+        pageSlug: slug,
+        fileSrc: imgName,
+        metaTitle: req.body.metaTitle,
+        metaDescription: req.body.metaDescription,
+        metaKeywords: req.body.metaKeywords,
+        status: req.body.status
+      },
+        { where: { id: pageId } }
 
-    );
+      );
+    }
+    else {
+      return res.status(400).send({ success: false, message: "File type does not allow" })
+    }
 
     if (fs.existsSync(path)) {
       const removeImage = await fs.unlinkSync(__basedir + "/uploads/cms/" + pageData.fileSrc);

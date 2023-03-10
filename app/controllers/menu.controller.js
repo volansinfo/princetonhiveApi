@@ -56,6 +56,9 @@ exports.addMenuList = async (req, res) => {
     if (!(req.body.parentId)) {
       return res.status(400).send({ message: "Please enter parentId!" })
     }
+    else if (isNaN(req.body.parentId)) {
+      return res.status(400).send({ message: "Please enter valid parentId!" })
+    }
     if (!(req.body.displayName)) {
       return res.status(400).send({ message: "Please enter displayName!" })
     }

@@ -69,7 +69,7 @@ exports.addMenuList = async (req, res) => {
     if (req.body.isParent != '') {
       var isParent = req.body.isParent;
     } else if (!(req.body.isParent)) {
-      return res.status(400).send({ message: "isParent Not empty!" });
+      return res.status(400).send({ message: "Please enter isParent!" });
     }
     else if (!(req.body.isParent == 0) && !(req.body.isParent == 1)) {
       return res.status(400).send({ message: "Invalid input value for enum isParent!" })
@@ -107,7 +107,7 @@ exports.addMenuList = async (req, res) => {
     });
 
 
-    res.status(200).send({ message: "Menu creted successfully" });
+    res.status(200).send({ message: "Menu created successfully" });
 
   } catch (err) {
     return res.status(500).send({ message: err.message });

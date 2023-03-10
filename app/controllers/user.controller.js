@@ -6,6 +6,7 @@ const Op = db.Sequelize.Op;
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { default: isEmail } = require("validator/lib/isEmail");
 
 exports.allAccess = async (req, res) => {
   try {
@@ -78,7 +79,7 @@ exports.userdelete = async (req, res) => {
 
       if (num == 1) {
 
-        res.status(200).send({ message: "User was deleted successfully." });
+        res.status(200).send({ message: "User deleted successfully." });
       } else {
         res.status(404).send({ message: "User Not found!" });
       }

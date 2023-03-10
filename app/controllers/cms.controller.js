@@ -57,7 +57,7 @@ exports.pageAdd = async (req, res) => {
     else {
       return res.status(400).send({ success: false, message: "File type does not allow" })
     }
-    res.status(200).send({ message: "Page add successfully:" });
+    res.status(200).send({ message: "Page added successfully:" });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -246,7 +246,7 @@ exports.pageDelete = async (req, res) => {
 
 
 
-    res.status(200).send({ message: "Page was deleted successfully!" });
+    res.status(200).send({ message: "Page deleted successfully!" });
 
   } catch (error) {
     return res.status(500).send({ message: error.message });

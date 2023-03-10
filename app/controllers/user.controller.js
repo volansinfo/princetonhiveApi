@@ -10,7 +10,9 @@ const bcrypt = require("bcryptjs");
 exports.allAccess = async (req, res) => {
   try {
     let data = await User.findAll();
-    res.status(200).json(data);
+    let sorted_data = data.sort((a, b) => b.id - a.id);
+    // console.log(data.sort((a, b) => a.id - b.id), "*************************")
+    res.status(200).json(sorted_data);
 
   } catch (error) {
     return res.status(500).send({ success: false, message: error.message });

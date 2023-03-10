@@ -112,7 +112,7 @@ exports.signin = async (req, res) => {
       },
     });
     if (!userStatus) {
-      return res.status(404).send({ message: "User status has been pending!" });
+      return res.status(400).send({ message: "User status has been pending!" });
     }
 
     const passwordIsValid = bcrypt.compareSync(

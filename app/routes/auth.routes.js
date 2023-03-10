@@ -28,7 +28,8 @@ module.exports = function (app) {
     controller.signup
   );
 
-  app.post("/api/user/signin", controller.signin);
+  app.post("/api/user/signin", [verifySignUp.validateEmail,
+  verifySignUp.emailValidation], controller.signin);
 
   app.post("/api/user/signout", controller.signout);
 

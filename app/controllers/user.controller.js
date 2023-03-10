@@ -10,10 +10,7 @@ const bcrypt = require("bcryptjs");
 exports.allAccess = async (req, res) => {
   try {
     let data = await User.findAll();
-    let response = {
-      userData: data
-    }
-    res.status(200).json(response);
+    res.status(200).json(data);
 
   } catch (error) {
     return res.status(500).send({ success: false, message: error.message });
@@ -66,6 +63,9 @@ exports.moderatorBoard = (req, res) => {
 exports.userdelete = async (req, res) => {
   try {
     const userId = req.params.id;
+    if (!(userId)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
 
     const userdelete = await User.destroy({
       where: {
@@ -78,7 +78,7 @@ exports.userdelete = async (req, res) => {
 
         res.status(200).send({ message: "User was deleted successfully." });
       } else {
-        res.status(500).send({ message: "Cannot delete User. Maybe User was not found!" });
+        res.status(404).send({ message: "User Not found!" });
       }
 
     });
@@ -120,6 +120,25 @@ exports.userstatus = async (req, res) => {
 
 exports.updateUserData = async (req, res) => {
   try {
+    if (!(req.body.fname)) {
+      return res.status(400).send({ message: "Please enter first name!" })
+    }
+    if (!(req.body.email)) {
+      return res.status(400).send({ message: "Please enter email address!" })
+    }
+    if (!(req.body.mnumber)) {
+      return res.status(400).send({ message: "Please enter mobile number!" })
+    }
+    if (!(req.body.pincode)) {
+      return res.status(400).send({ message: "Please enter pincode!" })
+    }
+    else if ((req.body.pincode.length > 10) || (req.body.pincode.length < 5)) {
+      return res.status(400).send({ message: "Please enter valid pincode!" })
+    }
+    else if (isNaN(req.body.pincode)) {
+
+      return res.status(400).send({ message: "Please enter valid pincode!" })
+    }
     const userId = req.params.id;
     const result = await User.update({
       fname: req.body.fname,

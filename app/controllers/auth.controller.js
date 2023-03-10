@@ -247,9 +247,10 @@ exports.forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(404).send({ success: false, message: "User does not exist!" });
     }
-    if (isEmpty(req.body.email)) {
+    if (!(req.body.email)) {
       return res.status(400).send({ success: false, message: "Please enter email address!" });
     }
+
     let generatedPwd = await generator.generate({
       length: 6,
       numbers: true,
@@ -278,7 +279,7 @@ exports.forgotPassword = async (req, res) => {
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 
-  } catch (e) {
+  } catch (error) {
     res.status(500).send({ success: false, message: error.message })
   }
 }

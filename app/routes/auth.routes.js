@@ -40,6 +40,7 @@ module.exports = function (app) {
     ],
     controller.changePassword);
 
-  app.post("/api/user/forgotPassword", controller.forgotPassword);
+  app.post("/api/user/forgotPassword", [verifySignUp.validateEmail,
+  verifySignUp.emailValidation], controller.forgotPassword);
 
 };

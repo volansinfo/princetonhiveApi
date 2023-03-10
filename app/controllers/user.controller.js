@@ -94,6 +94,23 @@ exports.userstatus = async (req, res) => {
   try {
     const userId = req.params.id;
     const userStatus = req.body.status;
+    const user = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!(user)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
+    else {
+
+      if (!(req.body.status)) {
+        return res.status(400).send({ message: "Please enter value for enum user_status" })
+      }
+      else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+        return res.status(400).send({ message: "Invalid input value for enum user_status" })
+      }
+    }
     if (userStatus == 1) {
 
       const result = await User.update(

@@ -148,6 +148,23 @@ exports.sliderstatus = async (req, res) => {
   try {
     const SliderId = req.params.id;
     const sliderStatus = req.body.status;
+    const slider = await Slider.findOne({
+      where: {
+        id: SliderId,
+      },
+    });
+    if (!(slider)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
+    else {
+
+      if (!(req.body.status)) {
+        return res.status(400).send({ message: "Please enter value for enum slider_status" })
+      }
+      else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+        return res.status(400).send({ message: "Invalid input value for enum slider_status" })
+      }
+    }
     if (sliderStatus == 1) {
 
       const result = await Slider.update(

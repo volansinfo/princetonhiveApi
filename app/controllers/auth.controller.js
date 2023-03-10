@@ -27,6 +27,12 @@ exports.signup = async (req, res) => {
       length: 6,
       numbers: true,
     })
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum user_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum user_status" })
+    }
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
@@ -106,7 +112,7 @@ exports.signin = async (req, res) => {
       },
     });
     if (!userStatus) {
-      return res.status(404).send({ message: "User status has been pending!" });
+      return res.status(400).send({ message: "User status has been pending!" });
     }
 
     const passwordIsValid = bcrypt.compareSync(
@@ -241,6 +247,9 @@ exports.forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(404).send({ success: false, message: "User does not exist!" });
     }
+    if (!(req.body.email)) {
+      return res.status(400).send({ success: false, message: "Please enter email address!" });
+    }
 
     let generatedPwd = await generator.generate({
       length: 6,
@@ -270,7 +279,7 @@ exports.forgotPassword = async (req, res) => {
 
     res.status(200).send({ success: true, message: `Your new password has been sent to mail : ${userEmail}` })
 
-  } catch (e) {
+  } catch (error) {
     res.status(500).send({ success: false, message: error.message })
   }
 }

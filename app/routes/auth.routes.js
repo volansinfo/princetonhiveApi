@@ -28,7 +28,8 @@ module.exports = function (app) {
     controller.signup
   );
 
-  app.post("/api/user/signin", controller.signin);
+  app.post("/api/user/signin", [verifySignUp.validateEmail,
+  verifySignUp.emailValidation], controller.signin);
 
   app.post("/api/user/signout", controller.signout);
 
@@ -40,6 +41,7 @@ module.exports = function (app) {
     ],
     controller.changePassword);
 
-  app.post("/api/user/forgotPassword", controller.forgotPassword);
+  app.post("/api/user/forgotPassword", [verifySignUp.validateEmail,
+  verifySignUp.emailValidation], controller.forgotPassword);
 
 };

@@ -32,8 +32,8 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
             pass: smtpServer.authPassword
         }
     })
-    let info
-    if (type != 'signup') {
+    // let info
+    if (type == 'forgotPassword') {
         info = await transporter.sendMail({
             from: `"Hive Step  "<${smtpServer.authUser}>`,
             to: userEmail,

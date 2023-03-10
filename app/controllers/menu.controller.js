@@ -53,7 +53,12 @@ exports.addMenuList = async (req, res) => {
     } else {
       var slug = '';
     }
-
+    if (!(req.body.parentId)) {
+      return res.status(400).send({ message: "Please enter parentId!" })
+    }
+    else if (isNaN(req.body.parentId)) {
+      return res.status(400).send({ message: "Please enter valid parentId!" })
+    }
     if (!(req.body.displayName)) {
       return res.status(400).send({ message: "Please enter displayName!" })
     }
@@ -63,10 +68,19 @@ exports.addMenuList = async (req, res) => {
 
     if (req.body.isParent != '') {
       var isParent = req.body.isParent;
-    } else {
-      return res.status(500).send({ message: "isParent Not empty!" });
+    } else if (!(req.body.isParent)) {
+      return res.status(400).send({ message: "isParent Not empty!" });
+    }
+    else if (!(req.body.isParent == 0) && !(req.body.isParent == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum isParent!" })
     }
 
+    if (!(req.body.isParent)) {
+      return res.status(400).send({ message: "Please enter isParent!" });
+    }
+    else if (!(req.body.isParent == 0) && !(req.body.isParent == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum isParent!" })
+    }
     if (req.body.iconTag != '') {
       var iconTag = req.body.iconTag;
     } else {
@@ -135,9 +149,13 @@ exports.updateMenuList = async (req, res) => {
 
     if (req.body.isParent != '') {
       var isParent = req.body.isParent;
-    } else {
+    } else if (!(req.body.isParent)) {
       return res.status(400).send({ message: "Please enter isParent!" });
     }
+    else if (!(req.body.isParent == 0) && !(req.body.isParent == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum isParent!" })
+    }
+
     if (!(req.body.parentId)) {
       return res.status(400).send({ message: "Please enter parentId!" })
     }
@@ -216,7 +234,7 @@ exports.deleteMenuList = async (req, res) => {
     }
 
 
-    res.status(200).send({ message: "Menu delete successfully" });
+    res.status(200).send({ message: "Menu deleted successfully" });
 
 
   } catch (err) {
@@ -229,6 +247,23 @@ exports.statusMenuList = async (req, res) => {
 
     const menuId = req.params.id;
     const menuStatus = req.body.status;
+    const menu = await Menu.findOne({
+      where: {
+        id: menuId,
+      },
+    });
+    if (!(menu)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
+    else {
+
+      if (!(req.body.status)) {
+        return res.status(400).send({ message: "Please enter value for enum menu_status" })
+      }
+      else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+        return res.status(400).send({ message: "Invalid input value for enum menu_status" })
+      }
+    }
     if (menuStatus == 1) {
 
       const result = await Menu.update(
@@ -268,7 +303,7 @@ exports.addUac = async (req, res) => {
     }
 
     const permissiondata = await userPermissions.bulkCreate(allPermissionData)
-    res.status(200).send({ message: "User permissions creted successfully!" });
+    res.status(200).send({ message: "User permissions created successfully!" });
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
@@ -328,7 +363,7 @@ exports.updateUac = async (req, res) => {
       }
 
     });
-    res.status(200).send({ message: "User permissions was updated successfully!" });
+    res.status(200).send({ message: "User permissions updated successfully!" });
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }

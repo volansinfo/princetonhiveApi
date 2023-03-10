@@ -118,7 +118,7 @@ exports.updatePage = async (req, res) => {
 
     await uploadFile(req, res);
     if (req.file == undefined) {
-      var imgName = null;
+      return res.status(400).send({ message: "Please upload a file!" })
     } else {
       var imgName = req.file.filename;
     }
@@ -174,6 +174,23 @@ exports.pagestatus = async (req, res) => {
   try {
     const pageId = req.params.id;
     const pageStatus = req.body.status;
+    const page = await Page.findOne({
+      where: {
+        id: pageId,
+      },
+    });
+    if (!(page)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
+    else {
+
+      if (!(req.body.status)) {
+        return res.status(400).send({ message: "Please enter value for enum cms_status" })
+      }
+      else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+        return res.status(400).send({ message: "Invalid input value for enum cms_status" })
+      }
+    }
     if (pageStatus == 1) {
 
       const result = await Page.update(

@@ -94,6 +94,23 @@ exports.userstatus = async (req, res) => {
   try {
     const userId = req.params.id;
     const userStatus = req.body.status;
+    const user = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!(user)) {
+      return res.status(404).send({ message: "User Not found!" })
+    }
+    else {
+
+      if (!(req.body.status)) {
+        return res.status(400).send({ message: "Please enter value for enum user_status" })
+      }
+      else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+        return res.status(400).send({ message: "Invalid input value for enum user_status" })
+      }
+    }
     if (userStatus == 1) {
 
       const result = await User.update(
@@ -126,6 +143,9 @@ exports.updateUserData = async (req, res) => {
     if (!(req.body.email)) {
       return res.status(400).send({ message: "Please enter email address!" })
     }
+    else if (!isEmail(req.body.email)) {
+      return res.status(400).send({ message: "Please enter valid email address!" })
+    }
     if (!(req.body.mnumber)) {
       return res.status(400).send({ message: "Please enter mobile number!" })
     }
@@ -138,6 +158,12 @@ exports.updateUserData = async (req, res) => {
     else if (isNaN(req.body.pincode)) {
 
       return res.status(400).send({ message: "Please enter valid pincode!" })
+    }
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum user_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum user_status" })
     }
     const userId = req.params.id;
     const result = await User.update({

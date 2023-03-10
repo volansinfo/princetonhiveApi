@@ -22,6 +22,12 @@ exports.bannerSliderAdd = async (req, res) => {
     if (!(req.body.title)) {
       return res.status(400).send({ message: "Please enter title!" })
     }
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_hiv_sliders_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_hiv_sliders_status" })
+    }
     const extension = req.file.originalname.split(".")[1]
     if (extension == "jpeg" || extension == "jpg" || extension == "png") {
       const user = await Slider.create({
@@ -48,7 +54,7 @@ exports.findSlider = async (req, res) => {
   try {
     let data = await Slider.findAll({
       where: {
-        status: '1',
+        status: ["0", "1"],
       },
     });
 
@@ -96,17 +102,37 @@ exports.updateSlider = async (req, res) => {
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
+    if (!(req.body.title)) {
+      return res.status(400).send({ message: "Please enter title!" })
+    }
+    if (!(req.body.status)) {
+      return res.status(400).send({ message: "Please enter value for enum enum_hiv_sliders_status" })
+    }
+    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum enum_hiv_sliders_status" })
+    }
+    // else if (!(req.body.status == 1)) {
+    //   return res.status(400).send({ message: "Invalid input value for enum enum_hiv_sliders_status" })
+    // }
 
-    const user = await Slider.update({
-      title: req.body.title,
-      path: req.file.path,
-      fileSrc: req.file.filename,
-      urlLink: req.body.urlLink,
-      status: req.body.status
-    },
-      { where: { id: SliderId } }
+    const extension = req.file.originalname.split(".")[1]
+    if (extension == "jpeg" || extension == "jpg" || extension == "png") {
 
-    );
+      const user = await Slider.update({
+        title: req.body.title,
+        path: req.file.path,
+        fileSrc: req.file.filename,
+        urlLink: req.body.urlLink,
+        status: req.body.status
+      },
+        { where: { id: SliderId } }
+
+      );
+    }
+    else {
+      return res.status(400).send({ success: false, message: "File type does not allow" })
+    }
+
 
     if (fs.existsSync(path)) {
       const removeImage = await fs.unlinkSync(__basedir + "/uploads/slider/" + slider.fileSrc);

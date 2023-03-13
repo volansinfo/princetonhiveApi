@@ -1,5 +1,6 @@
 const { authJwt } = require("../middleware");
 const controller = require("../controllers/user.controller");
+const { verifySignUp } = require("../middleware");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -44,7 +45,10 @@ module.exports = function (app) {
 
   // Update a User data using id
   app.post("/api/vol/user/:id",
-    [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+    [authJwt.verifyToken,
+    verifySignUp.validateMnumber,
+    verifySignUp.mnumberValidation,
+    authJwt.isSupportOrAdmin],
     controller.updateUserData
   );
 

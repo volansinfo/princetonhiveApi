@@ -108,6 +108,7 @@ emailValidation = async (req, res, next) => {
 
 validateMnumber = [
   check('mnumber').trim().not().isEmpty().withMessage('Please enter mobile number!')
+    .isInt().withMessage("Please enter numeric value!")
     .isLength({ min: 10, max: 10 }).withMessage('Please enter valid mobile number!')
 ]
 

@@ -114,6 +114,9 @@ exports.signin = async (req, res) => {
     if (!userStatus) {
       return res.status(400).send({ message: "User status has been pending!" });
     }
+    if (user.status == 0) {
+      return res.status(400).send({ message: "User inactive please contact to the support or admin!" });
+    }
 
     const passwordIsValid = bcrypt.compareSync(
       req.body.password,

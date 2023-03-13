@@ -67,11 +67,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         mnumber: {
             type: Sequelize.STRING,
             allowNull: false,
-            validate: {
-                notNull: { args: true, msg: "You must enter Phone Number" },
-                len: { args: [10, 10], msg: 'Phone Number is invalid' },
-                isInt: { args: true, msg: "You must enter Phone Number" },
-            }
+            // validate: {
+            //     notNull: { args: true, msg: "You must enter Phone Number" },
+            //     len: { args: [10, 10], msg: 'Phone Number is invalid' },
+            //     isInt: { args: true, msg: "You must enter Phone Number" },
+            // }
         },
 
         address: {

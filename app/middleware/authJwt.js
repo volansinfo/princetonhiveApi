@@ -50,7 +50,7 @@ isAdmin = async (req, res, next) => {
       }
     }
 
-    return res.status(403).send({
+    return res.status(400).send({
       message: "Require Admin Role!",
     });
   } catch (error) {
@@ -71,7 +71,7 @@ isSupport = async (req, res, next) => {
       }
     }
 
-    return res.status(403).send({
+    return res.status(400).send({
       message: "Require Support Role!",
     });
   } catch (error) {
@@ -96,7 +96,7 @@ isSupportOrAdmin = async (req, res, next) => {
       }
     }
 
-    return res.status(403).send({
+    return res.status(400).send({
       message: "Require Support or Admin Role!",
     });
   } catch (error) {

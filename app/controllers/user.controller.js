@@ -152,7 +152,7 @@ exports.userstatus = async (req, res) => {
         { where: { id: userId } }
       )
 
-      res.status(200).send({ message: "User has been active." });
+      res.status(200).send({ success: true, message: "User has been active." });
     } else {
 
       const result = await User.update(

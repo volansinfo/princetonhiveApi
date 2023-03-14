@@ -12,8 +12,24 @@ exports.allAccess = async (req, res) => {
   try {
     let data = await User.findAll();
     let sorted_data = data.sort((a, b) => b.id - a.id);
-    // console.log(data.sort((a, b) => a.id - b.id), "*************************")
-    res.status(200).json(sorted_data);
+
+    const page = parseInt(req.query.page)
+    const limit = 10
+
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+
+    const results = {}
+
+    results.totalItems = sorted_data.length;
+    results.totalPages = Math.ceil((sorted_data.length) / limit);
+    results.currentPage = parseInt(req.query.page);
+    results.dataItems = sorted_data.slice(startIndex, endIndex)
+
+    if (parseInt(req.query.page) > Math.ceil((sorted_data.length) / limit) || parseInt(req.query.page) < 1) {
+      return res.status(404).send({ success: false, message: "Page Not found!" })
+    }
+    res.status(200).json({ success: true, data: results });
 
   } catch (error) {
     return res.status(500).send({ success: false, message: error.message });
@@ -38,8 +54,9 @@ exports.userBoard = async (req, res) => {
         id: userId,
       },
     });
+    let sorted_data = data.sort((a, b) => b.id - a.id);
     let response = {
-      userData: data
+      userData: sorted_data
     }
     res.status(200).json(response);
 
@@ -51,12 +68,26 @@ exports.userBoard = async (req, res) => {
 exports.adminBoard = async (req, res) => {
 
   let data = await User.findAll({});
-  let response = {
-    userData: data
-  }
-  res.status(200).json(response);
+  let sorted_data = data.sort((a, b) => b.id - a.id);
 
-  //res.status(200).send("Admin Content.");
+  const page = parseInt(req.query.page)
+  const limit = 10
+
+  const startIndex = (page - 1) * limit
+  const endIndex = page * limit
+
+  const results = {}
+
+  results.totalItems = sorted_data.length;
+  results.totalPages = Math.ceil((sorted_data.length) / limit);
+  results.currentPage = parseInt(req.query.page);
+  results.userData = sorted_data.slice(startIndex, endIndex)
+
+  if (parseInt(req.query.page) > Math.ceil((sorted_data.length) / limit) || parseInt(req.query.page) < 1) {
+    return res.status(404).send({ success: false, message: "Page Not found!" })
+  }
+  res.status(200).json({ success: true, data: results });
+
 };
 
 exports.moderatorBoard = (req, res) => {

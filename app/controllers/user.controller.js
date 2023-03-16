@@ -1,5 +1,6 @@
 const db = require("../models");
 const config = require("../config/auth.config");
+const pagination = require("../middleware/pagination")
 const User = db.user;
 const Role = db.role;
 const Op = db.Sequelize.Op;
@@ -10,31 +11,22 @@ const { default: isEmail } = require("validator/lib/isEmail");
 
 exports.allAccess = async (req, res) => {
   try {
-    let data = await User.findAll();
-    let sorted_data = data.sort((a, b) => b.id - a.id);
-
-    const page = parseInt(req.query.page)
-    const limit = 10
-
-    const startIndex = (page - 1) * limit
-    const endIndex = page * limit
-
-    const results = {}
-
-    results.totalItems = sorted_data.length;
-    results.totalPages = Math.ceil((sorted_data.length) / limit);
-    results.currentPage = parseInt(req.query.page);
-    results.dataItems = sorted_data.slice(startIndex, endIndex)
-
-    if (parseInt(req.query.page) > Math.ceil((sorted_data.length) / limit) || parseInt(req.query.page) < 1) {
-      return res.status(404).send({ success: false, message: "Page Not found!" })
-    }
-    res.status(200).json({ success: true, data: results });
-
-  } catch (error) {
-    return res.status(500).send({ success: false, message: error.message });
+    const { limit, offset } = pagination.getPagination(req.query.page, 10)
+    const allUser = await User.findAndCountAll({
+      limit,
+      offset,
+      attributes: {
+        exclude: ['password', 'actualPassword']
+      },
+      order: [
+        ['id', 'DESC']
+      ]
+    })
+    const response = pagination.getPaginationData(allUser, req.query.page, limit)
+    res.status(200).json({ success: true, data: response });
+  } catch (e) {
+    res.status(500).send({ success: false, message: e.message })
   }
-
 };
 
 exports.userBoard = async (req, res) => {
@@ -67,27 +59,24 @@ exports.userBoard = async (req, res) => {
 
 exports.adminBoard = async (req, res) => {
 
-  let data = await User.findAll({});
-  let sorted_data = data.sort((a, b) => b.id - a.id);
+  try {
+    const { limit, offset } = pagination.getPagination(req.query.page, 10)
 
-  const page = parseInt(req.query.page)
-  const limit = 10
-
-  const startIndex = (page - 1) * limit
-  const endIndex = page * limit
-
-  const results = {}
-
-  results.totalItems = sorted_data.length;
-  results.totalPages = Math.ceil((sorted_data.length) / limit);
-  results.currentPage = parseInt(req.query.page);
-  results.userData = sorted_data.slice(startIndex, endIndex)
-
-  if (parseInt(req.query.page) > Math.ceil((sorted_data.length) / limit) || parseInt(req.query.page) < 1) {
-    return res.status(404).send({ success: false, message: "Page Not found!" })
+    const allUser = await User.findAndCountAll({
+      limit,
+      offset,
+      attributes: {
+        exclude: ['password', 'actualPassword']
+      },
+      order: [
+        ['id', 'DESC']
+      ]
+    })
+    const response = pagination.getPaginationData(allUser, req.query.page, limit)
+    res.status(200).json({ success: true, data: response });
+  } catch (e) {
+    res.status(500).send({ success: false, message: e.message })
   }
-  res.status(200).json({ success: true, data: results });
-
 };
 
 exports.moderatorBoard = (req, res) => {
@@ -221,7 +210,7 @@ exports.updateUserData = async (req, res) => {
         }
       }
     );
-    res.status(200).send({ message: "User data updated successfully." });
+    res.status(200).send({ success: true, message: "User data updated successfully." });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

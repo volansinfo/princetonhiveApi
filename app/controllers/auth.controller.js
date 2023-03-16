@@ -75,7 +75,7 @@ exports.signup = async (req, res) => {
       });
       const result = user.setRoles(roles);
       if (result)
-        res.status(200).send({ message: `User registered successfully & Your password has been sent to mail : ${userEmail}` });
+        res.status(200).send({ success: true, message: `User registered successfully & Your password has been sent to mail : ${userEmail}` });
     } else {
       // user has role = 1
       const result = user.setRoles([1]);
@@ -88,7 +88,7 @@ exports.signup = async (req, res) => {
 
 
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -133,6 +133,10 @@ exports.signin = async (req, res) => {
       });
     }
 
+    if ((user.tokenKey)) {
+      return res.status(401).send({ success: false, message: "User already logged on another device" })
+    }
+
     const token = jwt.sign({ id: user.id }, config.secret, {
       expiresIn: 86400, // 24 hours
     });
@@ -170,7 +174,8 @@ exports.signin = async (req, res) => {
 exports.signout = async (req, res) => {
   try {
     let token = req.headers["x-access-token"];
-    let newToken = "Sign out"
+
+    let newToken = null
 
     const tokenData = jwt.decode(token);
 
@@ -179,6 +184,14 @@ exports.signout = async (req, res) => {
         id: tokenData.id,
       },
     });
+
+    if (user.tokenKey != token) {
+      return res.status(401).send({ success: false, message: "token not matched!" })
+    }
+    if (user.tokenKey == null) {
+      return res.status(200).send({ success: true, message: "User already signout!" })
+    }
+
 
     await User.update({
       tokenKey: newToken,

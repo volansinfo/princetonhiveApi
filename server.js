@@ -43,6 +43,7 @@ require("./app/routes/student.routes")(app)
 require("./app/routes/teacher.routes")(app)
 require("./app/routes/university.routes")(app)
 require("./app/routes/support.routes")(app)
+require("./app/routes/assessment.route")(app)
 app.listen(port, () => {
         console.log(`Connection is setup at ${port}`);
 });

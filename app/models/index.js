@@ -47,6 +47,7 @@ db.UserPermissions = require("../models/userPermissions.model")(sequelize, Seque
 db.globalConfig = require("../models/globalConfig.model")(sequelize, Sequelize,DataTypes);
 db.WidgetPage = require("../models/widget.model")(sequelize,Sequelize,DataTypes);
 db.StateCountry = require("../models/statecountry.model")(sequelize,Sequelize,DataTypes);
+db.assignment = require("./assessment.model")(sequelize,Sequelize,DataTypes);
 
 
 db.role.belongsToMany(db.user, {

@@ -31,6 +31,9 @@ module.exports = function (app) {
   app.post("/api/user/signin", [verifySignUp.validateEmail,
   verifySignUp.emailValidation], controller.signin);
 
+  app.post("/api/user/frontend/signin", [verifySignUp.validateEmail,
+  verifySignUp.emailValidation], controller.studentOrTeacherSignin);
+
   app.post("/api/user/signout", [authJwt.verifyToken], controller.signout);
 
   app.post("/api/user/changePassword/:userId",

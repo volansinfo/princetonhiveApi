@@ -3,6 +3,7 @@ const config = require("../config/auth.config");
 const uploadFile = require("../middleware/menuMultiUpload");
 const fs = require("fs");
 const Menu = db.Menu;
+const User = db.user
 const userPermissions = db.UserPermissions;
 
 const Op = db.Sequelize.Op;
@@ -293,13 +294,76 @@ exports.addUac = async (req, res) => {
       return item;
     });
 
+    if ((allPermissionData[0].userId).trim() == "" || (req.body.userId).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter userId!" })
+    }
+    const user = await User.findOne({
+      where: {
+        id: req.body.userId,
+      },
+    });
+    if (!user) {
+      return res.status(404).send({ success: false, message: "User Not found!" })
+    }
+    if (req.body.userId != allPermissionData[0].userId) {
+      return res.status(400).send({ success: false, message: "UserId does not match!" })
+    }
+
+    if ((allPermissionData[0].moduleId).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter moduleId!" })
+    }
+    const menu = await Menu.findOne({
+      where: {
+        id: allPermissionData[0].moduleId,
+      },
+    });
+
+    if (!menu) {
+      return res.status(404).send({ success: false, message: "Module Not found!" })
+    }
+
+    if ((allPermissionData[0].isAdd).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter isAdd!" })
+    }
+    else if ((allPermissionData[0].isAdd) != "0" && (allPermissionData[0].isAdd) != "1") {
+      return res.status(400).send({ success: false, message: "Please enter 0 & 1 only for isAdd!" })
+    }
+
+    if ((allPermissionData[0].isUpdate).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter isUpdate!" })
+    }
+    else if (allPermissionData[0].isUpdate != "0" && allPermissionData[0].isUpdate != "1") {
+      return res.status(400).send({ success: false, message: "Please enter 0 & 1 only for isUpdate!" })
+    }
+
+    if ((allPermissionData[0].isRead).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter isRead!" })
+    }
+    else if (allPermissionData[0].isRead != "0" && allPermissionData[0].isRead != "1") {
+      return res.status(400).send({ success: false, message: "Please enter 0 & 1 only for isRead!" })
+    }
+
+    if ((allPermissionData[0].isDelete).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter isDelete!" })
+    }
+    else if (allPermissionData[0].isDelete != "0" && allPermissionData[0].isDelete != "1") {
+      return res.status(400).send({ success: false, message: "Please enter 0 & 1 only for isDelete!" })
+    }
+
+    if ((allPermissionData[0].isStatus).trim() == "") {
+      return res.status(400).send({ success: false, message: "Please enter isStatus!" })
+    }
+    else if (allPermissionData[0].isStatus != "0" && allPermissionData[0].isStatus != "1") {
+      return res.status(400).send({ success: false, message: "Please enter 0 & 1 only for isStatus!" })
+    }
+
     const meuserData = await userPermissions.findOne({
       where: {
         userId: req.body.userId,
       },
     });
     if (meuserData) {
-      return res.status(404).send({ message: "User permissions already exists so please add a permission another user!" });
+      return res.status(400).send({ message: "User permissions already exists so please add a permission another user!" });
     }
 
     const permissiondata = await userPermissions.bulkCreate(allPermissionData)

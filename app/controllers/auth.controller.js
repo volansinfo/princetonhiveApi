@@ -27,10 +27,10 @@ exports.signup = async (req, res) => {
       length: 6,
       numbers: true,
     })
-    if (!(req.body.status)) {
-      return res.status(400).send({ message: "Please enter value for enum user_status" })
-    }
-    else if (!(req.body.status == 0) && !(req.body.status == 1)) {
+    // if (!(req.body.status)) {
+    //   return res.status(400).send({ message: "Please enter value for enum user_status" })
+    // }
+    if (!(req.body.status == 0) && !(req.body.status == 1)) {
       return res.status(400).send({ message: "Invalid input value for enum user_status" })
     }
     const user = await User.create({
@@ -45,7 +45,7 @@ exports.signup = async (req, res) => {
       state: req.body.state,
       pincode: req.body.pincode,
       country: req.body.country,
-      status: req.body.status,
+      status: req.body.status ? req.body.status : 1,
       uuid: uuid
       // username: req.body.username,
       // email: req.body.email,
@@ -146,6 +146,9 @@ exports.signin = async (req, res) => {
     for (let i = 0; i < roles.length; i++) {
       authorities.push("ROLE_" + roles[i].name.toUpperCase());
     }
+    if (authorities == "ROLE_STUDENT" || authorities == "ROLE_TEACHER") {
+      return res.status(400).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
+    }
 
     //let tokenKey =  req.session.token = token;
     let tokenKey = token;
@@ -166,6 +169,91 @@ exports.signin = async (req, res) => {
       accessToken: tokenKey,
       message: "Login successfully"
     });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+exports.studentOrTeacherSignin = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    if (req.body.email == "") {
+      return res.status(400).send({ message: "Please enter email address!" });
+    }
+    else if (!user) {
+      return res.status(404).send({ message: "User Not found!" });
+    }
+
+    const userStatus = await User.findOne({
+      where: {
+        status: '1',
+      },
+    });
+    if (!userStatus) {
+      return res.status(400).send({ message: "User status has been pending!" });
+    }
+    if (user.status == 0) {
+      return res.status(400).send({ message: "User inactive please contact to the support or admin!" });
+    }
+
+    const passwordIsValid = bcrypt.compareSync(
+      req.body.password,
+      user.password
+    );
+    if (req.body.password == "") {
+      return res.status(400).send({
+        message: "Please enter password!",
+      });
+    }
+    else if (!passwordIsValid) {
+      return res.status(401).send({
+        message: "Invalid Password!",
+      });
+    }
+
+    if ((user.tokenKey)) {
+      return res.status(401).send({ success: false, message: "User already logged on another device" })
+    }
+
+    const token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 86400, // 24 hours
+    });
+
+    let authorities = [];
+    const roles = await user.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      authorities.push("ROLE_" + roles[i].name.toUpperCase());
+    }
+
+    if (authorities == "ROLE_STUDENT" || authorities == "ROLE_TEACHER") {
+      let tokenKey = token;
+
+      await User.update({
+        tokenKey: token,
+      }, {
+        where: {
+          id: user.id
+        }
+      })
+
+      return res.status(200).send({
+        id: user.id,
+        uuid: user.uuid,
+        email: user.email,
+        roles: authorities,
+        accessToken: tokenKey,
+        message: "Login successfully"
+      });
+    }
+    else {
+      return res.status(400).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
+    }
+    //let tokenKey =  req.session.token = token;
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

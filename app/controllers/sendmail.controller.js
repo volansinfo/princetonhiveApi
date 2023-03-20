@@ -46,9 +46,10 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
         info = await transporter.sendMail({
             from: `"Hive Step  "<${smtpServer.authUser}>`,
             to: userEmail,
-            subject: "Hive Step new password",
+            subject: "Welcome to Hive Step",
             text: "Hello from the Hive Step side.",
-            html: `Your password is :<b><h1> ${generatedPwd}</h1></b>`
+            html: `We're glad you're here.Over the next few weeks, we'll share tips to help you to make the most of Hive Step.<br>Login information for your account<br>
+            Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>`
         })
 
     }

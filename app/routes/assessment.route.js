@@ -15,4 +15,25 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.assignment
   );
+
+  app.get(
+    "/api/user/allAssessment/:studentId",
+    [authJwt.verifyToken],
+    controller.getAllAssessment
+  );
+  app.get(
+    "/api/user/assessmentSelf/:studentId",
+    [authJwt.verifyToken],
+    controller.getAssessmentBySelf
+  );
+  app.get(
+    "/api/user/assessmentAssigned/:studentId",
+    [authJwt.verifyToken],
+    controller.getAssessmentByAssigned
+  );
+  app.get(
+    "/api/user/assessmentCompleted/:studentId",
+    [authJwt.verifyToken],
+    controller.getAssessmentByCompleted
+  );
 };

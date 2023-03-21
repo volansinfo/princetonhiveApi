@@ -52,6 +52,7 @@ exports.signup = async (req, res) => {
       // password: bcrypt.hashSync(req.body.password, 8),
     });
     const userEmail = req.body.email
+    const username = req.body.username
     // const hostType = req.body.hostType
 
 
@@ -63,7 +64,7 @@ exports.signup = async (req, res) => {
     }
 
 
-    sendMail(userEmail, generatedPwd, smtpServer, 'signup')
+    sendMail(userEmail, username, generatedPwd, smtpServer, 'signup')
 
     if (req.body.roles) {
       const roles = await Role.findAll({

@@ -200,6 +200,8 @@ exports.updateUserData = async (req, res) => {
       city: req.body.city,
       state: req.body.state,
       pincode: req.body.pincode,
+      gender:req.body.gender,
+      dob:req.body.dob,
       country: req.body.country,
       status: req.body.status,
     },

@@ -44,6 +44,8 @@ exports.signup = async (req, res) => {
       city: req.body.city,
       state: req.body.state,
       pincode: req.body.pincode,
+      gender:req.body.gender,
+      dob:req.body.dob,
       country: req.body.country,
       status: req.body.status ? req.body.status : 1,
       uuid: uuid

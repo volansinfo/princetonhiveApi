@@ -17,22 +17,22 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/user/allAssessment/:studentId",
+    "/api/user/allAssessment",
     [authJwt.verifyToken],
     controller.getAllAssessment
   );
   app.get(
-    "/api/user/assessmentSelf/:studentId",
+    "/api/user/assessmentSelf",
     [authJwt.verifyToken],
     controller.getAssessmentBySelf
   );
   app.get(
-    "/api/user/assessmentAssigned/:studentId",
+    "/api/user/assessmentAssigned",
     [authJwt.verifyToken],
     controller.getAssessmentByAssigned
   );
   app.get(
-    "/api/user/assessmentCompleted/:studentId",
+    "/api/user/assessmentCompleted",
     [authJwt.verifyToken],
     controller.getAssessmentByCompleted
   );

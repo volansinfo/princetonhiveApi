@@ -37,7 +37,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       },
       teacherId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       status: {
         type: Sequelize.ENUM("0", "1"),

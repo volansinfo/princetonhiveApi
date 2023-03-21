@@ -1,4 +1,5 @@
 const controller = require("../controllers/assessment.controller");
+const { authJwt } = require("../middleware");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -9,5 +10,9 @@ module.exports = function (app) {
     next();
   });
 
-  app.post("/api/user/assessment", controller.assignment);
+  app.post(
+    "/api/user/assessment",
+    [authJwt.verifyToken],
+    controller.assignment
+  );
 };

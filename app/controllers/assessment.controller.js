@@ -32,12 +32,10 @@ exports.assignment = async (req, res) => {
         .status(400)
         .send({ status: false, message: "Please Enter Assessment AI Level" });
     } else if (!assessmentStatusType) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          message: "Please Enter Assessment Status Type",
-        });
+      return res.status(400).send({
+        status: false,
+        message: "Please Enter Assessment Status Type",
+      });
     } else if (!studentId) {
       return res
         .status(400)

@@ -123,7 +123,7 @@ mnumberValidation = async (req, res, next) => {
 
 validatePincode = [
   check('pincode').trim().not().isEmpty().withMessage('Please enter pincode!')
-    .isNumeric().withMessage("Please enter integer value!")
+    .isNumeric().withMessage("Please enter only numeric value !")
     .isLength({ min: 5, max: 10 }).withMessage('pincode must be 5 to 10 characters long!')
 ]
 

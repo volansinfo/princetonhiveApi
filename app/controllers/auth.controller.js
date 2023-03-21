@@ -33,6 +33,7 @@ exports.signup = async (req, res) => {
     if (!(req.body.status == 0) && !(req.body.status == 1)) {
       return res.status(400).send({ message: "Invalid input value for enum user_status" })
     }
+
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
@@ -44,8 +45,8 @@ exports.signup = async (req, res) => {
       city: req.body.city,
       state: req.body.state,
       pincode: req.body.pincode,
-      gender:req.body.gender,
-      dob:req.body.dob,
+      gender: req.body.gender,
+      dob: req.body.dob,
       country: req.body.country,
       status: req.body.status ? req.body.status : 1,
       uuid: uuid

@@ -52,9 +52,8 @@ exports.signup = async (req, res) => {
       // password: bcrypt.hashSync(req.body.password, 8),
     });
     const userEmail = req.body.email
-    const username = req.body.username
+    const username = (req.body.fname).trim() + " " + (req.body.lname).trim()
     // const hostType = req.body.hostType
-
 
     const smtpServer = await globalConfig.findOne({
     })
@@ -148,7 +147,7 @@ exports.signin = async (req, res) => {
       authorities.push("ROLE_" + roles[i].name.toUpperCase());
     }
     if (authorities == "ROLE_STUDENT" || authorities == "ROLE_TEACHER") {
-      return res.status(400).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
+      return res.status(401).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
     }
 
     //let tokenKey =  req.session.token = token;
@@ -252,7 +251,7 @@ exports.studentOrTeacherSignin = async (req, res) => {
       });
     }
     else {
-      return res.status(400).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
+      return res.status(401).send({ success: false, message: `You are trying to login as ${authorities} and you can not login here!` })
     }
     //let tokenKey =  req.session.token = token;
   } catch (error) {

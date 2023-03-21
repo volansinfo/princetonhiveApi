@@ -63,7 +63,14 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             //     }
             // }
         },
-
+        gender: {
+            type: Sequelize.ENUM('1', '2', '3'),
+            comment: "1-male,2-female,3-other",
+            allowNull: false
+        },
+        dob: {
+            type: Sequelize.DATEONLY
+        },
         mnumber: {
             type: Sequelize.STRING,
             allowNull: false,

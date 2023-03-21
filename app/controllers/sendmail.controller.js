@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer")
 
-const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
+const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => {
 
 
 
@@ -48,7 +48,12 @@ const sendMail = async (userEmail, generatedPwd, smtpServer, type) => {
             to: userEmail,
             subject: "Welcome to Hive Step",
             text: "Hello from the Hive Step side.",
-            html: `We're glad you're here.Over the next few weeks, we'll share tips to help you to make the most of Hive Step.<br>Login information for your account<br>
+            html: `Welcome to hive steps<br><br><br>
+            Dear  (${username})<br><br>
+            Thanks for Sign-Up.We are delighted to welcome you to the company's internship program. We are delighted to have you join our team! We were happy to read about your interests and endeavours in the areas of (internship tasks) as well as your personal, academic, and professional objectives.<br><br>
+            We look forward to welcoming you soon!<br>
+            Hive Steps Team<br>
+            <br>
             Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>`
         })
 

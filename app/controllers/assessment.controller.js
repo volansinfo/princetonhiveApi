@@ -114,21 +114,30 @@ exports.assignment = async (req, res) => {
       // );
     }
 
-    const isStundentAndTeacherExist = await User.findAll();
+    const isStundentAndTeacherExist = await User.findAll({
+      attributes: ["id", "uuid"],
+    });
+    // console.log(isStundentAndTeacherExist[0].id, "jkjkhjkkj");
     for (let i = 0; i < isStundentAndTeacherExist.length; i++) {
-      if (isStundentAndTeacherExist[i].id == studentId) {
+      if (
+        isStundentAndTeacherExist[i].id == studentId ||
+        isStundentAndTeacherExist[i].id == teacherId
+      ) {
         const assessment = await Assessment.create(data);
         return res.status(201).send({
           status: 201,
-          message: "Assessment created successfully ",
+          message: "created Assignment successfully",
           data: assessment,
         });
       } else {
-        return res.status(400).send({
-          status: false,
-          message: "Student does not exist",
-        });
+        return res
+          .status(400)
+          .send({ status: false, message: "user not exist" });
       }
+
+      // const studentUUID = isStundentAndTeacherExist[i].uuid;
+      // const UUID = studentUUID.slice(0, 3);
+      // console.log(UUID);
     }
 
     // const assessment = await Assessment.create(data);

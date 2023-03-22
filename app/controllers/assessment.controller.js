@@ -19,11 +19,11 @@ exports.assignment = async (req, res) => {
     if (!assessmentName) {
       return res
         .status(400)
-        .send({ status: false, message: "Please Enter Assessment Name" });
+        .send({ status: false, message: "Please enter assessment name" });
     } else if (!assessmentResponseType) {
       return res.status(400).send({
         status: false,
-        message: "Please Enter Assessment Response Type",
+        message: "Please enter assessment response type",
       });
     } else if (
       assessmentResponseType != "1" &&
@@ -33,9 +33,12 @@ exports.assignment = async (req, res) => {
     ) {
       return res.status(400).send({
         status: false,
-        message:
-          "Please Enter valid enum like [1,2,3,4] of assessment response type",
+        message: "Please Enter valid assessment response type like [1,2,3,4]",
       });
+    } else if (!assessmentPurpose) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment purpose" });
     } else if (
       assessmentPurpose != "1" &&
       assessmentPurpose != "2" &&
@@ -45,9 +48,12 @@ exports.assignment = async (req, res) => {
     ) {
       return res.status(400).send({
         status: false,
-        message:
-          "Please Enter valid enum like [1,2,3,4,5] of assessment purpose",
+        message: "Please Enter valid assessment purpose like [1,2,3,4,5]",
       });
+    } else if (!assessmentAILevel) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please Enter assessment AI level" });
     } else if (
       assessmentAILevel != "1" &&
       assessmentAILevel != "2" &&
@@ -55,7 +61,12 @@ exports.assignment = async (req, res) => {
     ) {
       return res.status(400).send({
         status: false,
-        message: "Please Enter valid enum like [1,2,3] of assessment AI level",
+        message: "Please enter valid assessment AI level like [1,2,3]",
+      });
+    } else if (!assessmentStatusType) {
+      return res.status(400).send({
+        status: false,
+        message: "Please Enter Assessment Status Type",
       });
     } else if (
       assessmentStatusType != "1" &&
@@ -65,26 +76,8 @@ exports.assignment = async (req, res) => {
     ) {
       return res.status(400).send({
         status: false,
-        message:
-          "Please enter valid enum like [1,2,3,4] of assessment status type",
+        message: "Please enter valid assessment status like [1,2,3,4]",
       });
-    } else if (!assessmentPurpose) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Assessment Purpose" });
-    } else if (!assessmentAILevel) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Assessment AI Level" });
-    } else if (!assessmentStatusType) {
-      return res.status(400).send({
-        status: false,
-        message: "Please Enter Assessment Status Type",
-      });
-    } else if (!studentId) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter StudentId" });
     } else if (!status) {
       return res
         .status(400)
@@ -107,45 +100,29 @@ exports.assignment = async (req, res) => {
           message: "Assessment name is  already exist",
         });
       }
-      // console.log(
-      //   findStudentId[i].studentId,
-      //   findStudentId[i].assessmentName,
-      //   "findassessement"
-      // );
     }
 
-    const isStundentAndTeacherExist = await User.findAll({
-      attributes: ["id", "uuid"],
+    const userId = await User.findOne({
+      where: {
+        id: req.body.studentId,
+      },
     });
-    // console.log(isStundentAndTeacherExist[0].id, "jkjkhjkkj");
-    for (let i = 0; i < isStundentAndTeacherExist.length; i++) {
-      if (
-        isStundentAndTeacherExist[i].id == studentId ||
-        isStundentAndTeacherExist[i].id == teacherId
-      ) {
-        const assessment = await Assessment.create(data);
-        return res.status(201).send({
-          status: 201,
-          message: "created Assignment successfully",
-          data: assessment,
-        });
-      } else {
-        return res
-          .status(400)
-          .send({ status: false, message: "user not exist" });
-      }
-
-      // const studentUUID = isStundentAndTeacherExist[i].uuid;
-      // const UUID = studentUUID.slice(0, 3);
-      // console.log(UUID);
+    if (!studentId) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please Enter StudentId" });
+    } else if (!userId) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Student does not exist" });
     }
 
-    // const assessment = await Assessment.create(data);
-    // return res.status(201).send({
-    //   status: 201,
-    //   message: "created Assignment successfully",
-    //   data: assessment,
-    // });
+    const assessment = await Assessment.create(data);
+    return res.status(201).send({
+      status: 201,
+      message: "Assessment created successfully",
+      data: assessment,
+    });
   } catch (error) {
     return res.status(500).send(error);
   }

@@ -85,10 +85,6 @@ exports.assignment = async (req, res) => {
       return res
         .status(400)
         .send({ status: false, message: "Please Enter StudentId" });
-    } else if (!teacherId) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter StudentId" });
     } else if (!status) {
       return res
         .status(400)
@@ -120,10 +116,7 @@ exports.assignment = async (req, res) => {
 
     const isStundentAndTeacherExist = await User.findAll();
     for (let i = 0; i < isStundentAndTeacherExist.length; i++) {
-      if (
-        isStundentAndTeacherExist[i].id == studentId &&
-        isStundentAndTeacherExist[i].id == teacherId
-      ) {
+      if (isStundentAndTeacherExist[i].id == studentId) {
         const assessment = await Assessment.create(data);
         return res.status(201).send({
           status: 201,
@@ -133,7 +126,7 @@ exports.assignment = async (req, res) => {
       } else {
         return res.status(400).send({
           status: false,
-          message: "Student or Teacher does not exist",
+          message: "Student does not exist",
         });
       }
     }

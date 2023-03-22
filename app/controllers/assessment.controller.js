@@ -118,13 +118,13 @@ exports.assignment = async (req, res) => {
     }
 
     const assessment = await Assessment.create(data);
-    return res.status(201).send({
-      status: 201,
+    return res.status(200).send({
+      status: 200,
       message: "Assessment created successfully",
       data: assessment,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -155,7 +155,7 @@ exports.getAllAssessment = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -188,7 +188,7 @@ exports.getAssessmentBySelf = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -221,7 +221,7 @@ exports.getAssessmentByAssigned = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -254,6 +254,6 @@ exports.getAssessmentByCompleted = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };

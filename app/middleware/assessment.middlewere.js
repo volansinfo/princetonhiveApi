@@ -107,15 +107,16 @@ exports.assignmenErrorHanding = async (req, res, next) => {
         id: req.body.studentId,
       },
     });
-    if (!studentId) {
+    if (!studentId && studentId == "") {
       return res
         .status(400)
         .send({ status: false, message: "Please Enter StudentId" });
     } else if (!userId) {
       return res
-        .status(400)
+        .status(404)
         .send({ status: false, message: "Student does not exist" });
     }
+
     next();
   } catch (error) {
     return res.status(500).send({ success: false, message: error.message });

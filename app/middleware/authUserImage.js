@@ -21,7 +21,7 @@ let storage = multer.diskStorage({
 
 let uploadFile = multer({
     storage: storage,
-    limits: { fileSize: 67 * 1024 },
+    limits: { fileSize: 7 * 1024 },
 }).single("profileImg");
 
 let authUserImage = util.promisify(uploadFile);

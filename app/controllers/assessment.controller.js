@@ -4,148 +4,23 @@ const pagination = require("../middleware/pagination");
 const User = db.user;
 exports.assignment = async (req, res) => {
   try {
-    const data = req.body;
-    const {
-      assessmentName,
-      assessmentResponseType,
-      assessmentPurpose,
-      assessmentAILevel,
-      assessmentStatusType,
-      studentId,
-      teacherId,
-      status,
-    } = data;
-
-    if (!assessmentName) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Assessment Name" });
-    } else if (!assessmentResponseType) {
-      return res.status(400).send({
-        status: false,
-        message: "Please Enter Assessment Response Type",
-      });
-    } else if (
-      assessmentResponseType != "1" &&
-      assessmentResponseType != "2" &&
-      assessmentResponseType != "3" &&
-      assessmentResponseType != "4"
-    ) {
-      return res.status(400).send({
-        status: false,
-        message:
-          "Please Enter valid enum like [1,2,3,4] of assessment response type",
-      });
-    } else if (
-      assessmentPurpose != "1" &&
-      assessmentPurpose != "2" &&
-      assessmentPurpose != "3" &&
-      assessmentPurpose != "4" &&
-      assessmentPurpose != "5"
-    ) {
-      return res.status(400).send({
-        status: false,
-        message:
-          "Please Enter valid enum like [1,2,3,4,5] of assessment purpose",
-      });
-    } else if (
-      assessmentAILevel != "1" &&
-      assessmentAILevel != "2" &&
-      assessmentAILevel != "3"
-    ) {
-      return res.status(400).send({
-        status: false,
-        message: "Please Enter valid enum like [1,2,3] of assessment AI level",
-      });
-    } else if (
-      assessmentStatusType != "1" &&
-      assessmentStatusType != "2" &&
-      assessmentStatusType != "3" &&
-      assessmentStatusType != "4"
-    ) {
-      return res.status(400).send({
-        status: false,
-        message:
-          "Please enter valid enum like [1,2,3,4] of assessment status type",
-      });
-    } else if (!assessmentPurpose) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Assessment Purpose" });
-    } else if (!assessmentAILevel) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Assessment AI Level" });
-    } else if (!assessmentStatusType) {
-      return res.status(400).send({
-        status: false,
-        message: "Please Enter Assessment Status Type",
-      });
-    } else if (!studentId) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter StudentId" });
-    } else if (!teacherId) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter StudentId" });
-    } else if (!status) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Status" });
-    } else if (status != "0" && status != "1") {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter valid enum like [0,1] of status type",
-      });
-    }
-
-    const findStudentId = await Assessment.findAll();
-    for (let i = 0; i < findStudentId.length; i++) {
-      if (
-        findStudentId[i].studentId == studentId &&
-        findStudentId[i].assessmentName == assessmentName
-      ) {
-        return res.status(400).send({
-          status: false,
-          message: "Assessment name is  already exist",
-        });
-      }
-      // console.log(
-      //   findStudentId[i].studentId,
-      //   findStudentId[i].assessmentName,
-      //   "findassessement"
-      // );
-    }
-
-    const isStundentAndTeacherExist = await User.findAll();
-    for (let i = 0; i < isStundentAndTeacherExist.length; i++) {
-      if (
-        isStundentAndTeacherExist[i].id == studentId &&
-        isStundentAndTeacherExist[i].id == teacherId
-      ) {
-        const assessment = await Assessment.create(data);
-        return res.status(201).send({
-          status: 201,
-          message: "Assessment created successfully ",
-          data: assessment,
-        });
-      } else {
-        return res.status(400).send({
-          status: false,
-          message: "Student or Teacher does not exist",
-        });
-      }
-    }
-
-    // const assessment = await Assessment.create(data);
-    // return res.status(201).send({
-    //   status: 201,
-    //   message: "created Assignment successfully",
-    //   data: assessment,
-    // });
+    const assessment = await Assessment.create({
+      assessmentName: req.body.assessmentName,
+      assessmentResponseType: req.body.assessmentResponseType,
+      assessmentPurpose: req.body.assessmentPurpose,
+      assessmentAILevel: req.body.assessmentAILevel,
+      assessmentStatusType: req.body.assessmentStatusType,
+      studentId: req.body.studentId,
+      teacherId: req.body.teacherId,
+      status: req.body.status,
+    });
+    return res.status(200).send({
+      status: 200,
+      message: "Assessment created successfully",
+      data: assessment,
+    });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -156,6 +31,9 @@ exports.getAllAssessment = async (req, res) => {
     const results = await Assessment.findAndCountAll({
       limit,
       offset,
+      where: {
+        status: "1",
+      },
       order: [["id", "DESC"]],
     });
 
@@ -176,7 +54,7 @@ exports.getAllAssessment = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -189,6 +67,7 @@ exports.getAssessmentBySelf = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "1",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -209,7 +88,7 @@ exports.getAssessmentBySelf = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -222,6 +101,7 @@ exports.getAssessmentByAssigned = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "2",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -242,7 +122,7 @@ exports.getAssessmentByAssigned = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };
 
@@ -255,6 +135,7 @@ exports.getAssessmentByCompleted = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "3",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -275,6 +156,6 @@ exports.getAssessmentByCompleted = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ success: false, message: error.message });
   }
 };

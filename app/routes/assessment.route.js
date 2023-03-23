@@ -1,6 +1,6 @@
 const controller = require("../controllers/assessment.controller");
 const { authJwt } = require("../middleware");
-
+const assessmentError = require("../middleware/assessment.middlewere");
 module.exports = function (app) {
   app.use(function (req, res, next) {
     res.header(
@@ -12,7 +12,8 @@ module.exports = function (app) {
 
   app.post(
     "/api/user/assessment",
-    [authJwt.verifyToken],
+
+    [authJwt.verifyToken, assessmentError.assignmenErrorHanding],
     controller.assignment
   );
 

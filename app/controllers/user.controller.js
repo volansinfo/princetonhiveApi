@@ -4,6 +4,7 @@ const pagination = require("../middleware/pagination")
 const User = db.user;
 const Role = db.role;
 const Op = db.Sequelize.Op;
+const uploadFile = require("../middleware/authUserImage")
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -160,28 +161,46 @@ exports.userstatus = async (req, res) => {
 
 exports.updateUserData = async (req, res) => {
   try {
-    if (!(req.body.fname)) {
+    await uploadFile(req, res);
+    if (req.file == undefined) {
+      return res.status(400).send({ message: "Please upload a file!" });
+    }
+
+    // first name validation
+    if (!(req.body.fname).trim()) {
       return res.status(400).send({ message: "Please enter first name!" })
     }
-    if (!(req.body.email)) {
+
+    // email validation
+    if (!(req.body.email).trim()) {
       return res.status(400).send({ message: "Please enter email address!" })
     }
     else if (!isEmail(req.body.email)) {
       return res.status(400).send({ message: "Please enter valid email address!" })
     }
-    if (!(req.body.mnumber)) {
+
+    // mobile number validation
+    if (!(req.body.mnumber).trim()) {
       return res.status(400).send({ message: "Please enter mobile number!" })
     }
-    if (!(req.body.pincode)) {
+    else if ((req.body.mnumber).length != 10) {
+      return res.status(400).send({ success: false, message: "Please enter valid mobile number!" })
+    }
+    else if (isNaN(req.body.mnumber)) {
+      return res.status(400).send({ success: false, message: "please enter numeric value!" })
+    }
+
+    // pincode validation
+    if (!(req.body.pincode).trim()) {
       return res.status(400).send({ message: "Please enter pincode!" })
     }
     else if ((req.body.pincode.length > 10) || (req.body.pincode.length < 5)) {
       return res.status(400).send({ message: "Please enter valid pincode!" })
     }
     else if (isNaN(req.body.pincode)) {
-
       return res.status(400).send({ message: "Please enter valid pincode!" })
     }
+
     if (!(req.body.status)) {
       return res.status(400).send({ message: "Please enter value for enum user_status" })
     }
@@ -192,6 +211,7 @@ exports.updateUserData = async (req, res) => {
     const result = await User.update({
       fname: req.body.fname,
       lname: req.body.lname,
+      profileImg: req.file.filename,
       // password: bcrypt.hashSync(req.body.password, 8),
       // actualPassword: req.body.password,
       email: req.body.email,
@@ -200,8 +220,8 @@ exports.updateUserData = async (req, res) => {
       city: req.body.city,
       state: req.body.state,
       pincode: req.body.pincode,
-      gender:req.body.gender,
-      dob:req.body.dob,
+      gender: req.body.gender,
+      dob: req.body.dob,
       country: req.body.country,
       status: req.body.status,
     },

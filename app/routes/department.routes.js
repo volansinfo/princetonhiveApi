@@ -28,12 +28,12 @@ module.exports = function (app) {
     )
 
     app.delete("/api/vol/department/:id",
-        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        [authJwt.verifyToken, (authJwt.isSupportOrAdmin || authJwt.isTeacher)],
         controller.departmentDelete
     );
     app.post(
         "/api/vol/department/:id",
-        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        [authJwt.verifyToken, (authJwt.isSupportOrAdmin || authJwt.isTeacher)],
         controller.updateDepartment
     );
 }

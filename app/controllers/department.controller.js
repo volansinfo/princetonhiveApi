@@ -8,13 +8,14 @@ exports.departmentAdd = async (req, res) => {
     try {
         const existdepartment = await department.findOne({
             where: {
-                departmentName: req.body.departmentName
+                departmentName: (req.body.departmentName).trim()
             }
         })
+
         if (existdepartment) {
             return res.status(400).send({ success: false, message: "Department already exist!" })
         }
-        console.log(existdepartment, "******************************")
+
         if ((req.body.departmentName).trim() == "") {
             return res.status(400).send({ message: "Please enter department name!" })
         }

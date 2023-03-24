@@ -15,15 +15,15 @@ module.exports = function (app) {
         controller.departmentAdd
     );
     app.get("/api/vol/department",
-        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        [authJwt.verifyToken, (authJwt.isSupportOrAdmin || authJwt.isTeacher)],
         controller.getAllDepartments
     );
     app.get("/api/vol/department/:id",
-        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        [authJwt.verifyToken, (authJwt.isSupportOrAdmin || authJwt.isTeacher)],
         controller.getDepartment
     );
     app.patch("/api/vol/department/:id",
-        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        [authJwt.verifyToken, (authJwt.isSupportOrAdmin || authJwt.isTeacher)],
         controller.departmentstatus
     )
 

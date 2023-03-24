@@ -31,6 +31,9 @@ exports.getAllAssessment = async (req, res) => {
     const results = await Assessment.findAndCountAll({
       limit,
       offset,
+      where: {
+        status: "1",
+      },
       order: [["id", "DESC"]],
     });
 
@@ -64,6 +67,7 @@ exports.getAssessmentBySelf = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "1",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -97,6 +101,7 @@ exports.getAssessmentByAssigned = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "2",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -130,6 +135,7 @@ exports.getAssessmentByCompleted = async (req, res) => {
       offset,
       where: {
         assessmentStatusType: "3",
+        status: "1",
       },
       order: [["id", "DESC"]],
     });

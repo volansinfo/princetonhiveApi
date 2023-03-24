@@ -8,18 +8,17 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         fname: {
             type: Sequelize.STRING,
             allowNull: false,
-            // validate: {
-            //     len: {
-            //         args: [3, 50],
-            //         msg: 'Please enter first name.'
-            //     }
-            // }
         },
 
         lname: {
             type: Sequelize.STRING,
             allowNull: true
         },
+        profileImg: {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
+
 
         uuid: {
             type: DataTypes.STRING,
@@ -54,14 +53,6 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: {
-                msg: 'This email is already taken.'
-            },
-            // validate: {
-            //     isEmail: {
-            //         msg: 'Email address must be valid.'
-            //     }
-            // }
         },
         gender: {
             type: Sequelize.ENUM('1', '2', '3'),
@@ -74,11 +65,6 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         mnumber: {
             type: Sequelize.STRING,
             allowNull: false,
-            // validate: {
-            //     notNull: { args: true, msg: "You must enter Phone Number" },
-            //     len: { args: [10, 10], msg: 'Phone Number is invalid' },
-            //     isInt: { args: true, msg: "You must enter Phone Number" },
-            // }
         },
 
         address: {
@@ -98,9 +84,6 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
 
         pincode: {
             type: Sequelize.STRING,
-            // validate: {
-            //     isNumeric: true
-            // }
         },
 
         country: {

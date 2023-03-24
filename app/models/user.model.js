@@ -18,7 +18,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: Sequelize.TEXT,
             allowNull: true,
         },
-
+        path: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
 
         uuid: {
             type: DataTypes.STRING,

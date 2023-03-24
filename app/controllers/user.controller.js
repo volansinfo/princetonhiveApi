@@ -212,7 +212,6 @@ exports.updateUserData = async (req, res) => {
       fname: req.body.fname,
       lname: req.body.lname,
       profileImg: req.file.filename,
-      path: req.file.path,
       // password: bcrypt.hashSync(req.body.password, 8),
       // actualPassword: req.body.password,
       email: req.body.email,

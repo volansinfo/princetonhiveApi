@@ -149,6 +149,9 @@ exports.updateDepartment = async (req, res) => {
         if (!departmentData) {
             return res.status(404).send({ success: false, message: "Department Not found!" });
         }
+
+        const allDepartmentData = await department.findAll()
+        console.log(allDepartmentData, "888888888888888888888888888888")
         if ((req.body.status).trim() == "") {
             return res.status(400).send({ message: "Status value should not empty!" })
         }

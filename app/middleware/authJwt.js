@@ -107,6 +107,27 @@ isSupportOrAdmin = async (req, res, next) => {
   }
 };
 
+isTeacher = async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.userId);
+    const roles = await user.getRoles();
+
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name === "teacher") {
+        return next();
+      }
+    }
+
+    return res.status(400).send({
+      message: "Require Techer Role!",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Unable to validate User role!",
+    });
+  }
+};
+
 checkUserAddPermission = async (req, res, next) => {
   try {
     let token = req.headers["x-access-token"]
@@ -354,6 +375,7 @@ const authJwt = {
   isAdmin,
   isSupport,
   isSupportOrAdmin,
+  isTeacher,
   checkUserAddPermission,
   checkUserUpdatePermission,
   checkUserReadPermission,

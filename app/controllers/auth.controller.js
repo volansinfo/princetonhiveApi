@@ -120,6 +120,7 @@ exports.signup = async (req, res) => {
       fname: req.body.fname,
       lname: req.body.lname,
       profileImg: req.file.filename,
+      path: req.file.path,
       password: bcrypt.hashSync(generatedPwd, 8),
       actualPassword: generatedPwd,
       email: req.body.email,

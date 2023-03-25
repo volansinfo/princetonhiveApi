@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/vol/img", express.static('uploads'));
+app.use("/princetonhive/img", express.static('uploads'));
 global.__basedir = __dirname;
 
 // app.use(

@@ -98,7 +98,7 @@ isSupportOrAdmin = async (req, res, next) => {
     }
 
     return res.status(400).send({
-      message: "Require Support or Admin Role!",
+      message: "You don't have permission to access this module!",
     });
   } catch (error) {
     return res.status(500).send({
@@ -119,11 +119,39 @@ isTeacher = async (req, res, next) => {
     }
 
     return res.status(400).send({
-      message: "Require Techer Role!",
+      message: `You don't have permission to access this module!`,
     });
   } catch (error) {
     return res.status(500).send({
       message: "Unable to validate User role!",
+    });
+  }
+};
+
+isSupportOrAdminOrTeacher = async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.userId);
+    const roles = await user.getRoles();
+
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name === "support") {
+        return next();
+      }
+
+      if (roles[i].name === "admin") {
+        return next();
+      }
+      if (roles[i].name === "teacher") {
+        return next();
+      }
+    }
+
+    return res.status(400).send({
+      message: "You don't have permission to access this module!",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Unable to validate Support or Admin or Teacher role!",
     });
   }
 };
@@ -376,6 +404,7 @@ const authJwt = {
   isSupport,
   isSupportOrAdmin,
   isTeacher,
+  isSupportOrAdminOrTeacher,
   checkUserAddPermission,
   checkUserUpdatePermission,
   checkUserReadPermission,

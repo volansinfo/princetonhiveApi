@@ -14,4 +14,24 @@ module.exports = function (app) {
         [authJwt.verifyToken, authJwt.isTeacher],
         controller.questionAdd
     );
+    app.get(
+        "/api/vol/question",
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
+        controller.getAllQuestion
+    );
+    app.delete(
+        "/api/vol/question/:id",
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
+        controller.questionDelete
+    );
+    app.post(
+        "/api/vol/question/:id",
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
+        controller.updateQuestion
+    );
+    app.patch(
+        "/api/vol/question/:id",
+        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+        controller.questionStatus
+    );
 }

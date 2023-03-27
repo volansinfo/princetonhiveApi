@@ -21,6 +21,22 @@ exports.questionAdd = async (req, res) => {
         if (existquestion) {
             return res.status(400).send({ success: false, message: "Question already exist!" })
         }
+        if (!(req.body.questionName).trim()) {
+            return res.status(400).send({ message: "Please enter Question name!" });
+        }
+        if (!(req.body.departments).trim()) {
+            return res.status(400).send({ message: "Please enter Department!" });
+        }
+        if (isNaN(req.body.departments)) {
+            return res.status(400).send({ message: "Please enter numeric value!" });
+        }
+        if (!(req.body.level).trim()) {
+            return res.status(400).send({ message: "Please enter level!" });
+        }
+        if (!(req.body.level == 0) && !(req.body.level == 1) && !(req.body.level == 2)) {
+            return res.status(400).send({ message: "Invalid input value for enum level!" })
+        }
+
         const extension = req.file.originalname.split(".")[1]
         if (extension == "jpeg" || extension == "jpg" || extension == "png") {
 
@@ -87,26 +103,25 @@ exports.getAllQuestion = async (req, res) => {
 exports.questionDelete = async (req, res) => {
     try {
         const QuestionId = req.params.id;
-        const data = await question.findOne({
+        if (!(QuestionId)) {
+            return res.status(404).send({ message: "Question Not found!" })
+        }
+
+        const questiondelete = await question.destroy({
             where: {
-                id: QuestionId,
-            },
+                id: QuestionId
+            }
+
+        }).then(num => {
+
+            if (num == 1) {
+
+                res.status(200).send({ message: "Question deleted successfully." });
+            } else {
+                res.status(404).send({ message: "Question Not found!" });
+            }
+
         });
-        if (!data) {
-            return res.status(404).send({ message: "Question Not found!" });
-        }
-        const path = __basedir + "/uploads/question/" + data.questionImgUrl;
-
-        if (fs.existsSync(path)) {
-
-            const questiondelete = await question.destroy({
-                where: {
-                    id: QuestionId
-                }
-            })
-            const removeImage = await fs.unlinkSync(__basedir + "/uploads/question/" + data.questionImgUrl);
-        }
-        res.status(200).send({ message: "Question deleted successfully!" });
 
     } catch (error) {
         return res.status(500).send({ message: error.message });
@@ -132,6 +147,21 @@ exports.updateQuestion = async (req, res) => {
         else if (!(req.body.status == 0) && !(req.body.status == 1)) {
             return res.status(400).send({ message: "Invalid input value for enum question_status" })
         }
+        if (!(req.body.questionName).trim()) {
+            return res.status(400).send({ message: "Please enter Question name!" });
+        }
+        if (!(req.body.departments).trim()) {
+            return res.status(400).send({ message: "Please enter Department!" });
+        }
+        if (isNaN(req.body.departments)) {
+            return res.status(400).send({ message: "Please enter numeric value!" });
+        }
+        if (!(req.body.level).trim()) {
+            return res.status(400).send({ message: "Please enter level!" });
+        }
+        if (!(req.body.level == 0) && !(req.body.level == 1) && !(req.body.level == 2)) {
+            return res.status(400).send({ message: "Invalid input value for enum level!" })
+        }
 
         const extension = req.file.originalname.split(".")[1]
         if (extension == "jpeg" || extension == "jpg" || extension == "png") {
@@ -141,7 +171,7 @@ exports.updateQuestion = async (req, res) => {
                 departments: req.body.departments,
                 level: req.body.level,
                 questionImgUrl: req.file.filename,
-                status: req.body.status
+                status: req.body.status ? req.body.status : 1
             },
                 { where: { id: questionId } }
 

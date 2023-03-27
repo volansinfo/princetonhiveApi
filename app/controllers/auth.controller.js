@@ -22,9 +22,6 @@ const { default: isEmail } = require("validator/lib/isEmail");
 exports.signup = async (req, res) => {
   // Save User to Database
   try {
-<<<<<<< HEAD
-    const uuid = await generateUUID(req);
-=======
 
     await uploadFile(req, res);
     if (req.file == undefined) {
@@ -33,19 +30,11 @@ exports.signup = async (req, res) => {
 
 
     const uuid = await generateUUID(req)
->>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
 
     let generatedPwd = await generator.generate({
       length: 6,
       numbers: true,
-<<<<<<< HEAD
-    });
-    // if (!(req.body.status)) {
-    //   return res.status(400).send({ message: "Please enter value for enum user_status" })
-    // }
-=======
     })
->>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
     if (!(req.body.status == 0) && !(req.body.status == 1)) {
       return res
         .status(400)
@@ -143,21 +132,10 @@ exports.signup = async (req, res) => {
       dob: req.body.dob,
       country: req.body.country,
       status: req.body.status ? req.body.status : 1,
-<<<<<<< HEAD
-      uuid: uuid,
-      // username: req.body.username,
-      // email: req.body.email,
-      // password: bcrypt.hashSync(req.body.password, 8),
-    });
-    const userEmail = req.body.email;
-    const username = req.body.fname.trim() + " " + req.body.lname.trim();
-    // const hostType = req.body.hostType
-=======
       uuid: uuid
     });
     const userEmail = req.body.email
     const username = (req.body.fname).trim() + " " + (req.body.lname).trim()
->>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
 
     const smtpServer = await globalConfig.findOne({});
 

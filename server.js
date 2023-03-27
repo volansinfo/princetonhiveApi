@@ -1,12 +1,15 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 //const cookieSession = require("cookie-session");
 const app = express();
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/vol/img", express.static('uploads'));
+app.use(bodyParser.json());
+app.use("/vol/img", express.static("uploads"));
+
 global.__basedir = __dirname;
 
 // app.use(
@@ -17,6 +20,12 @@ global.__basedir = __dirname;
 //     sameSite: 'strict'
 //   })
 // );
+app.get("/", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send("Hello World!");
+  res.setHeader("Content-type", "multipart/form-data");
+  res.setHeader("Content-Type", "text/csv");
+});
 
 // database
 const db = require("./app/models");
@@ -29,21 +38,21 @@ db.sequelize.sync();
 // });
 
 //require("./app/routes/stuReg.routes")(app);
-require('./app/routes/auth.routes')(app);
-require('./app/routes/user.routes')(app);
-require('./app/routes/slider.routes')(app);
-require('./app/routes/cms.routes')(app);
-require('./app/routes/menu.routes')(app);
-require('./app/routes/role.routes')(app);
-require('./app/routes/globalConfig.routes')(app);
-require('./app/routes/widget.routes')(app);
+require("./app/routes/auth.routes")(app);
+require("./app/routes/user.routes")(app);
+require("./app/routes/slider.routes")(app);
+require("./app/routes/cms.routes")(app);
+require("./app/routes/menu.routes")(app);
+require("./app/routes/role.routes")(app);
+require("./app/routes/globalConfig.routes")(app);
+require("./app/routes/widget.routes")(app);
 require("./app/routes/stateCountry.routes")(app);
 require("./app/routes/admin.routes")(app);
-require("./app/routes/student.routes")(app)
-require("./app/routes/teacher.routes")(app)
-require("./app/routes/university.routes")(app)
-require("./app/routes/support.routes")(app)
-require("./app/routes/assessment.route")(app)
+require("./app/routes/student.routes")(app);
+require("./app/routes/teacher.routes")(app);
+require("./app/routes/university.routes")(app);
+require("./app/routes/support.routes")(app);
+require("./app/routes/assessment.route")(app);
 app.listen(port, () => {
-        console.log(`Connection is setup at ${port}`);
+  console.log(`Connection is setup at ${port}`);
 });

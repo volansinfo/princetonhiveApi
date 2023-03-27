@@ -1,6 +1,11 @@
 const controller = require("../controllers/assessment.controller");
 const { authJwt } = require("../middleware");
 const assessmentError = require("../middleware/assessment.middlewere");
+
+const csvController = require("../controllers/csv.controller");
+
+const upload = require("../middleware/multer");
+
 module.exports = function (app) {
   app.use(function (req, res, next) {
     res.header(
@@ -37,4 +42,5 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAssessmentByCompleted
   );
+  app.post("/api/csv-file", [upload.single("file")], csvController.uploadCsv);
 };

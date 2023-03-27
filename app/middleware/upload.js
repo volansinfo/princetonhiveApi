@@ -7,13 +7,12 @@ let storage = multer.diskStorage({
     cb(null, __basedir + "/uploads/slider/");
   },
   filename: (req, file, cb) => {
-
     var filetype = file.mimetype;
     var fileformate = filetype.split("/")[1];
 
-    var  data = req.body.title;
-    var  num = data.toLowerCase();
-    var imageName = num.replace(/\s+/g, '-');
+    var data = req.body.title;
+    var num = data.toLowerCase();
+    var imageName = num.replace(/\s+/g, "-");
 
     //console.log(req.body);
     //console.log(file.originalname);

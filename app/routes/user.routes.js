@@ -45,10 +45,7 @@ module.exports = function (app) {
 
   // Update a User data using id
   app.post("/api/vol/user/:id",
-    [authJwt.verifyToken,
-    verifySignUp.validateMnumber,
-    verifySignUp.mnumberValidation,
-    authJwt.isSupportOrAdmin],
+    [authJwt.verifyToken],
     controller.updateUserData
   );
 

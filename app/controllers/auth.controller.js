@@ -5,7 +5,9 @@ const Role = db.role;
 const globalConfig = db.globalConfig;
 const generator = require("generate-password");
 const Op = db.Sequelize.Op;
-const { verifySignUp } = require("../middleware");
+const verifySignUp = require("../middleware/verifySignUp");
+const uploadFile = require("../middleware/authUserImage")
+const fs = require("fs");
 
 const sendMail = require("./sendmail.controller");
 const generateUUID = require("./uuid.controller");
@@ -13,29 +15,122 @@ const generateUUID = require("./uuid.controller");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { where } = require("sequelize");
+const { check } = require("express-validator");
+const { validateEmail } = require("../middleware/verifySignUp");
+const { default: isEmail } = require("validator/lib/isEmail");
 
 exports.signup = async (req, res) => {
   // Save User to Database
   try {
+<<<<<<< HEAD
     const uuid = await generateUUID(req);
+=======
 
-    // res.status(200).send({ message: "User registered successfully!" });
+    await uploadFile(req, res);
+    if (req.file == undefined) {
+      return res.status(400).send({ message: "Please upload a file!" });
+    }
+
+
+    const uuid = await generateUUID(req)
+>>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
+
     let generatedPwd = await generator.generate({
       length: 6,
       numbers: true,
+<<<<<<< HEAD
     });
     // if (!(req.body.status)) {
     //   return res.status(400).send({ message: "Please enter value for enum user_status" })
     // }
+=======
+    })
+>>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
     if (!(req.body.status == 0) && !(req.body.status == 1)) {
       return res
         .status(400)
         .send({ message: "Invalid input value for enum user_status" });
     }
 
+    // first name validation
+
+    if (!(req.body.fname).trim()) {
+      return res.status(400).send({ success: false, message: "Please enter first name!" })
+    }
+    else if ((req.body.fname).length < 3 || (req.body.fname).length > 50) {
+      return res.status(400).send({ success: false, message: "first name must be 3 to 50 characters long!" })
+    }
+
+    // checking duplicate email
+
+    checkUser = await User.findOne({
+      where: {
+        email: req.body.email
+      }
+    });
+
+    if (checkUser) {
+      return res.status(400).send({
+        success: false,
+        message: "Failed! Email is already in use!"
+      });
+    }
+    // email validation
+    if (!(req.body.email).trim()) {
+      return res.status(400).send({ success: false, message: "Please enter email address!" })
+    }
+
+    else if (!isEmail(req.body.email)) {
+      return res.status(400).send({ success: false, message: "please enter valid email!" })
+    }
+
+    // mobile number validation
+    if (!(req.body.mnumber).trim()) {
+      return res.status(400).send({ success: false, message: "Please enter mobile number!" })
+    }
+    else if ((req.body.mnumber).length != 10) {
+      return res.status(400).send({ success: false, message: "Please enter valid mobile number!" })
+    }
+    else if (isNaN(req.body.mnumber)) {
+      return res.status(400).send({ success: false, message: "please enter numeric value!" })
+    }
+
+    // pincode validation
+    if (!(req.body.pincode).trim()) {
+      return res.status(400).send({ success: false, message: "Please enter pincode!" })
+    }
+
+    else if ((req.body.pincode).length < 5 || (req.body.pincode).length > 10) {
+      return res.status(400).send({ success: false, message: 'pincode must be 5 to 10 characters long!' })
+    }
+    else if (isNaN(req.body.pincode)) {
+      return res.status(400).send({ success: false, message: "please enter numeric value!" })
+    }
+    if (!(req.body.status == 0) && !(req.body.status == 1)) {
+      return res.status(400).send({ message: "Invalid input value for enum user_status" })
+    }
+    const roleExist = await Role.findOne({
+      where: {
+        name: req.body.roles[0]
+      }
+    })
+
+    if (!(req.body.roles[0])) {
+      return res.status(400).send({ success: false, message: "Please enter role!" })
+    }
+    else if (roleExist == null) {
+      return res.status(400).send({ success: false, message: "Role does not exist!" })
+    }
+
+    if (req.file.originalname.split(".")[1] != "jpg" && req.file.originalname.split(".")[1] != "jpeg" && req.file.originalname.split(".")[1] != "png") {
+      return res.status(400).send({ success: false, message: "File type does not allow" })
+    }
+
+
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
+      profileImg: req.file.filename,
       password: bcrypt.hashSync(generatedPwd, 8),
       actualPassword: generatedPwd,
       email: req.body.email,
@@ -48,6 +143,7 @@ exports.signup = async (req, res) => {
       dob: req.body.dob,
       country: req.body.country,
       status: req.body.status ? req.body.status : 1,
+<<<<<<< HEAD
       uuid: uuid,
       // username: req.body.username,
       // email: req.body.email,
@@ -56,6 +152,12 @@ exports.signup = async (req, res) => {
     const userEmail = req.body.email;
     const username = req.body.fname.trim() + " " + req.body.lname.trim();
     // const hostType = req.body.hostType
+=======
+      uuid: uuid
+    });
+    const userEmail = req.body.email
+    const username = (req.body.fname).trim() + " " + (req.body.lname).trim()
+>>>>>>> 0cd7c662142e73a21a928dc09c6ebb35a020a75a
 
     const smtpServer = await globalConfig.findOne({});
 

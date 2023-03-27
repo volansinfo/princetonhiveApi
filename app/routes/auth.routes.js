@@ -13,25 +13,13 @@ module.exports = function (app) {
 
   app.post(
     "/api/user/signup",
-    [
-      verifySignUp.checkDuplicateUsernameOrEmail,
-      verifySignUp.checkRolesExisted,
-      verifySignUp.validatefname,
-      verifySignUp.fnameValidation,
-      verifySignUp.validateEmail,
-      verifySignUp.emailValidation,
-      verifySignUp.validateMnumber,
-      verifySignUp.mnumberValidation,
-      verifySignUp.validatePincode,
-      verifySignUp.pincodeValidation
-    ],
     controller.signup
   );
 
   app.post("/api/user/signin", [verifySignUp.validateEmail,
   verifySignUp.emailValidation], controller.signin);
 
-  app.post("/api/user/frontend/signin", [verifySignUp.validateEmail,
+  app.post("/api/user/student-Teacher/signin", [verifySignUp.validateEmail,
   verifySignUp.emailValidation], controller.studentOrTeacherSignin);
 
   app.post("/api/user/signout", [authJwt.verifyToken], controller.signout);

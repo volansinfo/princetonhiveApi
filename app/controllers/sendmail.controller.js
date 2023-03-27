@@ -52,9 +52,14 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
             Dear  ${username},<br><br>
             Thanks for Sign-Up.We are delighted to welcome you to the company's internship program. We are delighted to have you join our team! We were happy to read about your interests and endeavours in the areas of (internship tasks) as well as your personal, academic, and professional objectives.<br><br>
             We look forward to welcoming you soon!<br><br>
+            
+            Login Credentials<br>
+
+            Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>
+            <br><br>
+            Thanks<br>
             Hive Steps Team<br>
-            <br>
-            Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>`
+            <br>`
         })
 
     }

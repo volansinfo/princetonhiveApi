@@ -15,25 +15,25 @@ module.exports = function (app) {
         controller.departmentAdd
     );
     app.get("/api/vol/department",
-        [authJwt.verifyToken, (authJwt.isSupportOrAdmin, authJwt.isTeacher)],
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
         controller.getAllDepartments
     );
     app.get("/api/vol/department/:id",
-        [authJwt.verifyToken, (authJwt.isSupportOrAdmin, authJwt.isTeacher)],
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
         controller.getDepartment
     );
     app.patch("/api/vol/department/:id",
-        [authJwt.verifyToken, (authJwt.isSupportOrAdmin, authJwt.isTeacher)],
+        [authJwt.verifyToken, authJwt.isSupportOrAdmin],
         controller.departmentstatus
     )
 
     app.delete("/api/vol/department/:id",
-        [authJwt.verifyToken, (authJwt.isSupportOrAdmin, authJwt.isTeacher)],
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
         controller.departmentDelete
     );
     app.post(
         "/api/vol/department/:id",
-        [authJwt.verifyToken, (authJwt.isSupportOrAdmin, authJwt.isTeacher)],
+        [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
         controller.updateDepartment
     );
 }

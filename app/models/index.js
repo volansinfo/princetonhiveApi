@@ -49,7 +49,7 @@ db.WidgetPage = require("../models/widget.model")(sequelize, Sequelize, DataType
 db.StateCountry = require("../models/statecountry.model")(sequelize, Sequelize, DataTypes);
 db.assignment = require("./assessment.model")(sequelize, Sequelize, DataTypes);
 db.Department = require("../models/department.model")(sequelize, Sequelize, DataTypes);
-db.Question = require("../models/question.model")(sequelize, Sequelize, DataTypes);
+db.Question = require("../models/question.model.js")(sequelize, Sequelize, DataTypes);
 
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",

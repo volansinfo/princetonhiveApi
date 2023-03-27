@@ -11,20 +11,51 @@ const bcrypt = require("bcryptjs");
 const { default: isEmail } = require("validator/lib/isEmail");
 
 exports.allAccess = async (req, res) => {
+  var fullUrl = req.protocol + '://' + req.get('host') + '/princetonhive/img/user/';
   try {
-    const { limit, offset } = pagination.getPagination(req.query.page, 10)
-    const allUser = await User.findAndCountAll({
-      limit,
-      offset,
-      attributes: {
-        exclude: ['password', 'actualPassword']
-      },
+    const allUser = await User.findAll({
       order: [
         ['id', 'DESC']
       ]
     })
-    const response = pagination.getPaginationData(allUser, req.query.page, limit)
-    res.status(200).json({ success: true, data: response });
+    let fileInfos = [];
+    allUser.forEach((file) => {
+      fileInfos.push({
+        id: file.id,
+        fname: file.fname,
+        lname: file.lname,
+        profileImg: fullUrl + file.profileImg,
+        email: file.email,
+        mnumber: file.mnumber,
+        address: file.address,
+        city: file.city,
+        state: file.state,
+        pincode: file.pincode,
+        gender: file.gender,
+        dob: file.dob,
+        country: file.country,
+        status: file.status,
+        uuid: file.uuid,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+      });
+    });
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // calculating the starting and ending index
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const results = {};
+    // results.results = fileInfos.slice(startIndex, endIndex);
+    results.dataItems = fileInfos.slice(startIndex, endIndex)
+    results.totalItems = fileInfos.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil((fileInfos.length) / limit);
+
+    // const response = pagination.getPaginationData(allUser, req.query.page, limit)
+    res.status(200).json({ success: true, data: results });
   } catch (e) {
     res.status(500).send({ success: false, message: e.message })
   }
@@ -59,22 +90,48 @@ exports.userBoard = async (req, res) => {
 };
 
 exports.adminBoard = async (req, res) => {
-
+  var fullUrl = req.protocol + '://' + req.get('host') + '/princetonhive/img/user/';
   try {
-    const { limit, offset } = pagination.getPagination(req.query.page, 10)
-
-    const allUser = await User.findAndCountAll({
-      limit,
-      offset,
-      attributes: {
-        exclude: ['password', 'actualPassword']
-      },
+    const allUser = await User.findAll({
       order: [
         ['id', 'DESC']
       ]
     })
-    const response = pagination.getPaginationData(allUser, req.query.page, limit)
-    res.status(200).json({ success: true, data: response });
+    let fileInfos = [];
+    allUser.forEach((file) => {
+      fileInfos.push({
+        id: file.id,
+        fname: file.fname,
+        lname: file.lname,
+        profileImg: fullUrl + file.profileImg,
+        email: file.email,
+        mnumber: file.mnumber,
+        address: file.address,
+        city: file.city,
+        state: file.state,
+        pincode: file.pincode,
+        gender: file.gender,
+        dob: file.dob,
+        country: file.country,
+        status: file.status,
+        uuid: file.uuid,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+      });
+    });
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const results = {};
+    results.dataItems = fileInfos.slice(startIndex, endIndex)
+    results.totalItems = fileInfos.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil((fileInfos.length) / limit);
+
+    res.status(200).json({ success: true, data: results });
   } catch (e) {
     res.status(500).send({ success: false, message: e.message })
   }

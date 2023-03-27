@@ -22,12 +22,6 @@ let storage = multer.diskStorage({
 let uploadFile = multer({
     storage: storage,
     limits: { fileSize: maxSize },
-    fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new Error('Please upload a valid image file'))
-        }
-        cb(undefined, true)
-    }
 }).single("questionImgUrl");
 
 let authUserImage = util.promisify(uploadFile);

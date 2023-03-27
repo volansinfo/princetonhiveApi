@@ -43,6 +43,9 @@ exports.getAllDepartments = async (req, res) => {
         const allDepartment = await department.findAndCountAll({
             limit,
             offset,
+            where: {
+                status: "1"
+            },
             order: [
                 ['id', 'DESC']
             ]
@@ -65,7 +68,7 @@ exports.getDepartment = async (req, res) => {
             },
         });
         if (!Data) {
-            return res.status(404).send({ success: false, message: "Widget Not found!" });
+            return res.status(404).send({ success: false, message: "Department Not found!" });
         }
         let response = {
             departmentData: Data
@@ -107,7 +110,7 @@ exports.departmentstatus = async (req, res) => {
                 { status: departmentStatus },
                 { where: { id: departmentId } }
             )
-            res.status(200).send({ success: true, message: "Department has bee deactivate!" });
+            res.status(200).send({ success: true, message: "Department has been disabled!" });
         }
 
     } catch (eror) {
@@ -132,7 +135,7 @@ exports.departmentDelete = async (req, res) => {
             }
         })
 
-        res.status(200).send({ success: true, message: "Department was deleted successfully!" });
+        res.status(200).send({ success: true, message: "Department deleted successfully!" });
     } catch (error) {
         return res.status(500).send({ success: false, message: error.message });
     }
@@ -151,7 +154,7 @@ exports.updateDepartment = async (req, res) => {
         }
 
         const allDepartmentData = await department.findAll()
-        console.log(allDepartmentData, "888888888888888888888888888888")
+
         if ((req.body.status).trim() == "") {
             return res.status(400).send({ message: "Status value should not empty!" })
         }

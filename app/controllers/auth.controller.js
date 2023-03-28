@@ -8,9 +8,10 @@ const Op = db.Sequelize.Op;
 const verifySignUp = require("../middleware/verifySignUp");
 const uploadFile = require("../middleware/authUserImage")
 const fs = require("fs");
+const sharp = require('sharp');
 
 const sendMail = require("./sendmail.controller");
-const generateUUID = require("./uuid.controller");
+const getUUID = require("./uuid.controller");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -25,11 +26,14 @@ exports.signup = async (req, res) => {
 
     await uploadFile(req, res);
     if (req.file == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
+      return res.status(400).send({ message: "Please upload a image!" });
     }
 
+    const newFilename = `${Date.now()}_${req.file.originalname}`;
 
-    const uuid = await generateUUID(req)
+    await sharp(req.file.buffer).resize({ width: 67, height: 67 }).toFile(__basedir + "/uploads/user/" + newFilename)
+    console.log(req.body)
+    const uuid = await getUUID.generateUUID(req)
 
     let generatedPwd = await generator.generate({
       length: 6,
@@ -114,12 +118,10 @@ exports.signup = async (req, res) => {
     if (req.file.originalname.split(".")[1] != "jpg" && req.file.originalname.split(".")[1] != "jpeg" && req.file.originalname.split(".")[1] != "png") {
       return res.status(400).send({ success: false, message: "File type does not allow" })
     }
-
-
     const user = await User.create({
       fname: req.body.fname,
       lname: req.body.lname,
-      profileImg: req.file.filename,
+      profileImg: newFilename || null,
       password: bcrypt.hashSync(generatedPwd, 8),
       actualPassword: generatedPwd,
       email: req.body.email,
@@ -176,7 +178,11 @@ exports.signup = async (req, res) => {
       // res.status(200).send({ message: "User registered successfully!" });
     }
   } catch (error) {
-    res.status(500).send({ success: false, message: error.message });
+    if (e.message == "File type does not allow!") {
+      return res.status(400).send({ success: false, message: e.message })
+    } else {
+      return res.status(500).send({ success: false, message: e.message })
+    }
   }
 };
 

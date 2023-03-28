@@ -104,7 +104,7 @@ exports.departmentstatus = async (req, res) => {
                 { status: departmentStatus },
                 { where: { id: departmentId } }
             )
-            res.status(200).send({ success: true, message: "Department has been active!" });
+            res.status(200).send({ success: true, message: "Department has been enabled!" });
         } else {
             const result = await department.update(
                 { status: departmentStatus },

@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true
         },
+        teacherId: {
+            type: DataTypes.INTEGER,
+        },
         questionName: {
             type: Sequelize.STRING,
             allowNull: false

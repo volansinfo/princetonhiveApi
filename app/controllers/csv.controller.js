@@ -4,12 +4,10 @@ const generator = require("generate-password");
 const fs = require("fs");
 const csv = require("fast-csv");
 
-const generateUUID = require("./uuid.controller");
-const generateUuidStudent = require("./uuid.controller");
+const generateUUIDForBulkData = require("./uuid.controller");
 const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
 const bcrypt = require("bcryptjs");
-const { error, Console } = require("console");
 var bulkData = []
 
 
@@ -47,10 +45,9 @@ const uploadCsv = async (req, res) => {
             return res.status(400).send({ success: false, message: `This email: ${email.email} is already exists!` })
           }
         }
-        // }
 
         for (let i = 0; i < bulkData.length; i++) {
-          let lastUUID = await generateUuidStudent(bulkData[i]);
+          let lastUUID = await generateUUIDForBulkData(bulkData[i]);
 
           let generatedPwd = await generator.generate({
             length: 6,

@@ -295,7 +295,11 @@ function getPadsZero(type) {
   return padZero
 }
 
-const generateStudentuuid = async (row) => {
+/**
+ * 
+ * generate UUID for bulk data insertion 
+ */
+const generateUUIDForBulkData = async (row) => {
   const user = await User.findAll();
   allUUID=[]
   stuMaxUUID =[]
@@ -319,4 +323,4 @@ const generateStudentuuid = async (row) => {
 };
 
 module.exports = generateUUID;
-module.exports = generateStudentuuid;
+module.exports = generateUUIDForBulkData;

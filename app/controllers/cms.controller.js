@@ -64,7 +64,7 @@ exports.pageAdd = async (req, res) => {
 };
 
 exports.getPages = async (req, res) => {
-  var fullUrl = req.protocol + '://' + req.get('host') + '/vol/img/cms/';
+  var fullUrl = req.protocol + '://' + req.get('host') + '/princetonhive/img/cms/';
 
   try {
     let data = await Page.findAll();

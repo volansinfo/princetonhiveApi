@@ -58,7 +58,7 @@ async function getLastUUID(reqBody) {
       lastUUID = getTeacherUUID(reqBody)
       break
     case "student":
-      lastUUID = getStudentUUID(reqBody)
+      lastUUID = getStudentUUID(reqBody,"single")
       break
     case "support":
       lastUUID = getSupportUUID(reqBody)
@@ -147,15 +147,15 @@ function getUniversityUUID(reqBody) {
 /**
  *  generate student UUID
  */
-function getStudentUUID(reqBody) {
+function getStudentUUID(reqBody,bulk) {
   let lastUUID;
   if (stuMaxUUID.length == 0) {
-    let alpha_series = getUserTypes(reqBody.roles[0])
-    let countryCode = reqBody.country.toUpperCase()
-    let stateCode = reqBody.state.toUpperCase()
-    let cityName = reqBody.city.slice(0, 3).toUpperCase()
-    let reservNo = '4'
-    let incrementer = '000000001'
+    let alpha_series = (bulk = "bulk" ? "STU" : getUserTypes(reqBody.roles[0]));
+    let countryCode = reqBody.country.toUpperCase();
+    let stateCode = reqBody.state.toUpperCase();
+    let cityName = reqBody.city.slice(0, 3).toUpperCase();
+    let reservNo = "4";
+    let incrementer = "000000001";
 
     lastUUID = alpha_series + countryCode + stateCode + cityName + reservNo + incrementer;
   } else {
@@ -164,12 +164,12 @@ function getStudentUUID(reqBody) {
       maxUUID.push(parseInt(stuMaxUUID[i].slice(-9)))
     }
 
-    let alpha_series = getUserTypes(reqBody.roles[0])
-    let countryCode = reqBody.country.toUpperCase()
-    let stateCode = reqBody.state.toUpperCase()
-    let cityName = reqBody.city.slice(0, 3).toUpperCase()
-    let reservNo = '4'
-    let incrementer = addLeadingZeros(Math.max(...maxUUID) + 1, "Student")
+    let alpha_series = (bulk = "bulk" ? "STU" : getUserTypes(reqBody.roles[0]));
+    let countryCode = reqBody.country.toUpperCase();
+    let stateCode = reqBody.state.toUpperCase();
+    let cityName = reqBody.city.slice(0, 3).toUpperCase();
+    let reservNo = "4";
+    let incrementer = addLeadingZeros(Math.max(...maxUUID) + 1, "Student");
 
     lastUUID = alpha_series + countryCode + stateCode + cityName + reservNo + incrementer;
   }
@@ -295,4 +295,32 @@ function getPadsZero(type) {
   return padZero
 }
 
-module.exports = generateUUID
+/**
+ * 
+ * generate UUID for bulk data insertion 
+ */
+const generateUUIDForBulkData = async (row) => {
+  const user = await User.findAll();
+  allUUID=[]
+  stuMaxUUID =[]
+  if (user.length != 0) {
+    for (let i = 0; i < user.length; i++) {
+      allUUID.push(user[i].uuid);
+    }
+
+    for (let i = 0; i < allUUID.length; i++) {
+      let userType = allUUID[i].slice(0, 3);
+
+      if (userType == "STU") {
+        stuMaxUUID.push(allUUID[i]);
+      }
+    }
+  }
+
+
+  let lastUUID = getStudentUUID(row,"bulk")
+  return lastUUID;
+};
+
+module.exports = generateUUID;
+module.exports = generateUUIDForBulkData;

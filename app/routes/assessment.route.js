@@ -42,5 +42,9 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAssessmentByCompleted
   );
-  app.post("/api/csv-file", [upload.single("file")], csvController.uploadCsv);
+  app.post(
+    "/api/csv-file",
+    [authJwt.verifyToken, upload.single("file")],
+    csvController.uploadCsv
+  );
 };

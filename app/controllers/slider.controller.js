@@ -50,12 +50,15 @@ exports.bannerSliderAdd = async (req, res) => {
 };
 
 exports.findSlider = async (req, res) => {
-  var fullUrl = req.protocol + '://' + req.get('host') + '/vol/img/slider/';
+  var fullUrl = req.protocol + '://' + req.get('host') + '/princetonhive/img/slider/';
   try {
     let data = await Slider.findAll({
       where: {
         status: ["0", "1"],
       },
+      order: [
+        ['id', 'DESC']
+      ]
     });
 
     if (data == '') {
@@ -75,10 +78,22 @@ exports.findSlider = async (req, res) => {
       });
     });
 
-    let response = {
-      sliderData: fileInfos
+    const page = parseInt(req.query.page) || 0;
+    if (page < 0) {
+      return res.status(400).send({ success: false, message: "Page must not be negative!" })
     }
-    res.status(200).json(response);
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const results = {};
+    results.dataItems = fileInfos.slice(startIndex, endIndex)
+    results.totalItems = fileInfos.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil((fileInfos.length) / limit);
+
+    res.status(200).json({ success: true, data: results });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

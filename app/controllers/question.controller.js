@@ -5,16 +5,23 @@ const uploadFile = require("../middleware/questionUploads")
 const question = db.Question
 const fs = require("fs");
 
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
 exports.questionAdd = async (req, res) => {
     try {
         await uploadFile(req, res);
         if (req.file == undefined) {
             return res.status(400).send({ message: "Please upload a file!" });
         }
+        let token = req.headers["x-access-token"];
+        const tokenData = jwt.decode(token);
+        const tokenId = tokenData.id;
 
         const existquestion = await question.findOne({
             where: {
-                questionName: (req.body.questionName).trim()
+                teacherId: tokenId,
+                questionName: req.body.questionName
             }
         })
 
@@ -28,7 +35,7 @@ exports.questionAdd = async (req, res) => {
             return res.status(400).send({ message: "Please enter Department!" });
         }
         if (isNaN(req.body.departments)) {
-            return res.status(400).send({ message: "Please enter numeric value!" });
+            return res.status(400).send({ message: "Please enter numeric value in department!" });
         }
         if (!(req.body.level).trim()) {
             return res.status(400).send({ message: "Please enter level!" });
@@ -41,6 +48,7 @@ exports.questionAdd = async (req, res) => {
         if (extension == "jpeg" || extension == "jpg" || extension == "png") {
 
             const ques = await question.create({
+                teacherId: tokenData.id,
                 questionName: req.body.questionName,
                 departments: req.body.departments,
                 level: req.body.level,
@@ -212,14 +220,14 @@ exports.questionStatus = async (req, res) => {
                 { where: { id: QuestionId } }
             )
 
-            res.status(200).send({ message: "Question has been active" });
+            res.status(200).send({ message: "Question has been enabled" });
         } else {
 
             const result = await question.update(
                 { status: questionStatus },
                 { where: { id: QuestionId } }
             )
-            res.status(200).send({ message: "Question has been disable" });
+            res.status(200).send({ message: "Question has been disabled" });
         }
 
 

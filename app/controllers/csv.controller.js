@@ -8,11 +8,10 @@ const generateUUIDForBulkData = require("./uuid.controller");
 const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
 const bcrypt = require("bcryptjs");
-var bulkData = []
-
+var bulkData = [];
 
 const uploadCsv = async (req, res) => {
-  bulkData=[]
+  bulkData = [];
   try {
     if (req.file == undefined) {
       return res
@@ -20,9 +19,7 @@ const uploadCsv = async (req, res) => {
         .send({ status: false, message: "Please upload a CSV file!" });
     }
 
-
     let path = __basedir + "/uploads/slider/" + req.file.filename;
-
 
     fs.createReadStream(path)
       .pipe(csv.parse({ headers: true, columns: true, relax: true }))
@@ -30,19 +27,21 @@ const uploadCsv = async (req, res) => {
         throw error.message;
       })
       .on("data", async (row) => {
-        bulkData.push(row)
+        bulkData.push(row);
       })
       .on("end", async () => {
-
         for (let i = 0; i < bulkData.length; i++) {
           const email = await User.findOne({
             where: {
-              email: bulkData[i].email
-            }
-          })
+              email: bulkData[i].email,
+            },
+          });
 
           if (email) {
-            return res.status(400).send({ success: false, message: `This email: ${email.email} is already exists!` })
+            return res.status(400).send({
+              success: false,
+              message: `This email: ${email.email} is already exists!`,
+            });
           }
         }
 
@@ -69,14 +68,33 @@ const uploadCsv = async (req, res) => {
             state: bulkData[i].state,
             pincode: bulkData[i].pincode,
             country: bulkData[i].country,
-          }
+            status: 1,
+          };
 
           await User.create(document);
+          let userrname = document.fname.trim() + " " + document.lname.trim();
+
+          const smtpServer = await globalConfig.findOne({});
+
+          if (!smtpServer) {
+            return res
+              .status(404)
+              .send({ success: false, message: "SMTP server not configured!" });
+          }
+          sendMail(
+            document.email,
+            userrname,
+            document.actualPassword,
+            smtpServer,
+            "signup"
+          );
 
           if (i == bulkData.length - 1) {
-            return res.status(200).send({ success: true, message: "Bulk data created successfully." })
+            return res.status(200).send({
+              success: true,
+              message: "Bulk data created successfully.",
+            });
           }
-
         }
       });
   } catch (error) {
@@ -88,5 +106,5 @@ const uploadCsv = async (req, res) => {
 };
 
 module.exports = {
-  uploadCsv
+  uploadCsv,
 };

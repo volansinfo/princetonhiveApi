@@ -10,77 +10,21 @@ const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
 const bcrypt = require("bcryptjs");
 const { error, Console } = require("console");
-let allUUID = [];
-let stuMaxUUID = [];
+var bulkData = []
 
-/**
- *  generate student UUID
- */
-// function getStudentUUID(reqBody) {
-//   let lastUUID;
-//   if (stuMaxUUID.length == 0) {
-//     let alpha_series = "STU";
-//     let countryCode = reqBody.country.toUpperCase();
-//     let stateCode = reqBody.state.toUpperCase();
-//     let cityName = reqBody.city.slice(0, 3).toUpperCase();
-//     let reservNo = "4";
-//     let incrementer = "000000001";
-
-//     lastUUID =
-//       alpha_series +
-//       countryCode +
-//       stateCode +
-//       cityName +
-//       reservNo +
-//       incrementer;
-//   } else {
-//     let maxUUID = [];
-//     for (let i = 0; i < stuMaxUUID.length; i++) {
-//       maxUUID.push(parseInt(stuMaxUUID[i].slice(-9)));
-//     }
-
-//     console.log(reqBody, "req");
-//     console.log(maxUUID, "sdasd");
-//     let alpha_series = "STU";
-//     let countryCode = reqBody.country.toUpperCase();
-//     let stateCode = reqBody.state.toUpperCase();
-//     let cityName = reqBody.city.slice(0, 3).toUpperCase();
-//     let reservNo = "4";
-//     let incrementer = addLeadingZeros(Math.max(...maxUUID) + 1);
-//     console.log(incrementer, "incre");
-
-//     lastUUID =
-//       alpha_series +
-//       countryCode +
-//       stateCode +
-//       cityName +
-//       reservNo +
-//       incrementer;
-//   }
-
-//   console.log(lastUUID, "function");
-//   return lastUUID;
-// }
-
-// function addLeadingZeros(id) {
-//   console.log(id, "id");
-//   let noneZeroEcode = Number(id).toString();
-//   console.log(noneZeroEcode);
-//   let pad = "000000000";
-//   let uuid =
-//     pad.substring(0, pad.length - noneZeroEcode.length) + noneZeroEcode;
-//   console.log(uuid);
-//   return uuid;
-// }
 
 const uploadCsv = async (req, res) => {
+  bulkData=[]
   try {
     if (req.file == undefined) {
       return res
         .status(400)
         .send({ status: false, message: "Please upload a CSV file!" });
     }
+
+
     let path = __basedir + "/uploads/slider/" + req.file.filename;
+
 
     fs.createReadStream(path)
       .pipe(csv.parse({ headers: true, columns: true, relax: true }))
@@ -88,52 +32,56 @@ const uploadCsv = async (req, res) => {
         throw error.message;
       })
       .on("data", async (row) => {
-        // const newUser=uuid:"STU"+row.country.toUpperCase()+row.state.toUpperCase()+(generateStudentuuid()+1)
-        // console.log(row, "row");
-        let lastUUID = await generateUuidStudent(row);
-        console.log(lastUUID, "lastUUID");
+        bulkData.push(row)
+      })
+      .on("end", async () => {
 
-        // let count = counter(lastUUID);
-        // let counAndState = row.country + row.state;
-        // const uuids = await generateUuidStudent(counAndState);
-        let generatedPwd = await generator.generate({
-          length: 6,
-          numbers: true,
-        });
+        for (let i = 0; i < bulkData.length; i++) {
+          const email = await User.findOne({
+            where: {
+              email: bulkData[i].email
+            }
+          })
 
-        // const smtpServer = await globalConfig.findOne({});
-        // if (!smtpServer) {
-        //   return res.status(404).send({
-        //     success: false,
-        //     message: "SMTP server not configured!",
-        //   });
+          if (email) {
+            return res.status(400).send({ success: false, message: `This email: ${email.email} is already exists!` })
+          }
+        }
         // }
 
-        const username = row.fname + " " + row.lname;
-        // sendMail(row.email, username, generatedPwd, smtpServer, "signup");
-        // lastUUID = lastUUID++;
-        let document = {
-          fname: row.fname,
-          lname: row.lname,
-          uuid: lastUUID,
-          password: bcrypt.hashSync(generatedPwd, 8),
-          actualPassword: generatedPwd,
-          email: row.email,
-          gender: row.gender == "male" ? "1" : "2",
-          dob: row.dob,
-          address: row.address,
-          mnumber: row.mnumber,
-          city: row.city,
-          state: row.state,
-          pincode: row.pincode,
-          country: row.country,
-        };
-        // console.log(document)
-        await User.create(document);
+        for (let i = 0; i < bulkData.length; i++) {
+          let lastUUID = await generateUuidStudent(bulkData[i]);
+
+          let generatedPwd = await generator.generate({
+            length: 6,
+            numbers: true,
+          });
+
+          let document = {
+            fname: bulkData[i].fname,
+            lname: bulkData[i].lname,
+            uuid: lastUUID,
+            password: bcrypt.hashSync(generatedPwd, 8),
+            actualPassword: generatedPwd,
+            email: bulkData[i].email,
+            gender: (bulkData[i].gender = "male" ? "1" : "2"),
+            dob: bulkData[i].dob,
+            address: bulkData[i].address,
+            mnumber: bulkData[i].mnumber,
+            city: bulkData[i].city,
+            state: bulkData[i].state,
+            pincode: bulkData[i].pincode,
+            country: bulkData[i].country,
+          }
+
+          await User.create(document);
+
+          if (i == bulkData.length - 1) {
+            return res.status(200).send({ success: true, message: "Bulk data created successfully." })
+          }
+
+        }
       });
-    res.status(200).send({
-      message: "created successfully",
-    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -143,5 +91,5 @@ const uploadCsv = async (req, res) => {
 };
 
 module.exports = {
-  uploadCsv,
+  uploadCsv
 };

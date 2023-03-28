@@ -55,7 +55,7 @@ async function getLastUUID(reqBody) {
       lastUUID = getTeacherUUID(reqBody);
       break;
     case "student":
-      lastUUID = getStudentUUID(reqBody);
+      lastUUID = getStudentUUID(reqBody,"single");
       break;
     case "support":
       lastUUID = getSupportUUID(reqBody);
@@ -160,10 +160,10 @@ function getUniversityUUID(reqBody) {
 /**
  *  generate student UUID
  */
-function getStudentUUID(reqBody) {
+function getStudentUUID(reqBody,bulk) {
   let lastUUID;
   if (stuMaxUUID.length == 0) {
-    let alpha_series = getUserTypes("student");
+    let alpha_series = (bulk = "bulk" ? "STU" : getUserTypes(reqBody.roles[0]));
     let countryCode = reqBody.country.toUpperCase();
     let stateCode = reqBody.state.toUpperCase();
     let cityName = reqBody.city.slice(0, 3).toUpperCase();
@@ -183,7 +183,7 @@ function getStudentUUID(reqBody) {
       maxUUID.push(parseInt(stuMaxUUID[i].slice(-9)));
     }
 
-    let alpha_series = getUserTypes("student");
+    let alpha_series = (bulk = "bulk" ? "STU" : getUserTypes(reqBody.roles[0]));
     let countryCode = reqBody.country.toUpperCase();
     let stateCode = reqBody.state.toUpperCase();
     let cityName = reqBody.city.slice(0, 3).toUpperCase();
@@ -341,52 +341,10 @@ function getPadsZero(type) {
   return padZero;
 }
 
-// // only generating uuid for student in csv file data
-// const generateUuidStudent = async (countryAndstate) => {
-//   console.log(countryAndstate.length, "cccsss");
-//   const res = await User.findAll();
-//   const uuidData = [];
-//   const tea = [];
-//   for (let i = 0; i < res.length; i++) {
-//     const uuids = res[i].uuid;
-//     uuidData.push(uuids);
-//     // console.log(res[i].uuid);
-//   }
-//   for (let i = 0; i < uuidData.length; i++) {
-//     const b = uuidData[i].slice(0, 3);
-//     if (b == "STU") {
-//       tea.push(b);
-//     }
-//   }
-
-//   const total = tea.length;
-//   //   console.log(total);
-//   if (total == 0) {
-//     const val = 400000000 + 1;
-
-//     // console.log("STU" + countryAndstate.toUpperCase() + val);
-//     // const toUpperCountyandAtate = countryAndstate.toUpperCase();
-//     // console.log("STU" + country + state + val);
-//     return "STU" + toUpperCountyandAtate + val;
-//   } else {
-//     const mxVal = 400000000 + total;
-//     // const toUpperCountyandAtate = countryAndstate.toUpperCase();
-//     console.log("STU" + toUpperCountyandAtate + mxVal);
-//     return "STU" + toUpperCountyandAtate + mxVal;
-//   }
-// };
-
-function addLeadZeros(id, type) {
-  let noneZeroEcode = Number(id).toString();
-  let pad = "000000000";
-  let uuid =
-    pad.substring(0, pad.length - noneZeroEcode.length) + noneZeroEcode;
-  return uuid;
-}
-
 const generateStudentuuid = async (row) => {
   const user = await User.findAll();
-  // console.log(user.length, "User length");
+  allUUID=[]
+  stuMaxUUID =[]
   if (user.length != 0) {
     for (let i = 0; i < user.length; i++) {
       allUUID.push(user[i].uuid);
@@ -399,14 +357,12 @@ const generateStudentuuid = async (row) => {
         stuMaxUUID.push(allUUID[i]);
       }
     }
-    console.log(allUUID.length, "All User length");
-    console.log(stuMaxUUID.length, "All Stu length");
   }
-  let lastUUID = getStudentUUID(row);
 
+
+  let lastUUID = getStudentUUID(row,"bulk")
   return lastUUID;
 };
 
 module.exports = generateUUID;
 module.exports = generateStudentuuid;
-// module.exports = generateUuidStudent;

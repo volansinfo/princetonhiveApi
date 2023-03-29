@@ -1,8 +1,8 @@
 module.exports = {
   HOST: "localhost",
   USER: "postgres",
-  PASSWORD: "Pri@217#$%36",
-  DB: "princetonhive_api",
+  PASSWORD: "admin@123",
+  DB: "princetonhive_api_local",
   dialect: "postgres",
   pool: {
     max: 5,

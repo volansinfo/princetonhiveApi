@@ -1,28 +1,21 @@
 const util = require("util");
 const multer = require("multer");
 const maxSize = 2 * 1024 * 1024;
+const multerStorage = multer.memoryStorage();
 
-let storage = multer.diskStorage({
+var path = require("path");
 
-    destination: (req, file, cb) => {
-        cb(null, __basedir + "/uploads/user/");
-    },
-    filename: (req, file, cb) => {
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: function (req, file, callback) {
+    var ext = path.extname(file.originalname);
 
-        var filetype = file.mimetype;
-        var fileformate = filetype.split("/")[1];
-
-        var data = req.body.fname;
-        var num = data.toLowerCase();
-        var imageName = num.replace(/\s+/g, '-');
-        cb(null, `${Date.now()}_${imageName}.${fileformate}`);
-    },
-});
-
-let uploadFile = multer({
-    storage: storage,
-    limits: { fileSize: maxSize },
+    if (ext != ".png" && ext != ".jpg" && ext != ".jpeg") {
+      return callback(new Error("File type does not allow!"));
+    }
+    callback(null, true);
+  },
 }).single("profileImg");
 
-let authUserImage = util.promisify(uploadFile);
+let authUserImage = util.promisify(upload);
 module.exports = authUserImage;

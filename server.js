@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/princetonhive/img", express.static('uploads'));
+app.use("/princetonhive/img", express.static("uploads"));
 global.__basedir = __dirname;
 
 // app.use(
@@ -46,13 +46,14 @@ require("./app/routes/globalConfig.routes")(app);
 require("./app/routes/widget.routes")(app);
 require("./app/routes/stateCountry.routes")(app);
 require("./app/routes/admin.routes")(app);
-require("./app/routes/student.routes")(app)
-require("./app/routes/teacher.routes")(app)
-require("./app/routes/university.routes")(app)
-require("./app/routes/support.routes")(app)
-require("./app/routes/assessment.route")(app)
-require("./app/routes/department.routes")(app)
-require("./app/routes/question.routes")(app)
+require("./app/routes/student.routes")(app);
+require("./app/routes/teacher.routes")(app);
+require("./app/routes/university.routes")(app);
+require("./app/routes/support.routes")(app);
+require("./app/routes/assessment.route")(app);
+require("./app/routes/department.routes")(app);
+require("./app/routes/question.routes")(app);
+require("./app/routes/teacher.assessment.route")(app);
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });

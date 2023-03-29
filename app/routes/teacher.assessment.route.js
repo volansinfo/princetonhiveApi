@@ -15,4 +15,19 @@ module.exports = function (app) {
     [authJwt.verifyToken, errorValidation.errorHandingTeacherAssessment],
     controller.createAssessment
   );
+  app.get(
+    "/api/vol/getAssessmentOngoing",
+    [authJwt.verifyToken],
+    controller.getAssessmentOngoing
+  );
+  app.get(
+    "/api/vol/getAssessmentUpcomming",
+    [authJwt.verifyToken],
+    controller.getAssessmentUpcomming
+  );
+  app.get(
+    "/api/vol/getAssessmentActiveUpcomming",
+    [authJwt.verifyToken],
+    controller.getAssessmentActiveUpcomming
+  );
 };

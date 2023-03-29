@@ -7,6 +7,7 @@ var path = require("path");
 
 const upload = multer({
     storage: multerStorage,
+    limits: { fileSize: maxSize },
     fileFilter: function (req, file, callback) {
         var ext = path.extname(file.originalname);
 

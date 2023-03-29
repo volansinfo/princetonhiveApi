@@ -24,6 +24,9 @@ exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
     if (req.file !== undefined) {
+      if (req.file.size < 2 * 1024) {
+        return res.status(400).send({ success: false, message: "File too small, please select a file greater than 2kb" })
+      }
       const newFilename = `${Date.now()}_${req.file.originalname}`;
 
       await sharp(req.file.buffer)
@@ -390,6 +393,9 @@ exports.signup = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
+    }
+    else if (e.message == "File too large") {
+      return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
     } else {
       return res.status(500).send({ success: false, message: e.message });
     }

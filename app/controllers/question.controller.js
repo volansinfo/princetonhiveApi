@@ -15,6 +15,9 @@ exports.questionAdd = async (req, res) => {
         if (req.file == undefined) {
             return res.status(400).send({ message: "Please upload a file!" });
         }
+        if (req.file.size < 600 * 1024) {
+            return res.status(400).send({ success: false, message: "File too small, please select a file greater than 600kb" })
+        }
         const newFilename = `${Date.now()}_${req.file.originalname}`;
 
         await sharp(req.file.buffer).resize({ width: 500, height: 500 }).toFile(__basedir + "/uploads/question/" + newFilename)
@@ -49,25 +52,26 @@ exports.questionAdd = async (req, res) => {
             return res.status(400).send({ message: "Invalid input value for enum level!" })
         }
 
-        const extension = req.file.originalname.split(".")[1]
-        if (extension == "jpeg" || extension == "jpg" || extension == "png") {
 
-            const ques = await question.create({
-                teacherId: tokenData.id,
-                questionName: req.body.questionName,
-                departments: req.body.departments,
-                level: req.body.level,
-                questionImgUrl: newFilename || null,
-                status: req.body.status ? req.body.status : 1,
-            });
-        }
-        else {
-            return res.status(400).send({ success: false, message: "File type does not allow" })
-        }
+        const ques = await question.create({
+            teacherId: tokenData.id,
+            questionName: req.body.questionName,
+            departments: req.body.departments,
+            level: req.body.level,
+            questionImgUrl: newFilename || null,
+            status: req.body.status ? req.body.status : 1,
+        });
 
         res.status(200).send({ success: true, message: "Question added successfully!" });
     } catch (error) {
-        return res.status(500).send({ success: false, message: error.message });
+        if (error.message == "File type does not allow!") {
+            return res.status(400).send({ success: false, message: error.message });
+        }
+        else if (error.message == "File too large") {
+            return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
+        } else {
+            return res.status(500).send({ success: false, message: error.message });
+        }
     }
 }
 
@@ -156,6 +160,9 @@ exports.updateQuestion = async (req, res) => {
         if (req.file == undefined) {
             return res.status(400).send({ message: "Please upload a file!" });
         }
+        if (req.file.size < 600 * 1024) {
+            return res.status(400).send({ success: false, message: "File too small, please select a file greater than 600kb" })
+        }
         const newFilename = `${Date.now()}_${req.file.originalname}`;
         await sharp(req.file.buffer).resize({ width: 500, height: 500 }).toFile(__basedir + "/uploads/question/" + newFilename)
 
@@ -188,7 +195,14 @@ exports.updateQuestion = async (req, res) => {
         );
         return res.status(200).send({ message: 'Question updated successfully' });
     } catch (error) {
-        return res.status(500).send({ message: error.message });
+        if (error.message == "File type does not allow!") {
+            return res.status(400).send({ success: false, message: error.message });
+        }
+        else if (error.message == "File too large") {
+            return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
+        } else {
+            return res.status(500).send({ success: false, message: error.message });
+        }
     }
 }
 

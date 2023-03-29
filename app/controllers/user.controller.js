@@ -407,6 +407,9 @@ exports.updateUserData = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message })
+    }
+    else if (e.message == "File too large") {
+      return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
     } else {
       return res.status(500).send({ success: false, message: e.message })
     }

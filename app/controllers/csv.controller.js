@@ -3,6 +3,9 @@ const User = db.user;
 const generator = require("generate-password");
 const fs = require("fs");
 const csv = require("fast-csv");
+const jwt = require("jsonwebtoken");
+const Role = db.role;
+const Op = db.Sequelize.Op;
 
 const getUUID = require("./uuid.controller");
 const { globalConfig, user } = require("../models");
@@ -13,10 +16,31 @@ var bulkData = [];
 const uploadCsv = async (req, res) => {
   bulkData = [];
   try {
+    const token = req.headers["x-access-token"];
+    const decodeToken = jwt.decode(token);
+    const teacherId = decodeToken.id;
+    const teacherExist = await User.findOne({
+      where: {
+        id: teacherId,
+      },
+    });
+
+    const teacherUuid = teacherExist.uuid.slice(0, 3);
+    if (teacherUuid != "TEA") {
+      return res.status(401).send({
+        status: false,
+        message: "you have not permission to add bulk student",
+      });
+    }
+    console.log(req.file.originalname, "+++++++++++++++++++++++++++++");
     if (req.file == undefined) {
       return res
         .status(400)
         .send({ status: false, message: "Please upload a CSV file!" });
+    } else if (req.file.originalname.split(".")[1] != "csv") {
+      return res
+        .status(400)
+        .send({ status: false, message: "only csv file accepted" });
     }
 
     let path = __basedir + "/uploads/slider/" + req.file.filename;
@@ -30,6 +54,21 @@ const uploadCsv = async (req, res) => {
         bulkData.push(row);
       })
       .on("end", async () => {
+        for (let i = 0; i < bulkData.length; i++) {
+          const mnumber = await User.findOne({
+            where: {
+              mnumber: bulkData[i].mnumber,
+            },
+          });
+
+          if (mnumber) {
+            return res.status(400).send({
+              success: false,
+              message: `This mobile number: ${mnumber.mnumber} is already exist!`,
+            });
+          }
+        }
+
         for (let i = 0; i < bulkData.length; i++) {
           const email = await User.findOne({
             where: {
@@ -71,11 +110,20 @@ const uploadCsv = async (req, res) => {
             status: 1,
           };
 
-          await User.create(document);
+          const user = await User.create(document);
           let userrname = document.fname.trim() + " " + document.lname.trim();
 
-          const smtpServer = await globalConfig.findOne({});
+          const roles = await Role.findAll({
+            where: {
+              name: {
+                [Op.or]: ["student"],
+              },
+            },
+          });
 
+          const result = user.setRoles(roles);
+
+          const smtpServer = await globalConfig.findOne({});
           if (!smtpServer) {
             return res
               .status(404)

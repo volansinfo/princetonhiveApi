@@ -49,12 +49,10 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Please enter first name!" });
       } else if (req.body.fname.length < 3 || req.body.fname.length > 50) {
-        return res
-          .status(400)
-          .send({
-            success: false,
-            message: "first name must be 3 to 50 characters long!",
-          });
+        return res.status(400).send({
+          success: false,
+          message: "first name must be 3 to 50 characters long!",
+        });
       }
 
       // checking duplicate email
@@ -88,12 +86,10 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Please enter mobile number!" });
       } else if (req.body.mnumber.length != 10) {
-        return res
-          .status(400)
-          .send({
-            success: false,
-            message: "Please enter valid mobile number!",
-          });
+        return res.status(400).send({
+          success: false,
+          message: "Please enter valid mobile number!",
+        });
       } else if (isNaN(req.body.mnumber)) {
         return res
           .status(400)
@@ -106,12 +102,10 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Please enter pincode!" });
       } else if (req.body.pincode.length < 5 || req.body.pincode.length > 10) {
-        return res
-          .status(400)
-          .send({
-            success: false,
-            message: "pincode must be 5 to 10 characters long!",
-          });
+        return res.status(400).send({
+          success: false,
+          message: "pincode must be 5 to 10 characters long!",
+        });
       } else if (isNaN(req.body.pincode)) {
         return res
           .status(400)
@@ -178,6 +172,7 @@ exports.signup = async (req, res) => {
 
       sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
 
+      console.log(req.body.roles, "Rolesssssssssssss");
       if (req.body.roles) {
         const roles = await Role.findAll({
           where: {

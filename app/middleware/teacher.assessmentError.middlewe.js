@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const db = require("../models");
 const User = db.user;
 const errorHandingTeacherAssessment = async (req, res, next) => {
-  const dateFormate = new Date("2012/09/11");
+  // const dateFormate = new Date("2012/09/11");
   const data = req.body;
   const {
     assessmentName,
@@ -33,10 +33,18 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
     },
   });
   const roles = permissionRoles.uuid.slice(0, 3);
-  if (roles != "TEA" || roles != "UNI" || roles != "SUP" || roles != "ADM") {
+  if (roles != "TEA" && roles != "UNI" && roles != "SUP" && roles != "ADM") {
     return res
       .status(401)
       .send({ status: false, message: "permission denied" });
+  }
+
+  const isValidRequestBody = function (requestBody) {
+    return Object.keys(requestBody).length > 0;
+  };
+
+  if (!isValidRequestBody(data)) {
+    return res.status(400).send({ status: false, msg: "enter data in body" });
   }
   if (!assessmentName) {
     return res
@@ -56,20 +64,10 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       status: false,
       message: "Please enter start date",
     });
-  } else if (startDate != dateFormate) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid start date in formate yyyy/mm/dd",
-    });
   } else if (!endDate) {
     return res.status(400).send({
       status: false,
       message: "Please enter end date",
-    });
-  } else if (endDate != dateFormate) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid end date in formate yyyy/mm/dd",
     });
   } else if (!assessmentPurpose) {
     return res.status(400).send({
@@ -104,7 +102,7 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
   } else if (!assessmentResponseType) {
     return res.status(400).send({
       status: false,
-      message: "Please enter assessment AI level",
+      message: "Please enter assessment response type",
     });
   } else if (
     assessmentResponseType != "1" &&

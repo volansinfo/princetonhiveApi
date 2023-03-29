@@ -23,25 +23,47 @@ exports.getAllStudent = async (req, res) => {
         })
         let fileInfos = [];
         allUser.forEach((file) => {
-            fileInfos.push({
-                id: file.id,
-                fname: file.fname,
-                lname: file.lname,
-                profileImg: fullUrl + file.profileImg,
-                email: file.email,
-                mnumber: file.mnumber,
-                address: file.address,
-                city: file.city,
-                state: file.state,
-                pincode: file.pincode,
-                gender: file.gender,
-                dob: file.dob,
-                country: file.country,
-                status: file.status,
-                uuid: file.uuid,
-                createdAt: file.createdAt,
-                updatedAt: file.updatedAt,
-            });
+            if (file.profileImg !== null) {
+                fileInfos.push({
+                    id: file.id,
+                    fname: file.fname,
+                    lname: file.lname,
+                    profileImg: fullUrl + file.profileImg,
+                    email: file.email,
+                    mnumber: file.mnumber,
+                    address: file.address,
+                    city: file.city,
+                    state: file.state,
+                    pincode: file.pincode,
+                    gender: file.gender,
+                    dob: file.dob,
+                    country: file.country,
+                    status: file.status,
+                    uuid: file.uuid,
+                    createdAt: file.createdAt,
+                    updatedAt: file.updatedAt,
+                });
+            } else {
+                fileInfos.push({
+                    id: file.id,
+                    fname: file.fname,
+                    lname: file.lname,
+                    profileImg: "",
+                    email: file.email,
+                    mnumber: file.mnumber,
+                    address: file.address,
+                    city: file.city,
+                    state: file.state,
+                    pincode: file.pincode,
+                    gender: file.gender,
+                    dob: file.dob,
+                    country: file.country,
+                    status: file.status,
+                    uuid: file.uuid,
+                    createdAt: file.createdAt,
+                    updatedAt: file.updatedAt,
+                });
+            }
         });
         const page = parseInt(req.query.page) || 0;
         if (page < 0) {

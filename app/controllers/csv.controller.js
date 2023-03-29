@@ -4,7 +4,7 @@ const generator = require("generate-password");
 const fs = require("fs");
 const csv = require("fast-csv");
 
-const generateUUIDForBulkData = require("./uuid.controller");
+const getUUID = require("./uuid.controller");
 const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
 const bcrypt = require("bcryptjs");
@@ -46,7 +46,7 @@ const uploadCsv = async (req, res) => {
         }
 
         for (let i = 0; i < bulkData.length; i++) {
-          let lastUUID = await generateUUIDForBulkData(bulkData[i]);
+          let lastUUID = await getUUID.generateUUIDForBulkData(bulkData[i]);
 
           let generatedPwd = await generator.generate({
             length: 6,

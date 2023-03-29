@@ -4,6 +4,7 @@ const pagination = require("../middleware/pagination")
 const uploadFile = require("../middleware/questionUploads")
 const question = db.Question
 const fs = require("fs");
+const sharp = require('sharp');
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -14,6 +15,10 @@ exports.questionAdd = async (req, res) => {
         if (req.file == undefined) {
             return res.status(400).send({ message: "Please upload a file!" });
         }
+        const newFilename = `${Date.now()}_${req.file.originalname}`;
+
+        await sharp(req.file.buffer).resize({ width: 500, height: 500 }).toFile(__basedir + "/uploads/question/" + newFilename)
+        console.log(req.body)
         let token = req.headers["x-access-token"];
         const tokenData = jwt.decode(token);
         const tokenId = tokenData.id;
@@ -52,7 +57,7 @@ exports.questionAdd = async (req, res) => {
                 questionName: req.body.questionName,
                 departments: req.body.departments,
                 level: req.body.level,
-                questionImgUrl: req.file.filename,
+                questionImgUrl: newFilename || null,
                 status: req.body.status ? req.body.status : 1,
             });
         }

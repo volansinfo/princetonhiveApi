@@ -14,10 +14,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: Sequelize.STRING,
             allowNull: true
         },
-        // profileImg: {
-        //     type: Sequelize.TEXT,
-        //     allowNull: true,
-        // },
+        profileImg: {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
 
         uuid: {
             type: DataTypes.STRING,

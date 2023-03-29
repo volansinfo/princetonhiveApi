@@ -58,7 +58,7 @@ async function getLastUUID(reqBody) {
       lastUUID = getTeacherUUID(reqBody)
       break
     case "student":
-      lastUUID = getStudentUUID(reqBody,"single")
+      lastUUID = getStudentUUID(reqBody, "single")
       break
     case "support":
       lastUUID = getSupportUUID(reqBody)
@@ -74,6 +74,7 @@ async function getLastUUID(reqBody) {
  */
 function getAdminUUId(reqBody) {
   let lastUUID;
+  console.log(reqBody)
   if (admMaxUUID.length == 0) {
 
     let alpha_series = getUserTypes(reqBody.roles[0])
@@ -147,7 +148,7 @@ function getUniversityUUID(reqBody) {
 /**
  *  generate student UUID
  */
-function getStudentUUID(reqBody,bulk) {
+function getStudentUUID(reqBody, bulk) {
   let lastUUID;
   if (stuMaxUUID.length == 0) {
     let alpha_series = (bulk = "bulk" ? "STU" : getUserTypes(reqBody.roles[0]));
@@ -301,8 +302,8 @@ function getPadsZero(type) {
  */
 const generateUUIDForBulkData = async (row) => {
   const user = await User.findAll();
-  allUUID=[]
-  stuMaxUUID =[]
+  allUUID = []
+  stuMaxUUID = []
   if (user.length != 0) {
     for (let i = 0; i < user.length; i++) {
       allUUID.push(user[i].uuid);
@@ -318,9 +319,14 @@ const generateUUIDForBulkData = async (row) => {
   }
 
 
-  let lastUUID = getStudentUUID(row,"bulk")
+  let lastUUID = getStudentUUID(row, "bulk")
   return lastUUID;
 };
 
-module.exports = generateUUID;
-module.exports = generateUUIDForBulkData;
+var UUID = {
+  generateUUID,
+  generateUUIDForBulkData
+}
+
+module.exports = UUID;
+// module.exports = generateUUIDForBulkData;

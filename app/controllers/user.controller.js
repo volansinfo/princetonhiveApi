@@ -273,24 +273,6 @@ exports.updateUserData = async (req, res) => {
       if (!(req.body.fname).trim()) {
         return res.status(400).send({ message: "Please enter first name!" })
       }
-
-      // email validation
-      if (!(req.body.email).trim()) {
-        return res.status(400).send({ message: "Please enter email address!" })
-      }
-      else if (!isEmail(req.body.email)) {
-        return res.status(400).send({ message: "Please enter valid email address!" })
-      }
-      // mobile number validation
-      if (!(req.body.mnumber).trim()) {
-        return res.status(400).send({ message: "Please enter mobile number!" })
-      }
-      else if ((req.body.mnumber).length != 10) {
-        return res.status(400).send({ success: false, message: "Please enter valid mobile number!" })
-      }
-      else if (isNaN(req.body.mnumber)) {
-        return res.status(400).send({ success: false, message: "please enter numeric value!" })
-      }
       // pincode validation
       if (!(req.body.pincode).trim()) {
         return res.status(400).send({ message: "Please enter pincode!" })
@@ -313,10 +295,6 @@ exports.updateUserData = async (req, res) => {
         fname: req.body.fname,
         lname: req.body.lname,
         profileImg: newFilename,
-        // password: bcrypt.hashSync(req.body.password, 8),
-        // actualPassword: req.body.password,
-        email: req.body.email,
-        mnumber: req.body.mnumber,
         address: req.body.address,
         city: req.body.city,
         state: req.body.state,
@@ -340,24 +318,6 @@ exports.updateUserData = async (req, res) => {
       if (!(req.body.fname).trim()) {
         return res.status(400).send({ message: "Please enter first name!" })
       }
-
-      // email validation
-      if (!(req.body.email).trim()) {
-        return res.status(400).send({ message: "Please enter email address!" })
-      }
-      else if (!isEmail(req.body.email)) {
-        return res.status(400).send({ message: "Please enter valid email address!" })
-      }
-      // mobile number validation
-      if (!(req.body.mnumber).trim()) {
-        return res.status(400).send({ message: "Please enter mobile number!" })
-      }
-      else if ((req.body.mnumber).length != 10) {
-        return res.status(400).send({ success: false, message: "Please enter valid mobile number!" })
-      }
-      else if (isNaN(req.body.mnumber)) {
-        return res.status(400).send({ success: false, message: "please enter numeric value!" })
-      }
       // pincode validation
       if (!(req.body.pincode).trim()) {
         return res.status(400).send({ message: "Please enter pincode!" })
@@ -380,10 +340,6 @@ exports.updateUserData = async (req, res) => {
         fname: req.body.fname,
         lname: req.body.lname,
         profileImg: newFilename,
-        // password: bcrypt.hashSync(req.body.password, 8),
-        // actualPassword: req.body.password,
-        email: req.body.email,
-        mnumber: req.body.mnumber,
         address: req.body.address,
         city: req.body.city,
         state: req.body.state,

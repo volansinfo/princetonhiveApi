@@ -24,12 +24,14 @@ exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
     if (req.file !== undefined) {
+      if (req.file.size < 2 * 1024) {
+        return res.status(400).send({ success: false, message: "File too small, please select a file greater than 2kb" })
+      }
       const newFilename = `${Date.now()}_${req.file.originalname}`;
 
       await sharp(req.file.buffer)
         .resize({ width: 67, height: 67 })
         .toFile(__basedir + "/uploads/user/" + newFilename);
-      console.log(req.body);
       const uuid = await getUUID.generateUUID(req);
 
       let generatedPwd = await generator.generate({
@@ -81,6 +83,18 @@ exports.signup = async (req, res) => {
       }
 
       // mobile number validation
+      checkUser = await User.findOne({
+        where: {
+          mnumber: req.body.mnumber,
+        },
+      });
+
+      if (checkUser) {
+        return res.status(400).send({
+          success: false,
+          message: "Failed! Mobile number is already in use!",
+        });
+      }
       if (!req.body.mnumber.trim()) {
         return res
           .status(400)
@@ -132,15 +146,7 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "Role does not exist!" });
       }
 
-      if (
-        req.file.originalname.split(".")[1] != "jpg" &&
-        req.file.originalname.split(".")[1] != "jpeg" &&
-        req.file.originalname.split(".")[1] != "png"
-      ) {
-        return res
-          .status(400)
-          .send({ success: false, message: "File type does not allow" });
-      }
+
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -198,9 +204,193 @@ exports.signup = async (req, res) => {
         // res.status(200).send({ message: "User registered successfully!" });
       }
     }
+    else {
+      {
+        const newFilename = null;
+        const uuid = await getUUID.generateUUID(req);
+
+        let generatedPwd = await generator.generate({
+          length: 6,
+          numbers: true,
+        });
+        if (!(req.body.status == 0) && !(req.body.status == 1)) {
+          return res
+            .status(400)
+            .send({ message: "Invalid input value for enum user_status" });
+        }
+
+        // first name validation
+
+        if (!req.body.fname.trim()) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter first name!" });
+        } else if (req.body.fname.length < 3 || req.body.fname.length > 50) {
+          return res
+            .status(400)
+            .send({
+              success: false,
+              message: "first name must be 3 to 50 characters long!",
+            });
+        }
+
+        // checking duplicate email
+
+        checkUser = await User.findOne({
+          where: {
+            email: req.body.email,
+          },
+        });
+
+        if (checkUser) {
+          return res.status(400).send({
+            success: false,
+            message: "Failed! Email is already in use!",
+          });
+        }
+        // email validation
+        if (!req.body.email.trim()) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter email address!" });
+        } else if (!isEmail(req.body.email)) {
+          return res
+            .status(400)
+            .send({ success: false, message: "please enter valid email!" });
+        }
+
+        // mobile number validation
+        checkUser = await User.findOne({
+          where: {
+            mnumber: req.body.mnumber,
+          },
+        });
+
+        if (checkUser) {
+          return res.status(400).send({
+            success: false,
+            message: "Failed! Mobile number is already in use!",
+          });
+        }
+        if (!req.body.mnumber.trim()) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter mobile number!" });
+        } else if (req.body.mnumber.length != 10) {
+          return res
+            .status(400)
+            .send({
+              success: false,
+              message: "Please enter valid mobile number!",
+            });
+        } else if (isNaN(req.body.mnumber)) {
+          return res
+            .status(400)
+            .send({ success: false, message: "please enter numeric value!" });
+        }
+
+        // pincode validation
+        if (!req.body.pincode.trim()) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter pincode!" });
+        } else if (req.body.pincode.length < 5 || req.body.pincode.length > 10) {
+          return res
+            .status(400)
+            .send({
+              success: false,
+              message: "pincode must be 5 to 10 characters long!",
+            });
+        } else if (isNaN(req.body.pincode)) {
+          return res
+            .status(400)
+            .send({ success: false, message: "please enter numeric value!" });
+        }
+        if (!(req.body.status == 0) && !(req.body.status == 1)) {
+          return res
+            .status(400)
+            .send({ message: "Invalid input value for enum user_status" });
+        }
+        const roleExist = await Role.findOne({
+          where: {
+            name: req.body.roles[0],
+          },
+        });
+
+        if (!req.body.roles[0]) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter role!" });
+        } else if (roleExist == null) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Role does not exist!" });
+        }
+
+
+        const user = await User.create({
+          fname: req.body.fname,
+          lname: req.body.lname,
+          profileImg: newFilename,
+          password: bcrypt.hashSync(generatedPwd, 8),
+          actualPassword: generatedPwd,
+          email: req.body.email,
+          mnumber: req.body.mnumber,
+          address: req.body.address,
+          city: req.body.city,
+          state: req.body.state,
+          pincode: req.body.pincode,
+          gender: req.body.gender,
+          dob: req.body.dob,
+          country: req.body.country,
+          status: req.body.status ? req.body.status : 1,
+          uuid: uuid,
+        });
+        const userEmail = req.body.email;
+        const username = req.body.fname.trim() + " " + req.body.lname.trim();
+
+        const smtpServer = await globalConfig.findOne({});
+
+        if (!smtpServer) {
+          return res
+            .status(404)
+            .send({ success: false, message: "SMTP server not configured!" });
+        }
+
+        sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+
+        if (req.body.roles) {
+          const roles = await Role.findAll({
+            where: {
+              name: {
+                [Op.or]: req.body.roles,
+              },
+            },
+          });
+          const result = user.setRoles(roles);
+          if (result)
+            res.status(200).send({
+              success: true,
+              message: `User registered successfully & Your password has been sent to mail : ${userEmail}`,
+            });
+        } else {
+          // user has role = 1
+          const result = user.setRoles([1]);
+          if (result)
+            res.status(200).send({
+              success: true,
+              message: `User registered successfully & Your password has been sent to mail : ${userEmail}`,
+            });
+          // res.status(200).send({ message: "User registered successfully!" });
+        }
+      }
+    }
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
+    }
+    else if (e.message == "File too large") {
+      return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
     } else {
       return res.status(500).send({ success: false, message: e.message });
     }

@@ -124,25 +124,47 @@ exports.adminBoard = async (req, res) => {
     })
     let fileInfos = [];
     allUser.forEach((file) => {
-      fileInfos.push({
-        id: file.id,
-        fname: file.fname,
-        lname: file.lname,
-        profileImg: fullUrl + file.profileImg,
-        email: file.email,
-        mnumber: file.mnumber,
-        address: file.address,
-        city: file.city,
-        state: file.state,
-        pincode: file.pincode,
-        gender: file.gender,
-        dob: file.dob,
-        country: file.country,
-        status: file.status,
-        uuid: file.uuid,
-        createdAt: file.createdAt,
-        updatedAt: file.updatedAt,
-      });
+      if (file.profileImg !== null) {
+        fileInfos.push({
+          id: file.id,
+          fname: file.fname,
+          lname: file.lname,
+          profileImg: fullUrl + file.profileImg,
+          email: file.email,
+          mnumber: file.mnumber,
+          address: file.address,
+          city: file.city,
+          state: file.state,
+          pincode: file.pincode,
+          gender: file.gender,
+          dob: file.dob,
+          country: file.country,
+          status: file.status,
+          uuid: file.uuid,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+        });
+      } else {
+        fileInfos.push({
+          id: file.id,
+          fname: file.fname,
+          lname: file.lname,
+          profileImg: "",
+          email: file.email,
+          mnumber: file.mnumber,
+          address: file.address,
+          city: file.city,
+          state: file.state,
+          pincode: file.pincode,
+          gender: file.gender,
+          dob: file.dob,
+          country: file.country,
+          status: file.status,
+          uuid: file.uuid,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+        });
+      }
     });
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 10;
@@ -385,6 +407,9 @@ exports.updateUserData = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message })
+    }
+    else if (e.message == "File too large") {
+      return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
     } else {
       return res.status(500).send({ success: false, message: e.message })
     }

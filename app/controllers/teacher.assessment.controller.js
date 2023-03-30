@@ -159,3 +159,9 @@ exports.getAssessmentActiveUpcomming = async (req, res) => {
     data: activeUpcomming,
   });
 };
+
+// 5)Write the update Api of teacher assessment (Have a permission university, admin and support)
+
+exports.updateAssessment = async () => {
+  
+};

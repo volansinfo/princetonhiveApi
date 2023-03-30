@@ -30,4 +30,9 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAssessmentActiveUpcomming
   );
+  app.patch(
+    "/api/vol/updateAssessment",
+    [authJwt.verifyToken],
+    controller.updateAssessment
+  );
 };

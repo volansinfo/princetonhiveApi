@@ -32,15 +32,15 @@ const uploadCsv = async (req, res) => {
         message: "you have not permission to add bulk student",
       });
     }
-    console.log(req.file.originalname, "+++++++++++++++++++++++++++++");
+
     if (req.file == undefined) {
       return res
         .status(400)
         .send({ status: false, message: "Please upload a CSV file!" });
-    } else if (req.file.originalname.split(".")[1] != "csv") {
-      return res
-        .status(400)
-        .send({ status: false, message: "only csv file accepted" });
+    }
+    // console.log(req.file.originalname.slice(-3), "hgjjhgjhg");
+    if (req.file.originalname.slice(-3) != "csv") {
+      return res.status(400).send({ message: "please upload valid csv file" });
     }
 
     let path = __basedir + "/uploads/slider/" + req.file.filename;
@@ -54,6 +54,69 @@ const uploadCsv = async (req, res) => {
         bulkData.push(row);
       })
       .on("end", async () => {
+        if (bulkData.length == 0) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter required field in the file ",
+          });
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          for (let j = i + 1; j < bulkData.length; j++) {
+            if (
+              bulkData[i].email == bulkData[j].email ||
+              bulkData[i].mnumber == bulkData[j].mnumber
+            ) {
+              return res.status(400).send({
+                message: `email ${
+                  (bulkData[i].email, bulkData[j].email)
+                } is same in file or mobile number ${
+                  (bulkData[i].mnumber, bulkData[j].mnumber)
+                } is same in file`,
+              });
+            }
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          if (!bulkData[i].fname) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter first name in file",
+            });
+          }
+        }
+        for (let i = 0; i < bulkData.length; i++) {
+          if (!bulkData[i].email) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter email in file",
+            });
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          if (!bulkData[i].mnumber) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter mobile number in file",
+            });
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          if (
+            !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+              bulkData[i].email.trim()
+            )
+          ) {
+            return res.status(400).send({
+              success: false,
+              message: "invalid email",
+            });
+          }
+        }
+
         for (let i = 0; i < bulkData.length; i++) {
           const mnumber = await User.findOne({
             where: {

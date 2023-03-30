@@ -86,6 +86,23 @@ const uploadCsv = async (req, res) => {
             });
           }
         }
+        for (let i = 0; i < bulkData.length; i++) {
+          if (!bulkData[i].email) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter email in file",
+            });
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          if (!bulkData[i].mnumber) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter mobile number in file",
+            });
+          }
+        }
 
         for (let i = 0; i < bulkData.length; i++) {
           if (

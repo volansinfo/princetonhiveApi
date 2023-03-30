@@ -33,7 +33,15 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             defaultValue: '0',
             comment: "0-pending,1-active"
         }
-    });
+    },
+        {
+            indexes: [
+                {
+                    unique: false,
+                    fields: ["departments"],
+                },
+            ],
+        });
 
     return Question;
 };

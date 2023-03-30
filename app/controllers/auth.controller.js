@@ -34,6 +34,35 @@ exports.signup = async (req, res) => {
         .toFile(__basedir + "/uploads/user/" + newFilename);
       const uuid = await getUUID.generateUUID(req);
 
+      if (req.body.roles[0] == "student") {
+        const userId = req.body.teacherId;
+        if (!userId.trim()) {
+          return res.status(400).send({ success: false, message: "Please enter teacher id!" })
+        }
+        else if (isNaN(userId)) {
+          return res.status(400).send({ success: false, message: "Please enter numeric value for teacher id!" })
+        }
+        const existTeacher = await User.findOne({
+          where: {
+            id: userId
+          },
+          attributes: {
+            exclude: ['password', 'actualPassword']
+          },
+          include: [{
+            model: db.role,
+            as: "roles",
+            where: { id: '3' },
+            required: true,
+            attributes: []
+          }],
+        })
+        if (existTeacher == null) {
+          return res.status(400).send({ success: false, message: "Teacher not exist!" })
+        }
+      }
+
+
       let generatedPwd = await generator.generate({
         length: 6,
         numbers: true,
@@ -164,6 +193,7 @@ exports.signup = async (req, res) => {
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
+        teacherId: req.body.teacherId ? req.body.teacherId : null
       });
       const userEmail = req.body.email;
       const username = req.body.fname.trim() + " " + req.body.lname.trim();
@@ -178,7 +208,6 @@ exports.signup = async (req, res) => {
 
       sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
 
-      console.log(req.body.roles, "Rolesssssssssssss");
       if (req.body.roles) {
         const roles = await Role.findAll({
           where: {
@@ -208,6 +237,34 @@ exports.signup = async (req, res) => {
       {
         const newFilename = null;
         const uuid = await getUUID.generateUUID(req);
+
+        if (req.body.roles[0] == "student") {
+          const userId = req.body.teacherId;
+          if (!userId.trim()) {
+            return res.status(400).send({ success: false, message: "Please enter teacher id!" })
+          }
+          else if (isNaN(userId)) {
+            return res.status(400).send({ success: false, message: "Please enter numeric value for teacher id!" })
+          }
+          const existTeacher = await User.findOne({
+            where: {
+              id: userId
+            },
+            attributes: {
+              exclude: ['password', 'actualPassword']
+            },
+            include: [{
+              model: db.role,
+              as: "roles",
+              where: { id: '3' },
+              required: true,
+              attributes: []
+            }],
+          })
+          if (existTeacher == null) {
+            return res.status(400).send({ success: false, message: "Teacher not exist!" })
+          }
+        }
 
         let generatedPwd = await generator.generate({
           length: 6,
@@ -345,6 +402,7 @@ exports.signup = async (req, res) => {
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
+          teacherId: req.body.teacherId ? req.body.teacherId : null
         });
         const userEmail = req.body.email;
         const username = req.body.fname.trim() + " " + req.body.lname.trim();

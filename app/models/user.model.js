@@ -102,7 +102,12 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         studentId: {
             type: DataTypes.INTEGER,
             allowNull: true
+        },
+        universityId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
+
     },
         {
             indexes: [

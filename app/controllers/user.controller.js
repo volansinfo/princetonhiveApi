@@ -267,6 +267,9 @@ exports.updateUserData = async (req, res) => {
   try {
     await uploadFile(req, res);
     if (req.file !== undefined) {
+      if (req.file.size < 2 * 1024) {
+        return res.status(400).send({ success: false, message: "File too small, please select a file greater than 2kb" })
+      }
       const newFilename = `${Date.now()}_${req.file.originalname}`;
       await sharp(req.file.buffer).resize({ width: 67, height: 67 }).toFile(__basedir + "/uploads/user/" + newFilename)
       // first name validation

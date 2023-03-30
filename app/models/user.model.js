@@ -94,9 +94,28 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: Sequelize.ENUM('0', '1'),
             defaultValue: '0',
             comment: "0-pending,1-active"
+        },
+        teacherId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        studentId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
-
-    });
+    },
+        {
+            indexes: [
+                {
+                    unique: false,
+                    fields: ["studentId"],
+                },
+                {
+                    unique: false,
+                    fields: ["teacherId"],
+                },
+            ],
+        });
 
     return User;
 };

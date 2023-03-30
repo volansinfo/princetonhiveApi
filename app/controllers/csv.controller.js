@@ -62,6 +62,15 @@ const uploadCsv = async (req, res) => {
         }
 
         for (let i = 0; i < bulkData.length; i++) {
+          if (bulkData[i].mnumber.length != 10) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter valid mobile number with 10 digit in file",
+            });
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
           for (let j = i + 1; j < bulkData.length; j++) {
             if (
               bulkData[i].email == bulkData[j].email ||
@@ -112,7 +121,17 @@ const uploadCsv = async (req, res) => {
           ) {
             return res.status(400).send({
               success: false,
-              message: "invalid email",
+              message: "Please enter valid email in file",
+            });
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          let dob = bulkData[i].dob;
+          if (isNaN(new Date(dob))) {
+            return res.status(400).send({
+              success: false,
+              message: `Invalid dob: ${dob}, please enter dd/mm/yyyy in this format`,
             });
           }
         }
@@ -162,7 +181,7 @@ const uploadCsv = async (req, res) => {
             password: bcrypt.hashSync(generatedPwd, 8),
             actualPassword: generatedPwd,
             email: bulkData[i].email,
-            gender: (bulkData[i].gender = "male" ? "1" : "2"),
+            gender: bulkData[i].gender == "male" ? "1" : "2",
             dob: bulkData[i].dob,
             address: bulkData[i].address,
             mnumber: bulkData[i].mnumber,
@@ -171,6 +190,7 @@ const uploadCsv = async (req, res) => {
             pincode: bulkData[i].pincode,
             country: bulkData[i].country,
             status: 1,
+            teacherId: teacherId,
           };
 
           const user = await User.create(document);

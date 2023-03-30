@@ -1,122 +1,122 @@
 module.exports = (sequelize, Sequelize, DataTypes) => {
-    const User = sequelize.define("hiv_users", {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-        },
-        fname: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+  const User = sequelize.define(
+    "hiv_users",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      fname: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-        lname: {
-            type: Sequelize.STRING,
-            allowNull: true
-        },
-        profileImg: {
-            type: Sequelize.TEXT,
-            allowNull: true,
-        },
+      lname: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      profileImg: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
 
-        uuid: {
-            type: DataTypes.STRING,
-            allowNull: false,
+      uuid: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
+      password: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        require: false,
+        validate: {
+          len: {
+            args: [5, 72],
+            msg: "Your password may be 5 to 72 characters only.",
+          },
         },
+      },
 
-        password: {
-            type: Sequelize.STRING,
-            allowNull: true,
-            require: false,
-            validate: {
-                len: {
-                    args: [5, 72],
-                    msg: 'Your password may be 5 to 72 characters only.'
-                }
-            }
-        },
+      actualPassword: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        require: false,
+      },
 
-        actualPassword: {
-            type: Sequelize.STRING,
-            allowNull: true,
-            require: false
+      tokenKey: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
 
-        },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      gender: {
+        type: Sequelize.ENUM("1", "2", "3"),
+        comment: "1-male,2-female,3-other",
+        allowNull: false,
+      },
+      dob: {
+        type: Sequelize.DATEONLY,
+      },
+      mnumber: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-        tokenKey: {
-            type: Sequelize.TEXT,
-            allowNull: true
-        },
+      address: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
 
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        gender: {
-            type: Sequelize.ENUM('1', '2', '3'),
-            comment: "1-male,2-female,3-other",
-            allowNull: false
-        },
-        dob: {
-            type: Sequelize.DATEONLY
-        },
-        mnumber: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+      city: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
 
-        address: {
-            type: Sequelize.TEXT,
-            allowNull: true
-        },
+      state: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
 
-        city: {
-            type: Sequelize.STRING,
-            allowNull: true
-        },
+      pincode: {
+        type: Sequelize.STRING,
+      },
 
-        state: {
-            type: Sequelize.STRING,
-            allowNull: true
-        },
+      country: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
 
-        pincode: {
-            type: Sequelize.STRING,
-        },
-
-        country: {
-            type: Sequelize.STRING,
-            allowNull: true
-        },
-
-        status: {
-            type: Sequelize.ENUM('0', '1'),
-            defaultValue: '0',
-            comment: "0-pending,1-active"
-        },
-        teacherId: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        },
-        universityId: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        }
-
+      status: {
+        type: Sequelize.ENUM("0", "1"),
+        defaultValue: "0",
+        comment: "0-pending,1-active",
+      },
+      teacherId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      universityId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
+    {
+      indexes: [
         {
-            indexes: [
-                {
-                    unique: false,
-                    fields: ["teacherId"],
-                },
-                {
-                    unique: false,
-                    fields: ["universityId"],
-                },
-            ],
-        });
+          unique: false,
+          fields: ["teacherId"],
+        },
+        {
+          unique: false,
+          fields: ["universityId"],
+        },
+      ],
+    }
+  );
 
-    return User;
+  return User;
 };

@@ -31,8 +31,23 @@ module.exports = function (app) {
     controller.getAssessmentActiveUpcomming
   );
   app.patch(
-    "/api/vol/updateAssessment",
-    [authJwt.verifyToken],
+    "/api/vol/updateAssessment/:id",
+    [authJwt.verifyToken, errorValidation.erroHandlingUpdate],
     controller.updateAssessment
+  );
+  app.patch(
+    "/api/vol/updateAssessmentStatus/:id",
+    [authJwt.verifyToken],
+    controller.updateStatus
+  );
+  app.delete(
+    "/api/vol/deleteAssessment/:id",
+    [authJwt.verifyToken],
+    controller.deleteAssessment
+  );
+  app.get(
+    "/api/vol/getAllAssessment",
+    [authJwt.verifyToken],
+    controller.getAllAssessment
   );
 };

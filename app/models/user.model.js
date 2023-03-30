@@ -99,10 +99,6 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        studentId: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        },
         universityId: {
             type: DataTypes.INTEGER,
             allowNull: true
@@ -113,11 +109,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             indexes: [
                 {
                     unique: false,
-                    fields: ["studentId"],
+                    fields: ["teacherId"],
                 },
                 {
                     unique: false,
-                    fields: ["teacherId"],
+                    fields: ["universityId"],
                 },
             ],
         });

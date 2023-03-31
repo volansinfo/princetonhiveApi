@@ -9,7 +9,7 @@ module.exports = function (app) {
         )
         next()
     })
+    app.get("/api/vol/allstudents-counts", [authJwt.verifyToken, authJwt.isTeacher], controller.getAllStudentsCountByTeacher)
     app.get("/api/vol/allstudents", [authJwt.verifyToken, authJwt.isTeacher], controller.getAllStudentByTeacher)
-    // updateStudentData
     app.post("/api/vol/student/:id", [authJwt.verifyToken], controller.updateStudentData)
 }

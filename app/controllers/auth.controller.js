@@ -34,6 +34,19 @@ exports.signup = async (req, res) => {
         .toFile(__basedir + "/uploads/user/" + newFilename);
       const uuid = await getUUID.generateUUID(req);
 
+      if (req.body.roles[0] == "admin" && (req.body.teacherId)) {
+        return res.status(400).send({ success: false, message: "You can not create admin because you have entered teacher id!" })
+      }
+      if (req.body.roles[0] == "teacher" && req.body.teacherId) {
+        return res.status(400).send({ success: false, message: "You can not create teacher because you have entered teacher id!" })
+      }
+      if (req.body.roles[0] == "university" && req.body.teacherId) {
+        return res.status(400).send({ success: false, message: "You can not create university because you have entered teacher id!" })
+      }
+      if (req.body.roles[0] == "support" && req.body.teacherId) {
+        return res.status(400).send({ success: false, message: "You can not create support because you have entered teacher id!" })
+      }
+
       if (req.body.roles[0] == "student") {
         const userId = req.body.teacherId;
         if (!userId.trim()) {
@@ -58,7 +71,7 @@ exports.signup = async (req, res) => {
           }],
         })
         if (existTeacher == null) {
-          return res.status(400).send({ success: false, message: "Teacher not exist!" })
+          return res.status(400).send({ success: false, message: "Teacher does not exist!" })
         }
       }
 
@@ -237,6 +250,18 @@ exports.signup = async (req, res) => {
       {
         const newFilename = null;
         const uuid = await getUUID.generateUUID(req);
+        if (req.body.roles[0] == "admin" && (req.body.teacherId)) {
+          return res.status(400).send({ success: false, message: "You can not create admin because you have entered teacher id!" })
+        }
+        if (req.body.roles[0] == "teacher" && req.body.teacherId) {
+          return res.status(400).send({ success: false, message: "You can not create teacher because you have entered teacher id!" })
+        }
+        if (req.body.roles[0] == "university" && req.body.teacherId) {
+          return res.status(400).send({ success: false, message: "You can not create university because you have entered teacher id!" })
+        }
+        if (req.body.roles[0] == "support" && req.body.teacherId) {
+          return res.status(400).send({ success: false, message: "You can not create support because you have entered teacher id!" })
+        }
 
         if (req.body.roles[0] == "student") {
           const userId = req.body.teacherId;
@@ -262,7 +287,7 @@ exports.signup = async (req, res) => {
             }],
           })
           if (existTeacher == null) {
-            return res.status(400).send({ success: false, message: "Teacher not exist!" })
+            return res.status(400).send({ success: false, message: "Teacher does not exist!" })
           }
         }
 

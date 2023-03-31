@@ -17,7 +17,8 @@ exports.getAllStudentByTeacher = async (req, res) => {
         const teacherId = tokenData.id
         const allUser = await studentUser.findAll({
             where: {
-                teacherId: teacherId
+                teacherId: teacherId,
+                status: "1"
             },
             order: [
                 ['id', 'DESC']
@@ -100,7 +101,8 @@ exports.getAllStudentsCountByTeacher = async (req, res) => {
         const teacherId = tokenData.id
         const allUser = await studentUser.findAll({
             where: {
-                teacherId: teacherId
+                teacherId: teacherId,
+                status: "1"
             },
             order: [
                 ['id', 'DESC']
@@ -150,7 +152,7 @@ exports.updateStudentData = async (req, res) => {
                 },
             })
             if (!student) {
-                return res.status(400).send({ success: false, message: "Student does not exist!" })
+                return res.status(404).send({ success: false, message: "Student does not exist!" })
             }
             if (student.teacherId == null) {
                 return res.status(400).send({ success: false, message: "Please enter Student Id only!" })

@@ -92,6 +92,27 @@ exports.getAllStudentByTeacher = async (req, res) => {
     }
 }
 
+exports.getAllStudentsCountByTeacher = async (req, res) => {
+    try {
+        let token = req.headers["x-access-token"];
+
+        const tokenData = jwt.decode(token);
+        const teacherId = tokenData.id
+        const allUser = await studentUser.findAll({
+            where: {
+                teacherId: teacherId
+            },
+            order: [
+                ['id', 'DESC']
+            ]
+        })
+        totalStudents = allUser.length;
+        return res.status(200).send({ success: true, totalStudents })
+    } catch (e) {
+        res.status(500).send({ success: false, message: e.message })
+    }
+}
+
 exports.updateStudentData = async (req, res) => {
     try {
         await uploadFile(req, res);

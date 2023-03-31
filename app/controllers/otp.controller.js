@@ -13,7 +13,7 @@ const bcrypt = require("bcryptjs");
 exports.sendotp = async (req, res) => {
   try {
   
-    return res.status(200).send({ success: false, message: "OTP send" })
+    return res.status(200).send({message: "OTP send" })
        
     
   } catch (e) {

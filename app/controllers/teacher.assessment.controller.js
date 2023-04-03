@@ -567,6 +567,7 @@ exports.getAllActiveAssessment = async (req, res) => {
     const assessmentData = await TeacherAssessment.findAll({
       where: {
         teacherId: JSON.stringify(userId),
+        assessmentType: "1",
         status: "1",
       },
     });

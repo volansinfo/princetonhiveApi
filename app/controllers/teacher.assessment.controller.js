@@ -58,13 +58,17 @@ exports.getAssessmentOngoing = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
-
-    const assessmentData = await TeacherAssessment.findAll();
-
+    const assessmentData = await TeacherAssessment.findAll({
+      where: {
+        teacherId: JSON.stringify(permissionRoles.id),
+      },
+      order: [["id", "DESC"]],
+    });
     const ongoing = [];
     // console.log(assessmentData);
     for (let i = 0; i < assessmentData.length; i++) {
@@ -77,37 +81,36 @@ exports.getAssessmentOngoing = async (req, res) => {
       const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
       if (
-        currentTime <= convertEndDateEpoch &&
-        convertStartDateEpoch <= currentTime
+        currentTime >= convertStartDateEpoch &&
+        currentTime <= convertEndDateEpoch
       ) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         ongoing.push(assessmentData[i]);
       }
-      // console.log(ongoing);
-      const page = parseInt(req.query.page) || 0;
-      const limit = parseInt(req.query.limit) || 10;
+    }
+    const page = parseInt(req.query.page) || 0;
+    const limit = 10;
 
-      const startIndex = page * limit;
-      const endIndex = (page + 1) * limit;
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+    console.log(ongoing);
+    const results = {};
+    results.dataItems = ongoing.slice(startIndex, endIndex);
+    results.totalItems = ongoing.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil(ongoing.length / limit);
 
-      const results = {};
-      results.dataItems = ongoing.slice(startIndex, endIndex);
-      results.totalItems = ongoing.length;
-      results.currentPage = parseInt(req.query.page) || 0;
-      results.totalPages = Math.ceil(ongoing.length / limit);
-
-      if (results.dataItems.length <= 0) {
-        return res.status(404).send({
-          status: false,
-          message: "No onging assessment found",
-        });
-      }
-      return res.status(200).send({
-        status: true,
-        message: "All Ongoing assessment found",
-        data: results,
+    if (results.dataItems.length <= 0) {
+      return res.status(404).send({
+        status: false,
+        message: "There are no ongoing assessment.",
       });
     }
+    return res.status(200).send({
+      status: true,
+      message: "All ongoing assessment found",
+      data: results,
+    });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -128,11 +131,15 @@ exports.getAssessmentUpcomming = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
-    const assessmentData = await TeacherAssessment.findAll();
+    const assessmentData = await TeacherAssessment.findAll({
+      where: { teacherId: JSON.stringify(permissionRoles.id) },
+      order: [["id", "DESC"]],
+    });
     const upcoming = [];
     // console.log(assessmentData);
     for (let i = 0; i < assessmentData.length; i++) {
@@ -167,7 +174,7 @@ exports.getAssessmentUpcomming = async (req, res) => {
     if (results.dataItems.length <= 0) {
       return res.status(404).send({
         status: false,
-        message: "No upcoming assessment found",
+        message: "There are no upcomming assessment.",
       });
     }
     return res.status(200).send({
@@ -194,14 +201,17 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
     const assessmentData = await TeacherAssessment.findAll({
       where: {
         status: "1",
+        where: { teacherId: JSON.stringify(permissionRoles.id) },
       },
+      order: [["id", "DESC"]],
     });
     const activeUpcomming = [];
     // console.log(assessmentData);
@@ -215,8 +225,8 @@ exports.getAssessmentPreviousActive = async (req, res) => {
       const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
       if (
-        currentTime < convertStartDateEpoch &&
-        convertEndDateEpoch > currentTime
+        currentTime > convertStartDateEpoch &&
+        convertEndDateEpoch < currentTime
       ) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         activeUpcomming.push(assessmentData[i]);
@@ -236,12 +246,12 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     if (results.dataItems.length <= 0) {
       return res.status(404).send({
         status: false,
-        message: "No active upcoming assessment found",
+        message: "There are no previous assessment.",
       });
     }
     return res.status(200).send({
       status: true,
-      message: "All active upcoming assessment found",
+      message: "All active previous assessment found",
       data: results,
     });
   } catch (error) {
@@ -265,9 +275,10 @@ exports.updateAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "UNI" && roles != "ADM" && roles != "SUP") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to update the assessment",
+      });
     }
     const existAssessment = await TeacherAssessment.findOne({
       where: {
@@ -330,9 +341,10 @@ exports.updateStatus = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "UNI" && roles != "ADM" && roles != "SUP") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to update the status",
+      });
     }
 
     const isValidRequestBody = function (requestBody) {
@@ -377,7 +389,7 @@ exports.updateStatus = async (req, res) => {
         data: response,
       });
     } else {
-      const res = await TeacherAssessment.update(
+      const responce = await TeacherAssessment.update(
         {
           status: status,
         },
@@ -388,7 +400,7 @@ exports.updateStatus = async (req, res) => {
       return res.status(200).send({
         status: true,
         message: "status has been disabled",
-        data: res,
+        data: responce,
       });
     }
   } catch (error) {
@@ -412,9 +424,10 @@ exports.deleteAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "UNI" && roles != "ADM" && roles != "SUP") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to delete the assessment",
+      });
     }
 
     const existAssessment = await TeacherAssessment.findOne({
@@ -458,12 +471,15 @@ exports.getAllAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "ADM") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
 
-    const assessmentData = await TeacherAssessment.findAll();
+    const assessmentData = await TeacherAssessment.findAll({
+      order: [["id", "DESC"]],
+    });
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 10;
 
@@ -506,9 +522,10 @@ exports.getAllActiveAssignedAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
 
     const assessmentData = await TeacherAssessment.findAll({
@@ -516,6 +533,7 @@ exports.getAllActiveAssignedAssessment = async (req, res) => {
         teacherId: JSON.stringify(userId),
         status: "1",
       },
+      order: [["id", "DESC"]],
     });
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 10;
@@ -559,9 +577,10 @@ exports.getAllActiveAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
 
     const assessmentData = await TeacherAssessment.findAll({
@@ -570,6 +589,7 @@ exports.getAllActiveAssessment = async (req, res) => {
         assessmentType: "1",
         status: "1",
       },
+      order: [["id", "DESC"]],
     });
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 10;
@@ -613,9 +633,10 @@ exports.getAllActivePracticeAssessment = async (req, res) => {
     });
     const roles = permissionRoles.uuid.slice(0, 3);
     if (roles != "TEA") {
-      return res
-        .status(401)
-        .send({ status: false, message: "permission denied" });
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
     }
 
     const assessmentData = await TeacherAssessment.findAll({
@@ -624,6 +645,7 @@ exports.getAllActivePracticeAssessment = async (req, res) => {
         assessmentType: "2",
         status: "1",
       },
+      order: [["id", "DESC"]],
     });
     console.log(assessmentData);
     const page = parseInt(req.query.page) || 0;

@@ -73,6 +73,11 @@ db.teacherAssessment = require("../models/teacher.assessment.model")(
   Sequelize,
   DataTypes
 );
+db.Blog = require("../models/blog.model")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
 
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",

@@ -26,9 +26,9 @@ module.exports = function (app) {
     controller.getAssessmentUpcomming
   );
   app.get(
-    "/api/vol/getAssessmentActiveUpcomming",
+    "/api/vol/getAssessmentPreviousActive",
     [authJwt.verifyToken],
-    controller.getAssessmentActiveUpcomming
+    controller.getAssessmentPreviousActive
   );
   app.patch(
     "/api/vol/updateAssessment/:id",
@@ -49,5 +49,20 @@ module.exports = function (app) {
     "/api/vol/getAllAssessment",
     [authJwt.verifyToken],
     controller.getAllAssessment
+  );
+  app.get(
+    "/api/vol/getAllActiveAssignedAssessment",
+    [authJwt.verifyToken],
+    controller.getAllActiveAssignedAssessment
+  );
+  app.get(
+    "/api/vol/getAllActiveAssessment",
+    [authJwt.verifyToken],
+    controller.getAllActiveAssessment
+  );
+  app.get(
+    "/api/vol/getAllActivePracticeAssessment",
+    [authJwt.verifyToken],
+    controller.getAllActivePracticeAssessment
   );
 };

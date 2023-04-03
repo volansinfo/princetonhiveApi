@@ -29,7 +29,7 @@ const uploadCsv = async (req, res) => {
     if (teacherUuid != "TEA") {
       return res.status(401).send({
         status: false,
-        message: "you have not permission to add bulk student",
+        message: "You don't have permission to add bulk students",
       });
     }
 
@@ -40,7 +40,10 @@ const uploadCsv = async (req, res) => {
     }
     // console.log(req.file.originalname.slice(-3), "hgjjhgjhg");
     if (req.file.originalname.slice(-3) != "csv") {
-      return res.status(400).send({ message: "please upload valid csv file" });
+      return res.status(400).send({
+        status: false,
+        message: "File type does not allow please upload csv file only",
+      });
     }
 
     let path = __basedir + "/uploads/slider/" + req.file.filename;
@@ -57,34 +60,8 @@ const uploadCsv = async (req, res) => {
         if (bulkData.length == 0) {
           return res.status(400).send({
             status: false,
-            message: "Please enter required field in the file ",
+            message: "Please enter required field in the file",
           });
-        }
-
-        for (let i = 0; i < bulkData.length; i++) {
-          if (bulkData[i].mnumber.length != 10) {
-            return res.status(400).send({
-              success: false,
-              message: "Please enter valid mobile number with 10 digit in file",
-            });
-          }
-        }
-
-        for (let i = 0; i < bulkData.length; i++) {
-          for (let j = i + 1; j < bulkData.length; j++) {
-            if (
-              bulkData[i].email == bulkData[j].email ||
-              bulkData[i].mnumber == bulkData[j].mnumber
-            ) {
-              return res.status(400).send({
-                message: `email ${
-                  (bulkData[i].email, bulkData[j].email)
-                } is same in file or mobile number ${
-                  (bulkData[i].mnumber, bulkData[j].mnumber)
-                } is same in file`,
-              });
-            }
-          }
         }
 
         for (let i = 0; i < bulkData.length; i++) {
@@ -93,28 +70,12 @@ const uploadCsv = async (req, res) => {
               success: false,
               message: "Please enter first name in file",
             });
-          }
-        }
-        for (let i = 0; i < bulkData.length; i++) {
-          if (!bulkData[i].email) {
+          } else if (!bulkData[i].email) {
             return res.status(400).send({
               success: false,
               message: "Please enter email in file",
             });
-          }
-        }
-
-        for (let i = 0; i < bulkData.length; i++) {
-          if (!bulkData[i].mnumber) {
-            return res.status(400).send({
-              success: false,
-              message: "Please enter mobile number in file",
-            });
-          }
-        }
-
-        for (let i = 0; i < bulkData.length; i++) {
-          if (
+          } else if (
             !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
               bulkData[i].email.trim()
             )
@@ -123,21 +84,58 @@ const uploadCsv = async (req, res) => {
               success: false,
               message: "Please enter valid email in file",
             });
-          }
-        }
-
-        for (let i = 0; i < bulkData.length; i++) {
-          let dob = bulkData[i].dob;
-          if (isNaN(new Date(dob))) {
+          } else if (!bulkData[i].dob) {
             return res.status(400).send({
               success: false,
-              message: `Invalid dob: ${dob}, please enter dd/mm/yyyy in this format`,
+              message: `Please enter dob in file`,
+            });
+          } else if (
+            !/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(
+              bulkData[i].dob
+            )
+          ) {
+            return res.status(400).send({
+              success: false,
+              message: `Please enter dob in this dd/mm/yyy format`,
+            });
+          } else if (!bulkData[i].mnumber) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter mobile number in file",
+            });
+          } else if (bulkData[i].mnumber.length != 10) {
+            return res.status(400).send({
+              success: false,
+              message: `Please enter valid mobile number: ${bulkData[i].mnumber} with 10 digit in file`,
+            });
+          } else if (isNaN(bulkData[i].mnumber)) {
+            return res.status(400).send({
+              success: false,
+              message: `Mobile number should be in numeric value`,
             });
           }
         }
 
         for (let i = 0; i < bulkData.length; i++) {
-          const mnumber = await User.findOne({
+          for (let j = i + 1; j < bulkData.length; j++) {
+            if (bulkData[i].email == bulkData[j].email) {
+              return res.status(400).send({
+                message: `Email ${
+                  (bulkData[i].email, bulkData[j].email)
+                } is same in file`,
+              });
+            } else if (bulkData[i].mnumber == bulkData[j].mnumber) {
+              return res.status(400).send({
+                message: `Mobile number ${
+                  (bulkData[i].mnumber, bulkData[j].mnumber)
+                } is same in file`,
+              });
+            }
+          }
+        }
+
+        for (let i = 0; i < bulkData.length; i++) {
+          let mnumber = await User.findOne({
             where: {
               mnumber: bulkData[i].mnumber,
             },
@@ -152,7 +150,7 @@ const uploadCsv = async (req, res) => {
         }
 
         for (let i = 0; i < bulkData.length; i++) {
-          const email = await User.findOne({
+          var email = await User.findOne({
             where: {
               email: bulkData[i].email,
             },
@@ -181,8 +179,8 @@ const uploadCsv = async (req, res) => {
             password: bcrypt.hashSync(generatedPwd, 8),
             actualPassword: generatedPwd,
             email: bulkData[i].email,
-            gender: bulkData[i].gender == "male" ? "1" : "2",
-            dob: bulkData[i].dob,
+            gender: bulkData[i].gender.toLowerCase() == "male" ? "1" : "2",
+            dob: bulkData[i].dob.split("/").reverse().join("/"),
             address: bulkData[i].address,
             mnumber: bulkData[i].mnumber,
             city: bulkData[i].city,
@@ -193,7 +191,7 @@ const uploadCsv = async (req, res) => {
             teacherId: teacherId,
           };
 
-          const user = await User.create(document);
+          let user = await User.create(document);
           let userrname = document.fname.trim() + " " + document.lname.trim();
 
           const roles = await Role.findAll({

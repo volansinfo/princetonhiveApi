@@ -50,6 +50,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       type: Sequelize.TEXT,
       allowNull: false,
     },
+
     aiParametersLevel: {
       type: Sequelize.ENUM("1", "2", "3"),
       comment: "1-beginner,2-intermediate,3-expert",
@@ -75,6 +76,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
     aiParametersEnvironment: {
       type: Sequelize.TEXT,
       allowNull: false,
+    },
+    teacherId: {
+      type: Sequelize.TEXT,
+      allowNull: true,
     },
     status: {
       type: Sequelize.ENUM("0", "1"),

@@ -2,8 +2,18 @@ const db = require("../models");
 const Assessment = db.assignment;
 const pagination = require("../middleware/pagination");
 const User = db.user;
+const jwt = require("jsonwebtoken");
 exports.assignment = async (req, res) => {
   try {
+    const token = req.headers["x-access-token"];
+    const decodeToken = jwt.decode(token);
+    const teacherId = decodeToken.id;
+    const teacherExist = await User.findOne({
+      where: {
+        id: teacherId,
+      },
+    });
+
     const assessment = await Assessment.create({
       assessmentName: req.body.assessmentName,
       assessmentResponseType: req.body.assessmentResponseType,
@@ -11,7 +21,8 @@ exports.assignment = async (req, res) => {
       assessmentAILevel: req.body.assessmentAILevel,
       assessmentStatusType: req.body.assessmentStatusType,
       studentId: req.body.studentId,
-      teacherId: req.body.teacherId,
+      teacherId:
+        teacherExist.uuid.slice(0, 3) == "TEA" ? teacherExist.id : null,
       status: req.body.status,
     });
     return res.status(200).send({

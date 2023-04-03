@@ -101,7 +101,7 @@ const uploadCsv = async (req, res) => {
           } else if (!bulkData[i].mnumber) {
             return res.status(400).send({
               success: false,
-              message: "Please enter valid mobile number in file",
+              message: "Please enter mobile number in file",
             });
           } else if (bulkData[i].mnumber.length != 10) {
             return res.status(400).send({
@@ -118,14 +118,15 @@ const uploadCsv = async (req, res) => {
 
         for (let i = 0; i < bulkData.length; i++) {
           for (let j = i + 1; j < bulkData.length; j++) {
-            if (
-              bulkData[i].email == bulkData[j].email ||
-              bulkData[i].mnumber == bulkData[j].mnumber
-            ) {
+            if (bulkData[i].email == bulkData[j].email) {
               return res.status(400).send({
-                message: `email ${
+                message: `Email ${
                   (bulkData[i].email, bulkData[j].email)
-                } is same in file or mobile number ${
+                } is same in file`,
+              });
+            } else if (bulkData[i].mnumber == bulkData[j].mnumber) {
+              return res.status(400).send({
+                message: `Mobile number ${
                   (bulkData[i].mnumber, bulkData[j].mnumber)
                 } is same in file`,
               });

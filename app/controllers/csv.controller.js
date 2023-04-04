@@ -190,7 +190,6 @@ const uploadCsv = async (req, res) => {
             status: 1,
             aadharNo: bulkData[i].aadharNo,
             panNo: bulkData[i].panNo,
-            department: bulkData[i].department,
             teacherId: teacherId,
           };
 

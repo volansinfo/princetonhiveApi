@@ -1,7 +1,7 @@
 const db = require("../models");
 const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
-
+const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
 
 exports.createAssessment = async (req, res) => {
@@ -209,7 +209,7 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     const assessmentData = await TeacherAssessment.findAll({
       where: {
         status: "1",
-        where: { teacherId: JSON.stringify(permissionRoles.id) },
+        teacherId: JSON.stringify(permissionRoles.id),
       },
       order: [["id", "DESC"]],
     });
@@ -386,7 +386,6 @@ exports.updateStatus = async (req, res) => {
       return res.status(200).send({
         status: true,
         message: "status has been enable",
-        data: response,
       });
     } else {
       const responce = await TeacherAssessment.update(
@@ -400,7 +399,6 @@ exports.updateStatus = async (req, res) => {
       return res.status(200).send({
         status: true,
         message: "status has been disabled",
-        data: responce,
       });
     }
   } catch (error) {
@@ -449,7 +447,6 @@ exports.deleteAssessment = async (req, res) => {
     return res.status(200).send({
       status: true,
       message: "Assessment deleted successfully",
-      data: response,
     });
   } catch (error) {
     return res.status(500).send({ message: error.message });
@@ -672,5 +669,205 @@ exports.getAllActivePracticeAssessment = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).send({ message: error.message });
+  }
+};
+
+//13) Write a search teacher assessment Api which is using the key assessmentType and assessmentPurpose .
+
+exports.teacherSearchQueryAssessmentPurpose = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+
+    const permissionRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = permissionRoles.uuid.slice(0, 3);
+    if (roles != "TEA") {
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
+    }
+    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+    const data = req.query;
+    const { assessmentType, assessmentPurpose } = data;
+    if (!assessmentType) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment type" });
+    } else if (assessmentType != "1" && assessmentType != "2") {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment type like 1,2",
+      });
+    } else if (
+      assessmentPurpose != "1" &&
+      assessmentPurpose != "2" &&
+      assessmentPurpose != "3" &&
+      assessmentPurpose != "4" &&
+      assessmentPurpose != "5"
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment purpose like 1,2,3,4,5",
+      });
+    }
+    const results = await TeacherAssessment.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        assessmentType: assessmentType,
+        assessmentPurpose: assessmentPurpose,
+        teacherId: JSON.stringify(permissionRoles.id),
+      },
+    });
+    const response = pagination.getPaginationData(
+      results,
+      req.query.page,
+      limit
+    );
+    if (response.dataItems.length <= 0) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Assessment not available" });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Assessment found successfully ",
+      data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+//14) Write a search teacher assessment Api which is using the key assessmentType and Start Date .
+
+exports.teacherSearchQueryStartDate = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+
+    const permissionRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = permissionRoles.uuid.slice(0, 3);
+    if (roles != "TEA") {
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
+    }
+    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+    const data = req.query;
+    const { assessmentType, startDate } = data;
+    if (!assessmentType) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment type" });
+    } else if (assessmentType != "1" && assessmentType != "2") {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment type like 1,2",
+      });
+    }
+    const results = await TeacherAssessment.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        assessmentType: assessmentType,
+        startDate: startDate,
+        teacherId: JSON.stringify(permissionRoles.id),
+      },
+    });
+    const response = pagination.getPaginationData(
+      results,
+      req.query.page,
+      limit
+    );
+    if (response.dataItems.length <= 0) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Assessment not available" });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Assessment found successfully ",
+      data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+//15) Write a search teacher assessment Api which is using the key assessmentType and  End Date .
+
+exports.teacherSearchQueryEndDate = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+
+    const permissionRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = permissionRoles.uuid.slice(0, 3);
+    if (roles != "TEA") {
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
+    }
+    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+    const data = req.query;
+    const { assessmentType, endDate } = data;
+    if (!assessmentType) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment type" });
+    } else if (assessmentType != "1" && assessmentType != "2") {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment type like 1,2",
+      });
+    }
+    const results = await TeacherAssessment.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        assessmentType: assessmentType,
+        endDate: endDate,
+        teacherId: JSON.stringify(permissionRoles.id),
+      },
+    });
+    const response = pagination.getPaginationData(
+      results,
+      req.query.page,
+      limit
+    );
+    if (response.dataItems.length <= 0) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Assessment not available" });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Assessment found successfully ",
+      data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message });
   }
 };

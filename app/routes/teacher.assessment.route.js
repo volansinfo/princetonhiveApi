@@ -65,4 +65,20 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAllActivePracticeAssessment
   );
+
+  app.get(
+    "/api/vol/teacherSearchQueryAssessmentPurpose",
+    [authJwt.verifyToken],
+    controller.teacherSearchQueryAssessmentPurpose
+  );
+  app.get(
+    "/api/vol/teacherSearchQueryStartDate",
+    [authJwt.verifyToken],
+    controller.teacherSearchQueryStartDate
+  );
+  app.get(
+    "/api/vol/teacherSearchQueryEndDate",
+    [authJwt.verifyToken],
+    controller.teacherSearchQueryEndDate
+  );
 };

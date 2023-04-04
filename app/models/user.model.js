@@ -113,7 +113,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       },
       department: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {

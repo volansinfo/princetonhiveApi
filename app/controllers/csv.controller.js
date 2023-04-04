@@ -188,6 +188,9 @@ const uploadCsv = async (req, res) => {
             pincode: bulkData[i].pincode,
             country: bulkData[i].country,
             status: 1,
+            aadharNo: bulkData[i].aadharNo,
+            panNo: bulkData[i].panNo,
+            department: bulkData[i].department,
             teacherId: teacherId,
           };
 

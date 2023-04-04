@@ -103,6 +103,18 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      aadharNo: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      panNo: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      department: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       indexes: [

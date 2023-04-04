@@ -1,5 +1,19 @@
-// Need to fix the above issues: -
+// Write a search teacher assessment Api which is using the key.
 
-// 5.Assessment should not be duplicate but another teacher can create assessment with same name
+//  Assessment Type
 
-// 7.There should be sorting on all api. Recent assessment should be comes on first place
+//  Select Purpose
+
+//  Start Date
+
+//  End Date
+
+// Note: - Assessment Type should be required and all the filters should be worked on and conditions.
+// startDate:{
+//     type: Sequelize.DATEONLY,
+//     allowNull: true,
+//   },
+//   endDate:{
+//     type: Sequelize.DATEONLY,
+//     allowNull: true,
+//   },

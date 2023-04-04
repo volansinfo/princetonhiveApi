@@ -205,6 +205,11 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       id: studentId,
     },
   });
+  if (!studentExist) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Student id does not exist!" });
+  }
   const uuidStudent = studentExist.uuid;
   console.log(uuidStudent.slice(0, 3) != "STU");
   if (!studentExist || uuidStudent.slice(0, 3) != "STU") {

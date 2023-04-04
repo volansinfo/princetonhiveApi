@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const db = require("../models");
 const User = db.user;
+const Question = db.Question;
+const TeacherAssessment = db.teacherAssessment;
 const errorHandingTeacherAssessment = async (req, res, next) => {
   // const dateFormate = new Date("2012/09/11");
   const data = req.body;
@@ -37,6 +39,18 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
     return res
       .status(401)
       .send({ status: false, message: "permission denied" });
+  }
+  const findTeacherId = await TeacherAssessment.findAll();
+  for (let i = 0; i < findTeacherId.length; i++) {
+    if (
+      findTeacherId[i].teacherId == permissionRoles.id &&
+      findTeacherId[i].assessmentName == assessmentName
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Assessment name is  already exist",
+      });
+    }
   }
 
   const isValidRequestBody = function (requestBody) {
@@ -107,11 +121,12 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
   } else if (
     assessmentResponseType != "1" &&
     assessmentResponseType != "2" &&
-    assessmentResponseType != "3"
+    assessmentResponseType != "3" &&
+    assessmentResponseType != "4"
   ) {
     return res.status(400).send({
       status: false,
-      message: "Please enter valid assessment response type like 1,2,3",
+      message: "Please enter valid assessment response type like 1,2,3,4",
     });
   } else if (!questionId) {
     return res.status(400).send({
@@ -183,6 +198,43 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       message: "Please enter valid status like 0,1",
     });
   }
+
+  const studentExist = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  if (!studentExist) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Student id does not exist!" });
+  }
+
+  const questionExist = await Question.findOne({
+    where: {
+      id: questionId,
+    },
+  });
+  if (!questionExist) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Question id does not exist!" });
+  }
+
+  const startDateValidation = startDate;
+  const endDateValidation = endDate;
+  let convertStartDate = new Date(startDateValidation);
+  let convertEndDate = new Date(endDateValidation);
+  let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+  let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+  // const currentTime = Math.floor(new Date().getTime() / 1000.0);
+  if (convertEndDateEpoch < convertStartDateEpoch) {
+    return res.status(400).send({
+      status: false,
+      message: "Start date should not greater than end date",
+    });
+  }
+
   next();
 };
 
@@ -291,7 +343,8 @@ const erroHandlingUpdate = async (req, res, next) => {
   } else if (
     assessmentResponseType != "1" &&
     assessmentResponseType != "2" &&
-    assessmentResponseType != "3"
+    assessmentResponseType != "3" &&
+    assessmentResponseType != "4"
   ) {
     return res.status(400).send({
       status: false,
@@ -355,6 +408,40 @@ const erroHandlingUpdate = async (req, res, next) => {
     return res.status(400).send({
       status: false,
       message: "Please enter ai parameters environment",
+    });
+  }
+  const studentExist = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  if (!studentExist) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Student id does not exist!" });
+  }
+
+  const questionExist = await Question.findOne({
+    where: {
+      id: questionId,
+    },
+  });
+  if (!questionExist) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Question id does not exist!" });
+  }
+  const startDateValidation = startDate;
+  const endDateValidation = endDate;
+  let convertStartDate = new Date(startDateValidation);
+  let convertEndDate = new Date(endDateValidation);
+  let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+  let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+  // const currentTime = Math.floor(new Date().getTime() / 1000.0);
+  if (convertEndDateEpoch < convertStartDateEpoch) {
+    return res.status(400).send({
+      status: false,
+      message: "Start date should not greater than end date",
     });
   }
   next();

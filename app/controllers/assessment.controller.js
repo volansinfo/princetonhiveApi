@@ -171,7 +171,7 @@ exports.getAssessmentByCompleted = async (req, res) => {
   }
 };
 
-//15) Write a search teacher assessment Api which is using the key assessmentType and  End Date .
+//15) Write a search teacher assessment Api which is using the key assessmentType and  assessmentPurpose .
 
 exports.studentSearchQueryAssessmentPurpose = async (req, res) => {
   try {
@@ -222,6 +222,146 @@ exports.studentSearchQueryAssessmentPurpose = async (req, res) => {
         assessmentType: assessmentType,
         assessmentPurpose: assessmentPurpose,
         studentId: JSON.stringify(permissionRoles.id),
+      },
+    });
+    const response = pagination.getPaginationData(
+      results,
+      req.query.page,
+      limit
+    );
+    if (response.dataItems.length <= 0) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Assessment not available" });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Assessment found successfully ",
+      data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+//14) Write a search teacher assessment Api which is using the key assessmentType and Start Date .
+
+exports.studentSearchQueryStartDate = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+
+    const permissionRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = permissionRoles.uuid.slice(0, 3);
+    if (roles != "STU") {
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
+    }
+    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+    const data = req.query;
+    const { assessmentType, startDate } = data;
+    if (!assessmentType) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment type" });
+    } else if (assessmentType != "1" && assessmentType != "2") {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment type like 1,2",
+      });
+    } else if (
+      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(startDate)
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter date in yyyy-mm-dd format",
+      });
+    }
+    const results = await Assessment.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        assessmentType: assessmentType,
+        startDate: startDate,
+        teacherId: JSON.stringify(permissionRoles.id),
+      },
+    });
+    const response = pagination.getPaginationData(
+      results,
+      req.query.page,
+      limit
+    );
+    if (response.dataItems.length <= 0) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Assessment not available" });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Assessment found successfully ",
+      data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+//14) Write a search teacher assessment Api which is using the key assessmentType and end Date .
+
+exports.studentSearchQueryEndDate = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+
+    const permissionRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = permissionRoles.uuid.slice(0, 3);
+    if (roles != "STU") {
+      return res.status(401).send({
+        status: false,
+        message: "You don't have permission to access the asssessment",
+      });
+    }
+    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+    const data = req.query;
+    const { assessmentType, endDate } = data;
+    if (!assessmentType) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Please enter assessment type" });
+    } else if (assessmentType != "1" && assessmentType != "2") {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter valid assessment type like 1,2",
+      });
+    } else if (
+      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(endDate)
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter date in yyyy-mm-dd format",
+      });
+    }
+    const results = await Assessment.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        assessmentType: assessmentType,
+        endDate: endDate,
+        teacherId: JSON.stringify(permissionRoles.id),
       },
     });
     const response = pagination.getPaginationData(

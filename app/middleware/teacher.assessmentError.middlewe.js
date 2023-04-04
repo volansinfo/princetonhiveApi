@@ -218,16 +218,16 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       .send({ status: false, message: "Student id does not exist!" });
   }
 
-  const questionExist = await Question.findOne({
-    where: {
-      id: questionId,
-    },
-  });
-  if (!questionExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Question id does not exist!" });
-  }
+  // const questionExist = await Question.findOne({
+  //   where: {
+  //     id: questionId,
+  //   },
+  // });
+  // if (!questionExist) {
+  //   return res
+  //     .status(404)
+  //     .send({ status: false, message: "Question id does not exist!" });
+  // }
 
   const startDateValidation = startDate;
   const endDateValidation = endDate;

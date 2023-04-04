@@ -779,6 +779,14 @@ exports.teacherSearchQueryStartDate = async (req, res) => {
         message: "Please enter valid assessment type like 1,2",
       });
     }
+    else if (
+      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(startDate)
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter date in yyyy-mm-dd format",
+      });
+    }
     const results = await TeacherAssessment.findAndCountAll({
       limit,
       offset,
@@ -840,6 +848,13 @@ exports.teacherSearchQueryEndDate = async (req, res) => {
       return res.status(400).send({
         status: false,
         message: "Please enter valid assessment type like 1,2",
+      });
+    } else if (
+      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(endDate)
+    ) {
+      return res.status(400).send({
+        status: false,
+        message: "Please enter date in yyyy-mm-dd format",
       });
     }
     const results = await TeacherAssessment.findAndCountAll({

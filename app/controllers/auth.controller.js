@@ -222,6 +222,12 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ status: false, message: "Plaese enter valid aadhar number" });
       }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhar number",
+        });
+      }
       if (isNaN(req.body.department)) {
         return res.status(400).send({
           status: false,

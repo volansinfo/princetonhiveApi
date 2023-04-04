@@ -297,6 +297,12 @@ exports.updateUserData = async (req, res) => {
           message: "Please enter numeric value in department",
         });
       }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhar number",
+        });
+      }
       const aadharExist = await User.findOne({
         where: {
           aadharNo: req.body.aadharNo,

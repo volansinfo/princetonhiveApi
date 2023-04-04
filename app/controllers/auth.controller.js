@@ -222,7 +222,22 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ status: false, message: "Plaese enter valid aadhar number" });
       }
-
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
+      const aadharExist = await User.findOne({
+        where: {
+          aadharNo: req.body.aadharNo,
+        },
+      });
+      if (aadharExist) {
+        return res
+          .status(400)
+          .send({ status: 400, message: "Aadhar number already exist" });
+      }
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,

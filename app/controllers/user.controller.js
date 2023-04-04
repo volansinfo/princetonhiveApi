@@ -291,6 +291,22 @@ exports.updateUserData = async (req, res) => {
           .status(400)
           .send({ status: false, message: "Please enter valid aadhar number" });
       }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
+      const aadharExist = await User.findOne({
+        where: {
+          aadharNo: req.body.aadharNo,
+        },
+      });
+      if (aadharExist) {
+        return res
+          .status(400)
+          .send({ status: 400, message: "Aadhar number already exist" });
+      }
       const userId = req.params.id;
       const result = await User.update(
         {

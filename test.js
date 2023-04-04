@@ -18,7 +18,10 @@
 //     allowNull: true,
 //   },
 
-const date = "2020-22-24";
-if (/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(date)) {
-  console.log(date);
-}
+// const date = "2020-22-24";
+// if (/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(date)) {
+//   console.log(date);
+// }
+
+const a = 11111111;
+console.log(a.length);

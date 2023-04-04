@@ -104,8 +104,8 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         allowNull: true,
       },
       aadharNo: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
+        type: DataTypes.TEXT,
+        allowNull: false,
       },
       panNo: {
         type: DataTypes.TEXT,

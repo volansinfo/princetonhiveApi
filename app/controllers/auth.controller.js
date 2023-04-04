@@ -217,12 +217,12 @@ exports.signup = async (req, res) => {
       if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
         return res
           .status(400)
-          .send({ status: false, message: "Plaese enter valid aadhar number" });
+          .send({ status: false, message: "Plaese enter valid aadhaar number" });
       }
       if (isNaN(req.body.aadharNo)) {
         return res.status(400).send({
           status: false,
-          message: "Please enter numeric value in aadhar number",
+          message: "Please enter numeric value in aadhaar number",
         });
       }
       if (!req.body.department) {
@@ -245,7 +245,7 @@ exports.signup = async (req, res) => {
       if (aadharExist) {
         return res
           .status(400)
-          .send({ status: 400, message: "Aadhar number already exist" });
+          .send({ status: 400, message: "Aadhaar number already exist" });
       }
       const user = await User.create({
         fname: req.body.fname,

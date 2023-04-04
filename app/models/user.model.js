@@ -104,7 +104,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         allowNull: true,
       },
       aadharNo: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       panNo: {
@@ -113,7 +113,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       },
       department: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
       },
     },
     {

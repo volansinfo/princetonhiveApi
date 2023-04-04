@@ -281,22 +281,39 @@ exports.updateUserData = async (req, res) => {
           .status(400)
           .send({ message: "Invalid input value for enum user_status" });
       }
-      if (
-        !/^[2-9]{1}[0-9]{3}\s{1}[0-9]{4}\s{1}[0-9]{4}$/.test(req.body.aadharNo)
-      ) {
+
+      if (req.body.aadharNo.length != 12 && req.body.aadharNo.length != 0) {
         return res
           .status(400)
-          .send({ status: false, message: "Plaese enter valid aadhar number" });
+          .send({ status: false, message: "Please enter valid aadhar number" });
       }
-      const aadharNoExist = await User.findOne({
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
+      }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
+      if (isNaN(req.body.aadharNo) && !req.body.aadharNo) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhar number",
+        });
+      }
+      const aadharExist = await User.findOne({
         where: {
           aadharNo: req.body.aadharNo,
         },
       });
-      if (aadharNoExist) {
+      if (aadharExist) {
         return res
           .status(400)
-          .send({ status: false, message: "Aadhar card number already exist" });
+          .send({ status: 400, message: "Aadhar number already exist" });
       }
       const userId = req.params.id;
       const result = await User.update(

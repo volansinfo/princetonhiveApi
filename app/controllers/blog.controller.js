@@ -39,7 +39,9 @@ exports.blogAdd = async (req, res) => {
         if (existblog) {
             return res.status(400).send({ success: false, message: "Blog already exist!" })
         }
-
+        if (!(req.body.description).trim()) {
+            return res.status(400).send({ message: "Please enter Description!" });
+        }
         if ((req.body.description).length > 200) {
             return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })
         }
@@ -47,9 +49,6 @@ exports.blogAdd = async (req, res) => {
 
         var num = data.toLowerCase();
         var Slug = num.replace(/\s+/g, '-');
-        if (!(req.body.description).trim()) {
-            return res.status(400).send({ message: "Please enter Description!" });
-        }
 
         const blog = await blogs.create({
             title: req.body.title,
@@ -88,6 +87,7 @@ exports.getAllBlogs = async (req, res) => {
                 id: file.id,
                 title: file.title,
                 imgUrl: fullUrl + file.imgUrl,
+                slug: file.slug,
                 metaData: file.metaData,
                 metaTitle: file.metaTitle,
                 metaDescription: file.metaDescription,
@@ -132,6 +132,7 @@ exports.getActiveBlogs = async (req, res) => {
                 id: file.id,
                 title: file.title,
                 imgUrl: fullUrl + file.imgUrl,
+                slug: file.slug,
                 metaData: file.metaData,
                 metaTitle: file.metaTitle,
                 metaDescription: file.metaDescription,
@@ -168,10 +169,10 @@ exports.getBlogById = async (req, res) => {
                 id: blogId,
             },
         });
-        blogData.imgUrl = fullUrl + blogData.imgUrl
         if (!blogData) {
             return res.status(404).send({ success: false, message: "Blog Not found!" });
         }
+        blogData.imgUrl = fullUrl + blogData.imgUrl
         res.status(200).json({ success: true, data: blogData });
 
     } catch (error) {
@@ -218,9 +219,9 @@ exports.blogDelete = async (req, res) => {
 
             if (num == 1) {
 
-                res.status(200).send({ message: "BlogId deleted successfully." });
+                res.status(200).send({ message: "Blog deleted successfully." });
             } else {
-                res.status(404).send({ message: "BlogId Not found!" });
+                res.status(404).send({ message: "Blog Not found!" });
             }
 
         });
@@ -256,10 +257,13 @@ exports.updateBlog = async (req, res) => {
             return res.status(400).send({ message: "Invalid input value for enum blog_status" })
         }
         if (!(req.body.title).trim()) {
-            return res.status(400).send({ message: "Please enter Blog name!" });
+            return res.status(400).send({ message: "Please enter Blog title!" });
         }
         if ((req.body.title).length > 200) {
             return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
+        }
+        if (!(req.body.description).trim()) {
+            return res.status(400).send({ message: "Please enter Description!" });
         }
         if ((req.body.description).length > 200) {
             return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })

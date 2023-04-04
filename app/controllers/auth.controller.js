@@ -213,6 +213,37 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
+      if (!req.body.aadharNo) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Please enter aadhar card number" });
+      } else if (
+        !/^[2-9]{1}[0-9]{3}\s{1}[0-9]{4}\s{1}[0-9]{4}$/.test(req.body.aadharNo)
+      ) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Plaese enter valid aadhar number" });
+      }
+      const aadharNoExist = await User.findOne({
+        where: {
+          aadharNo: req.body.aadharNo,
+        },
+      });
+      if (aadharNoExist) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Aadhar card number already exist" });
+      }
+      const paNoExist = await User.findOne({
+        where: {
+          aadharNo: req.body.aadharNo,
+        },
+      });
+      if (paNoExist) {
+        res
+          .status(400)
+          .send({ status: false, message: "Please enter aadhar card number" });
+      }
 
       const user = await User.create({
         fname: req.body.fname,
@@ -232,6 +263,9 @@ exports.signup = async (req, res) => {
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
+        aadharNo: req.body.aadharNo,
+        panNo: req.body.panNo,
+        department: req.body.department,
       });
       const userEmail = req.body.email;
       const username = req.body.fname.trim() + " " + req.body.lname.trim();

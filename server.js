@@ -56,6 +56,7 @@ require("./app/routes/question.routes")(app);
 require("./app/routes/teacher.assessment.route")(app);
 require("./app/routes/studentTeacher.routes")(app)
 require("./app/routes/blog.routes")(app)
+require("./app/routes/gallery.routes")(app)
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });

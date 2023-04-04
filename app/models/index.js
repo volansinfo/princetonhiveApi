@@ -79,6 +79,12 @@ db.Blog = require("../models/blog.model")(
   DataTypes
 );
 
+db.Gallery = require("../models/gallery.model")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",
   foreignKey: "roleId",

@@ -236,13 +236,13 @@ exports.signup = async (req, res) => {
       }
       const paNoExist = await User.findOne({
         where: {
-          aadharNo: req.body.aadharNo,
+          panNo: req.body.panNo,
         },
       });
       if (paNoExist) {
         res
           .status(400)
-          .send({ status: false, message: "Please enter aadhar card number" });
+          .send({ status: false, message: "Please enter pan card number" });
       }
 
       const user = await User.create({

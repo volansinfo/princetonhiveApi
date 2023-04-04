@@ -281,15 +281,17 @@ exports.updateUserData = async (req, res) => {
           .status(400)
           .send({ message: "Invalid input value for enum user_status" });
       }
-      if (req.body.aadharNo) {
-        return res
-          .status(400)
-          .send({ status: false, message: "Please enter aadhar number" });
-      }
-      if (req.body.aadharNo.length != 12) {
+
+      if (req.body.aadharNo.length != 12 && req.body.aadharNo.length != 0) {
         return res
           .status(400)
           .send({ status: false, message: "Please enter valid aadhar number" });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
       }
       if (isNaN(req.body.department)) {
         return res.status(400).send({
@@ -297,7 +299,7 @@ exports.updateUserData = async (req, res) => {
           message: "Please enter numeric value in department",
         });
       }
-      if (isNaN(req.body.aadharNo)) {
+      if (isNaN(req.body.aadharNo) && !req.body.aadharNo) {
         return res.status(400).send({
           status: false,
           message: "Please enter numeric value in aadhar number",

@@ -213,11 +213,8 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
-      if (!req.body.aadharNo) {
-        return res
-          .status(400)
-          .send({ status: false, message: "Please enter aadhar card number" });
-      } else if (req.body.aadharNo.length != 12) {
+      const adharNUM = req.body.aadharNo;
+      if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
         return res
           .status(400)
           .send({ status: false, message: "Plaese enter valid aadhar number" });
@@ -226,6 +223,12 @@ exports.signup = async (req, res) => {
         return res.status(400).send({
           status: false,
           message: "Please enter numeric value in aadhar number",
+        });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
         });
       }
       if (isNaN(req.body.department)) {
@@ -262,7 +265,7 @@ exports.signup = async (req, res) => {
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
-        aadharNo: req.body.aadharNo,
+        aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
         panNo: req.body.panNo,
         department: req.body.department,
       });

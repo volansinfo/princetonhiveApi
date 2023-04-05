@@ -66,6 +66,7 @@ exports.getAssessmentOngoing = async (req, res) => {
     const assessmentData = await TeacherAssessment.findAll({
       where: {
         teacherId: JSON.stringify(permissionRoles.id),
+        status: "1",
       },
       order: [["id", "DESC"]],
     });
@@ -137,7 +138,7 @@ exports.getAssessmentUpcomming = async (req, res) => {
       });
     }
     const assessmentData = await TeacherAssessment.findAll({
-      where: { teacherId: JSON.stringify(permissionRoles.id) },
+      where: { teacherId: JSON.stringify(permissionRoles.id), status: "1" },
       order: [["id", "DESC"]],
     });
     const upcoming = [];
@@ -778,8 +779,7 @@ exports.teacherSearchQueryStartDate = async (req, res) => {
         status: false,
         message: "Please enter valid assessment type like 1,2",
       });
-    }
-    else if (
+    } else if (
       !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(startDate)
     ) {
       return res.status(400).send({

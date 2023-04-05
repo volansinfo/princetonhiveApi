@@ -36,9 +36,10 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
   });
   const roles = permissionRoles.uuid.slice(0, 3);
   if (roles != "TEA" && roles != "UNI" && roles != "SUP" && roles != "ADM") {
-    return res
-      .status(401)
-      .send({ status: false, message: "permission denied" });
+    return res.status(401).send({
+      status: false,
+      message: "You don't have permission to add the asssessment",
+    });
   }
   const findTeacherId = await TeacherAssessment.findAll();
   for (let i = 0; i < findTeacherId.length; i++) {
@@ -209,6 +210,13 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       .status(404)
       .send({ status: false, message: "Student id does not exist!" });
   }
+  const uuidStudent = studentExist.uuid;
+  console.log(uuidStudent.slice(0, 3) != "STU");
+  if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
+    return res
+      .status(404)
+      .send({ status: false, message: "Student id does not exist!" });
+  }
 
   const questionExist = await Question.findOne({
     where: {
@@ -270,9 +278,10 @@ const erroHandlingUpdate = async (req, res, next) => {
   });
   const roles = permissionRoles.uuid.slice(0, 3);
   if (roles != "UNI" && roles != "SUP" && roles != "ADM") {
-    return res
-      .status(401)
-      .send({ status: false, message: "permission denied" });
+    return res.status(401).send({
+      status: false,
+      message: "You don't have permission to update the asssessment",
+    });
   }
 
   const isValidRequestBody = function (requestBody) {

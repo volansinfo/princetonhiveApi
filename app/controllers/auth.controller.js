@@ -25,7 +25,10 @@ exports.signup = async (req, res) => {
     await uploadFile(req, res);
     if (req.file !== undefined) {
       if (req.file.size < 2 * 1024) {
-        return res.status(400).send({ success: false, message: "File too small, please select a file greater than 2kb" })
+        return res.status(400).send({
+          success: false,
+          message: "File too small, please select a file greater than 2kb",
+        });
       }
       const newFilename = `${Date.now()}_${req.file.originalname}`;
 
@@ -34,47 +37,70 @@ exports.signup = async (req, res) => {
         .toFile(__basedir + "/uploads/user/" + newFilename);
       const uuid = await getUUID.generateUUID(req);
 
-      if (req.body.roles[0] == "admin" && (req.body.teacherId)) {
-        return res.status(400).send({ success: false, message: "You can not create admin because you have entered teacher id!" })
+      if (req.body.roles[0] == "admin" && req.body.teacherId) {
+        return res.status(400).send({
+          success: false,
+          message:
+            "You can not create admin because you have entered teacher id!",
+        });
       }
       if (req.body.roles[0] == "teacher" && req.body.teacherId) {
-        return res.status(400).send({ success: false, message: "You can not create teacher because you have entered teacher id!" })
+        return res.status(400).send({
+          success: false,
+          message:
+            "You can not create teacher because you have entered teacher id!",
+        });
       }
       if (req.body.roles[0] == "university" && req.body.teacherId) {
-        return res.status(400).send({ success: false, message: "You can not create university because you have entered teacher id!" })
+        return res.status(400).send({
+          success: false,
+          message:
+            "You can not create university because you have entered teacher id!",
+        });
       }
       if (req.body.roles[0] == "support" && req.body.teacherId) {
-        return res.status(400).send({ success: false, message: "You can not create support because you have entered teacher id!" })
+        return res.status(400).send({
+          success: false,
+          message:
+            "You can not create support because you have entered teacher id!",
+        });
       }
 
       if (req.body.roles[0] == "student") {
         const userId = req.body.teacherId;
         if (!userId.trim()) {
-          return res.status(400).send({ success: false, message: "Please enter teacher id!" })
-        }
-        else if (isNaN(userId)) {
-          return res.status(400).send({ success: false, message: "Please enter numeric value for teacher id!" })
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter teacher id!" });
+        } else if (isNaN(userId)) {
+          return res.status(400).send({
+            success: false,
+            message: "Please enter numeric value for teacher id!",
+          });
         }
         const existTeacher = await User.findOne({
           where: {
-            id: userId
+            id: userId,
           },
           attributes: {
-            exclude: ['password', 'actualPassword']
+            exclude: ["password", "actualPassword"],
           },
-          include: [{
-            model: db.role,
-            as: "roles",
-            where: { id: '3' },
-            required: true,
-            attributes: []
-          }],
-        })
+          include: [
+            {
+              model: db.role,
+              as: "roles",
+              where: { id: "3" },
+              required: true,
+              attributes: [],
+            },
+          ],
+        });
         if (existTeacher == null) {
-          return res.status(400).send({ success: false, message: "Teacher does not exist!" })
+          return res
+            .status(400)
+            .send({ success: false, message: "Teacher does not exist!" });
         }
       }
-
 
       let generatedPwd = await generator.generate({
         length: 6,
@@ -187,8 +213,44 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
-
-
+      const adharNUM = req.body.aadharNo;
+      if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
+        return res.status(400).send({
+          status: false,
+          message: "Plaese enter valid aadhaar number",
+        });
+      }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhaar number",
+        });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
+      }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
+      const aadharExist = await User.findOne({
+        where: {
+          aadharNo: req.body.aadharNo,
+        },
+      });
+      if (
+        aadharExist?.aadharNo == req.body.aadharNo &&
+        aadharExist?.aadharNo.length > 0
+      ) {
+        return res
+          .status(400)
+          .send({ status: 400, message: "Aadhaar number already exist" });
+      }
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -206,7 +268,10 @@ exports.signup = async (req, res) => {
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
-        teacherId: req.body.teacherId ? req.body.teacherId : null
+        teacherId: req.body.teacherId ? req.body.teacherId : null,
+        aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
+        panNo: req.body.panNo,
+        department: req.body.department,
       });
       const userEmail = req.body.email;
       const username = req.body.fname.trim() + " " + req.body.lname.trim();
@@ -245,49 +310,72 @@ exports.signup = async (req, res) => {
           });
         // res.status(200).send({ message: "User registered successfully!" });
       }
-    }
-    else {
+    } else {
       {
         const newFilename = null;
         const uuid = await getUUID.generateUUID(req);
-        if (req.body.roles[0] == "admin" && (req.body.teacherId)) {
-          return res.status(400).send({ success: false, message: "You can not create admin because you have entered teacher id!" })
+        if (req.body.roles[0] == "admin" && req.body.teacherId) {
+          return res.status(400).send({
+            success: false,
+            message:
+              "You can not create admin because you have entered teacher id!",
+          });
         }
         if (req.body.roles[0] == "teacher" && req.body.teacherId) {
-          return res.status(400).send({ success: false, message: "You can not create teacher because you have entered teacher id!" })
+          return res.status(400).send({
+            success: false,
+            message:
+              "You can not create teacher because you have entered teacher id!",
+          });
         }
         if (req.body.roles[0] == "university" && req.body.teacherId) {
-          return res.status(400).send({ success: false, message: "You can not create university because you have entered teacher id!" })
+          return res.status(400).send({
+            success: false,
+            message:
+              "You can not create university because you have entered teacher id!",
+          });
         }
         if (req.body.roles[0] == "support" && req.body.teacherId) {
-          return res.status(400).send({ success: false, message: "You can not create support because you have entered teacher id!" })
+          return res.status(400).send({
+            success: false,
+            message:
+              "You can not create support because you have entered teacher id!",
+          });
         }
 
         if (req.body.roles[0] == "student") {
           const userId = req.body.teacherId;
           if (!userId.trim()) {
-            return res.status(400).send({ success: false, message: "Please enter teacher id!" })
-          }
-          else if (isNaN(userId)) {
-            return res.status(400).send({ success: false, message: "Please enter numeric value for teacher id!" })
+            return res
+              .status(400)
+              .send({ success: false, message: "Please enter teacher id!" });
+          } else if (isNaN(userId)) {
+            return res.status(400).send({
+              success: false,
+              message: "Please enter numeric value for teacher id!",
+            });
           }
           const existTeacher = await User.findOne({
             where: {
-              id: userId
+              id: userId,
             },
             attributes: {
-              exclude: ['password', 'actualPassword']
+              exclude: ["password", "actualPassword"],
             },
-            include: [{
-              model: db.role,
-              as: "roles",
-              where: { id: '3' },
-              required: true,
-              attributes: []
-            }],
-          })
+            include: [
+              {
+                model: db.role,
+                as: "roles",
+                where: { id: "3" },
+                required: true,
+                attributes: [],
+              },
+            ],
+          });
           if (existTeacher == null) {
-            return res.status(400).send({ success: false, message: "Teacher does not exist!" })
+            return res
+              .status(400)
+              .send({ success: false, message: "Teacher does not exist!" });
           }
         }
 
@@ -308,12 +396,10 @@ exports.signup = async (req, res) => {
             .status(400)
             .send({ success: false, message: "Please enter first name!" });
         } else if (req.body.fname.length < 3 || req.body.fname.length > 50) {
-          return res
-            .status(400)
-            .send({
-              success: false,
-              message: "first name must be 3 to 50 characters long!",
-            });
+          return res.status(400).send({
+            success: false,
+            message: "first name must be 3 to 50 characters long!",
+          });
         }
 
         // checking duplicate email
@@ -359,12 +445,10 @@ exports.signup = async (req, res) => {
             .status(400)
             .send({ success: false, message: "Please enter mobile number!" });
         } else if (req.body.mnumber.length != 10) {
-          return res
-            .status(400)
-            .send({
-              success: false,
-              message: "Please enter valid mobile number!",
-            });
+          return res.status(400).send({
+            success: false,
+            message: "Please enter valid mobile number!",
+          });
         } else if (isNaN(req.body.mnumber)) {
           return res
             .status(400)
@@ -376,13 +460,14 @@ exports.signup = async (req, res) => {
           return res
             .status(400)
             .send({ success: false, message: "Please enter pincode!" });
-        } else if (req.body.pincode.length < 5 || req.body.pincode.length > 10) {
-          return res
-            .status(400)
-            .send({
-              success: false,
-              message: "pincode must be 5 to 10 characters long!",
-            });
+        } else if (
+          req.body.pincode.length < 5 ||
+          req.body.pincode.length > 10
+        ) {
+          return res.status(400).send({
+            success: false,
+            message: "pincode must be 5 to 10 characters long!",
+          });
         } else if (isNaN(req.body.pincode)) {
           return res
             .status(400)
@@ -409,6 +494,44 @@ exports.signup = async (req, res) => {
             .send({ success: false, message: "Role does not exist!" });
         }
 
+        const adharNUM = req.body.aadharNo;
+        if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
+          return res.status(400).send({
+            status: false,
+            message: "Plaese enter valid aadhaar number",
+          });
+        }
+        if (isNaN(req.body.aadharNo)) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter numeric value in aadhaar number",
+          });
+        }
+        if (!req.body.department) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter department",
+          });
+        }
+        if (isNaN(req.body.department)) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter numeric value in department",
+          });
+        }
+        const aadharExist = await User.findOne({
+          where: {
+            aadharNo: req.body.aadharNo,
+          },
+        });
+        if (
+          aadharExist?.aadharNo == req.body?.aadharNo &&
+          aadharExist?.aadharNo.length > 0
+        ) {
+          return res
+            .status(400)
+            .send({ status: 400, message: "Aadhaar number already exist" });
+        }
 
         const user = await User.create({
           fname: req.body.fname,
@@ -427,7 +550,10 @@ exports.signup = async (req, res) => {
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
-          teacherId: req.body.teacherId ? req.body.teacherId : null
+          teacherId: req.body.teacherId ? req.body.teacherId : null,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
+          panNo: req.body.panNo,
+          department: req.body.department,
         });
         const userEmail = req.body.email;
         const username = req.body.fname.trim() + " " + req.body.lname.trim();
@@ -471,9 +597,11 @@ exports.signup = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
-    }
-    else if (e.message == "File too large") {
-      return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
+    } else if (e.message == "File too large") {
+      return res.status(400).send({
+        success: false,
+        message: "File too large, please select a file less than 3mb",
+      });
     } else {
       return res.status(500).send({ success: false, message: e.message });
     }

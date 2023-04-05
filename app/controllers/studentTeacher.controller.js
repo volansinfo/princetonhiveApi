@@ -124,12 +124,10 @@ exports.updateStudentData = async (req, res) => {
     await uploadFile(req, res);
     if (req.file !== undefined) {
       if (req.file.size < 2 * 1024) {
-        return res
-          .status(400)
-          .send({
-            success: false,
-            message: "File too small, please select a file greater than 2kb",
-          });
+        return res.status(400).send({
+          success: false,
+          message: "File too small, please select a file greater than 2kb",
+        });
       }
       const newFilename = `${Date.now()}_${req.file.originalname}`;
       await sharp(req.file.buffer)
@@ -173,6 +171,31 @@ exports.updateStudentData = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Please enter Student Id only!" });
       }
+      const adharNUM = req.body.aadharNo;
+      if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
+        return res.status(400).send({
+          status: false,
+          message: "Plaese enter valid aadhaar number",
+        });
+      }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhaar number",
+        });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
+      }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
       const result = await studentUser.update(
         {
           fname: req.body.fname,
@@ -186,6 +209,9 @@ exports.updateStudentData = async (req, res) => {
           dob: req.body.dob,
           country: req.body.country,
           status: req.body.status,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
+          panNo: req.body.panNo,
+          department: req.body.department,
         },
         {
           where: {
@@ -230,6 +256,31 @@ exports.updateStudentData = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Please enter Student Id only!" });
       }
+      const adharNUM = req.body.aadharNo;
+      if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
+        return res.status(400).send({
+          status: false,
+          message: "Plaese enter valid aadhaar number",
+        });
+      }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhaar number",
+        });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
+      }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
       const result = await studentUser.update(
         {
           fname: req.body.fname,
@@ -243,6 +294,9 @@ exports.updateStudentData = async (req, res) => {
           dob: req.body.dob,
           country: req.body.country,
           status: req.body.status,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
+          panNo: req.body.panNo,
+          department: req.body.department,
         },
         {
           where: {
@@ -258,12 +312,10 @@ exports.updateStudentData = async (req, res) => {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
     } else if (e.message == "File too large") {
-      return res
-        .status(400)
-        .send({
-          success: false,
-          message: "File too large, please select a file less than 3mb",
-        });
+      return res.status(400).send({
+        success: false,
+        message: "File too large, please select a file less than 3mb",
+      });
     } else {
       return res.status(500).send({ success: false, message: e.message });
     }

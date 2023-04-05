@@ -289,12 +289,10 @@ exports.updateUserData = async (req, res) => {
       }
 
       if (req.body.aadharNo.length != 12 && req.body.aadharNo.length != 0) {
-        return res
-          .status(400)
-          .send({
-            status: false,
-            message: "Please enter valid aadhaar number",
-          });
+        return res.status(400).send({
+          status: false,
+          message: "Please enter valid aadhaar number",
+        });
       }
       if (!req.body.department) {
         return res.status(400).send({
@@ -308,7 +306,7 @@ exports.updateUserData = async (req, res) => {
           message: "Please enter numeric value in department",
         });
       }
-      if (isNaN(req.body.aadharNo) && !req.body.aadharNo) {
+      if (isNaN(req.body.aadharNo)) {
         return res.status(400).send({
           status: false,
           message: "Please enter numeric value in aadhaar number",
@@ -365,6 +363,30 @@ exports.updateUserData = async (req, res) => {
           .status(400)
           .send({ message: "Invalid input value for enum user_status" });
       }
+      if (req.body.aadharNo.length != 12 && req.body.aadharNo.length != 0) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter valid aadhaar number",
+        });
+      }
+      if (!req.body.department) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter department",
+        });
+      }
+      if (isNaN(req.body.department)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in department",
+        });
+      }
+      if (isNaN(req.body.aadharNo)) {
+        return res.status(400).send({
+          status: false,
+          message: "Please enter numeric value in aadhaar number",
+        });
+      }
       const userId = req.params.id;
       const result = await User.update(
         {
@@ -379,6 +401,9 @@ exports.updateUserData = async (req, res) => {
           dob: req.body.dob,
           country: req.body.country,
           status: req.body.status,
+          aadharNo: req.body.aadharNo,
+          panNo: req.body.panNo,
+          department: req.body.department,
         },
         {
           where: {

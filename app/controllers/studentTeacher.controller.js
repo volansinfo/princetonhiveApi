@@ -18,7 +18,6 @@ exports.getAllStudentByTeacher = async (req, res) => {
         const allUser = await studentUser.findAll({
             where: {
                 teacherId: teacherId,
-                status: "1"
             },
             order: [
                 ['id', 'DESC']
@@ -102,7 +101,6 @@ exports.getAllStudentsCountByTeacher = async (req, res) => {
         const allUser = await studentUser.findAll({
             where: {
                 teacherId: teacherId,
-                status: "1"
             },
             order: [
                 ['id', 'DESC']

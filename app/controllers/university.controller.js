@@ -41,6 +41,9 @@ exports.getAllUniversity = async (req, res) => {
           country: file.country,
           status: file.status,
           uuid: file.uuid,
+          aadharNo: file.aadharNo,
+          panNo: file.panNo,
+          department: file.department,
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });
@@ -61,6 +64,9 @@ exports.getAllUniversity = async (req, res) => {
           country: file.country,
           status: file.status,
           uuid: file.uuid,
+          aadharNo: file.aadharNo,
+          panNo: file.panNo,
+          department: file.department,
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });

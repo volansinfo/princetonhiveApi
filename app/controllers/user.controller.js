@@ -38,6 +38,9 @@ exports.allAccess = async (req, res) => {
           country: file.country,
           status: file.status,
           uuid: file.uuid,
+          aadharNo: file.aadharNo,
+          panNo: file.panNo,
+          department: file.department,
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });
@@ -58,6 +61,9 @@ exports.allAccess = async (req, res) => {
           country: file.country,
           status: file.status,
           uuid: file.uuid,
+          aadharNo: file.aadharNo,
+          panNo: file.panNo,
+          department: file.department,
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });
@@ -285,7 +291,10 @@ exports.updateUserData = async (req, res) => {
       if (req.body.aadharNo.length != 12 && req.body.aadharNo.length != 0) {
         return res
           .status(400)
-          .send({ status: false, message: "Please enter valid aadhar number" });
+          .send({
+            status: false,
+            message: "Please enter valid aadhaar number",
+          });
       }
       if (!req.body.department) {
         return res.status(400).send({
@@ -302,19 +311,10 @@ exports.updateUserData = async (req, res) => {
       if (isNaN(req.body.aadharNo) && !req.body.aadharNo) {
         return res.status(400).send({
           status: false,
-          message: "Please enter numeric value in aadhar number",
+          message: "Please enter numeric value in aadhaar number",
         });
       }
-      const aadharExist = await User.findOne({
-        where: {
-          aadharNo: req.body.aadharNo,
-        },
-      });
-      if (aadharExist) {
-        return res
-          .status(400)
-          .send({ status: 400, message: "Aadhar number already exist" });
-      }
+
       const userId = req.params.id;
       const result = await User.update(
         {

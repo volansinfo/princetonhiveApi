@@ -215,9 +215,10 @@ exports.signup = async (req, res) => {
       }
       const adharNUM = req.body.aadharNo;
       if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
-        return res
-          .status(400)
-          .send({ status: false, message: "Plaese enter valid aadhaar number" });
+        return res.status(400).send({
+          status: false,
+          message: "Plaese enter valid aadhaar number",
+        });
       }
       if (isNaN(req.body.aadharNo)) {
         return res.status(400).send({
@@ -242,7 +243,10 @@ exports.signup = async (req, res) => {
           aadharNo: req.body.aadharNo,
         },
       });
-      if (aadharExist) {
+      if (
+        aadharExist?.aadharNo == req.body.aadharNo &&
+        aadharExist?.aadharNo.length > 0
+      ) {
         return res
           .status(400)
           .send({ status: 400, message: "Aadhaar number already exist" });
@@ -490,6 +494,45 @@ exports.signup = async (req, res) => {
             .send({ success: false, message: "Role does not exist!" });
         }
 
+        const adharNUM = req.body.aadharNo;
+        if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
+          return res.status(400).send({
+            status: false,
+            message: "Plaese enter valid aadhaar number",
+          });
+        }
+        if (isNaN(req.body.aadharNo)) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter numeric value in aadhaar number",
+          });
+        }
+        if (!req.body.department) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter department",
+          });
+        }
+        if (isNaN(req.body.department)) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter numeric value in department",
+          });
+        }
+        const aadharExist = await User.findOne({
+          where: {
+            aadharNo: req.body.aadharNo,
+          },
+        });
+        if (
+          aadharExist?.aadharNo == req.body?.aadharNo &&
+          aadharExist?.aadharNo.length > 0
+        ) {
+          return res
+            .status(400)
+            .send({ status: 400, message: "Aadhaar number already exist" });
+        }
+
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -508,6 +551,9 @@ exports.signup = async (req, res) => {
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
+          panNo: req.body.panNo,
+          department: req.body.department,
         });
         const userEmail = req.body.email;
         const username = req.body.fname.trim() + " " + req.body.lname.trim();

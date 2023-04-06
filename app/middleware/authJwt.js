@@ -3,6 +3,7 @@ const config = require("../config/auth.config.js");
 const db = require("../models");
 const UserPermission = db.UserPermissions
 const User = db.user;
+const bcrypt = require("bcryptjs");
 
 verifyToken = async (req, res, next) => {
   try {
@@ -39,6 +40,30 @@ verifyToken = async (req, res, next) => {
     return res.status(500).send({ success: false, message: e.message });
   }
 };
+
+verifyAISecretKey = async (req, res, next) => {
+  try {
+    let aiSecretKey = req.headers["ai-secret-key"];
+
+
+    if (!aiSecretKey) {
+      return res.status(401).send({success: false,message: "AI secret key not provided!"});
+      
+    }
+
+   const isValidAISecretKey = bcrypt.compareSync(
+      config.aiReportSecret,
+      aiSecretKey
+    )
+
+    if(!isValidAISecretKey){
+      return res.status(401).send({success: false,message: "AI secret key does not matched!"});
+    }
+    next();
+  } catch (e) {
+    return res.status(500).send({ success: false, message: e.message });
+  }
+}
 
 isAdmin = async (req, res, next) => {
   try {
@@ -400,6 +425,7 @@ checkUserUpdateStatusPermission = async (req, res, next) => {
 
 const authJwt = {
   verifyToken,
+  verifyAISecretKey,
   isAdmin,
   isSupport,
   isSupportOrAdmin,

@@ -1,6 +1,6 @@
 const util = require("util");
 const multer = require("multer");
-const maxSize = 10 * 1024 * 1024;
+const maxSize = 100 * 1024 * 1024;
 var path = require('path');
 const multerStorage = multer.memoryStorage();
 
@@ -21,25 +21,13 @@ const videoStorage = multer.diskStorage({
         cb(null, `${Date.now()}_${imageName}.${fileformate}`)
     }
 });
-
-const videoUpload = multer({
-    storage: videoStorage,
-    limits: {
-        fileSize: maxSize // 10000000 Bytes = 10 MB
-    },
-    fileFilter: function (req, file, callback) {
-        // console.log(file, "00000000000000")
-        var ext = path.extname(file.originalname);
-        if (ext != '.png' && ext != '.jpg' && ext != '.jpeg' && ext != '.mp4') {
-            return callback(new Error('File type does not allow!'))
-        }
-        callback(null, true)
-    },
-});
-// let uploadFile = multer({
-//     storage: videoStorage,
-//     limits: { fileSize: maxSize },
-// }).single("imgUrl");
+const videoUpload = multer(
+    {
+        storage: videoStorage,
+        limits: {
+            fileSize: maxSize
+        },
+    });
 
 // let uploadFileMiddleware = util.promisify(videoUpload);
 module.exports = videoUpload;

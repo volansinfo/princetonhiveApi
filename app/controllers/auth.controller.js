@@ -270,7 +270,7 @@ exports.signup = async (req, res) => {
         uuid: uuid,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
         aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
-        panNo: req.body.panNo,
+        panNo: req.body.panNo ? req.body.panNo : null,
         department: req.body.department,
       });
       const userEmail = req.body.email;
@@ -552,7 +552,7 @@ exports.signup = async (req, res) => {
           uuid: uuid,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
           aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
-          panNo: req.body.panNo,
+          panNo: req.body.panNo ? req.body.panNo : null,
           department: req.body.department,
         });
         const userEmail = req.body.email;

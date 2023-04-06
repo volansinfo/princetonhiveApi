@@ -250,7 +250,7 @@ exports.updateGallery = async (req, res) => {
                         return res.status(400).send({ message: "Please upload a file!" });
                     }
                     if (req.file.size < 50 * 1024) {
-                        return res.status(400).send({ success: false, message: "File too small, please select a file greater than 50kb" })
+                        return res.status(400).send({ success: false, message: "File too small, please select a image greater than 50kb" })
                     }
                     if (req.file.size > 3 * 1024 * 1024) {
                         return res.status(400).send({ success: false, message: "File too larg, please upload a image less than 3mb" })
@@ -266,14 +266,7 @@ exports.updateGallery = async (req, res) => {
                     if ((req.body.title).length > 200) {
                         return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
                     }
-                    const existgallery = await gallery.findOne({
-                        where: {
-                            title: req.body.title
-                        }
-                    })
-                    if (existgallery) {
-                        return res.status(400).send({ success: false, message: "Gallery already exist!" })
-                    }
+
                     if (!(req.body.galleryType).trim()) {
                         return res.status(400).send({ message: "Please enter gallery type!" });
                     }
@@ -330,14 +323,7 @@ exports.updateGallery = async (req, res) => {
                     if ((req.body.title).length > 200) {
                         return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
                     }
-                    const existgallery = await gallery.findOne({
-                        where: {
-                            title: req.body.title
-                        }
-                    })
-                    if (existgallery) {
-                        return res.status(400).send({ success: false, message: "Gallery already exist!" })
-                    }
+
                     if (!(req.body.galleryType).trim()) {
                         return res.status(400).send({ message: "Please enter gallery type!" });
                     }

@@ -16,5 +16,5 @@ module.exports = function (app) {
     app.post("/api/hiv/gallery/:id", [authJwt.verifyToken, authJwt.isSupportOrAdmin, uploadVideo.single("imgUrl")], controller.updateGallery);
     app.delete("/api/hiv/gallery/:id", [authJwt.verifyToken, authJwt.isSupportOrAdmin], controller.galleryDelete);
     app.patch("/api/hiv/gallery/:id", [authJwt.verifyToken, authJwt.isSupportOrAdmin], controller.galleryStatus);
-    app.get("/api/hiv/gallery-active", [authJwt.verifyToken, authJwt.isSupportOrAdmin], controller.getActiveGallery);
+    app.get("/api/hiv/gallery-active", controller.getActiveGallery);
 }

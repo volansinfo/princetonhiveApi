@@ -88,17 +88,30 @@ exports.getAllQuestion = async (req, res) => {
         })
         let fileInfos = [];
         allQuestion.forEach((file) => {
+            const showLevelName = (id) => {
+                if (id == 0) {
+                    return "Beginner";
+                }
+                else if (id == 1) {
+                    return "Intermediate";
+                }
+                else {
+                    return "Expert";
+                }
+            }
+
             fileInfos.push({
                 id: file.id,
                 questionName: file.questionName,
                 departments: file.departments,
-                level: file.level,
+                level: showLevelName(file.level),
                 questionImgUrl: fullUrl + file.questionImgUrl,
                 status: file.status,
                 createdAt: file.createdAt,
                 updatedAt: file.updatedAt,
             });
         });
+
         const page = parseInt(req.query.page) || 0;
         const limit = parseInt(req.query.limit) || 10;
 

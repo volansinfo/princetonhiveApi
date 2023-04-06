@@ -67,18 +67,8 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/vol/teacherSearchQueryAssessmentPurpose",
+    "/api/vol/teacherSearchQuery",
     [authJwt.verifyToken],
-    controller.teacherSearchQueryAssessmentPurpose
-  );
-  app.get(
-    "/api/vol/teacherSearchQueryStartDate",
-    [authJwt.verifyToken],
-    controller.teacherSearchQueryStartDate
-  );
-  app.get(
-    "/api/vol/teacherSearchQueryEndDate",
-    [authJwt.verifyToken],
-    controller.teacherSearchQueryEndDate
+    controller.teacherSearchQuery
   );
 };

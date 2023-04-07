@@ -229,8 +229,8 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       .send({ status: false, message: "Question id does not exist!" });
   }
 
-  const startDateValidation = startDate;
-  const endDateValidation = endDate;
+  const startDateValidation = startDate.split("/").reverse().join("/");
+  const endDateValidation = endDate.split("/").reverse().join("/");
   let convertStartDate = new Date(startDateValidation);
   let convertEndDate = new Date(endDateValidation);
   let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
@@ -440,8 +440,8 @@ const erroHandlingUpdate = async (req, res, next) => {
       .status(404)
       .send({ status: false, message: "Question id does not exist!" });
   }
-  const startDateValidation = startDate;
-  const endDateValidation = endDate;
+  const startDateValidation = startDate.split("/").reverse().join("/");
+  const endDateValidation = endDate.split("/").reverse().join("/");
   let convertStartDate = new Date(startDateValidation);
   let convertEndDate = new Date(endDateValidation);
   let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;

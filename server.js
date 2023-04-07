@@ -54,10 +54,10 @@ require("./app/routes/assessment.route")(app);
 require("./app/routes/department.routes")(app);
 require("./app/routes/question.routes")(app);
 require("./app/routes/teacher.assessment.route")(app);
-require("./app/routes/studentTeacher.routes")(app)
-require("./app/routes/blog.routes")(app)
-require("./app/routes/gallery.routes")(app)
-require("./app/routes/studentAiReport.routes")(app)
+require("./app/routes/studentTeacher.routes")(app);
+require("./app/routes/blog.routes")(app);
+require("./app/routes/gallery.routes")(app);
+require("./app/routes/studentAiReport.routes")(app);
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });

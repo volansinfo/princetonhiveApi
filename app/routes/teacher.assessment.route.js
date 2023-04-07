@@ -51,17 +51,17 @@ module.exports = function (app) {
     controller.getAllAssessment
   );
   app.get(
-    "/api/vol/getAllActiveAssignedAssessment",
+    "/api/vol/getAllActiveAssessment",
     [authJwt.verifyToken],
     controller.getAllActiveAssignedAssessment
   );
   app.get(
-    "/api/vol/getAllActiveAssessment",
+    "/api/vol/getAssignedAssessment",
     [authJwt.verifyToken],
     controller.getAllActiveAssessment
   );
   app.get(
-    "/api/vol/getAllActivePracticeAssessment",
+    "/api/vol/getPracticeAssessment",
     [authJwt.verifyToken],
     controller.getAllActivePracticeAssessment
   );

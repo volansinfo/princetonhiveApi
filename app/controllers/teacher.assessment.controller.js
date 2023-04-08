@@ -740,8 +740,8 @@ exports.teacherSearchQuery = async (req, res) => {
       });
     }
 
-    let convertStartDate = new Date(startDate);
-    let convertEndDate = new Date(endDate);
+    let convertStartDate = new Date(startDate?.split("/").reverse().join("-"));
+    let convertEndDate = new Date(endDate?.split("/").reverse().join("-"));
     let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
     let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
     // const currentTime = Math.floor(new Date().getTime() / 1000.0);
@@ -776,20 +776,21 @@ exports.teacherSearchQuery = async (req, res) => {
 
     if (assessmentPurpose && assessmentType && startDate && endDate) {
       let startDateFormate = startDate.split("/").reverse().join("-");
-
+      console.log(typeof startDateFormate, typeof startDate, "PALKJ");
       let endDateFormate = endDate.split("/").reverse().join("-");
       const results = await TeacherAssessment.findAll({
         where: {
           assessmentType: assessmentType,
           assessmentPurpose: assessmentPurpose,
           teacherId: JSON.stringify(userId),
+
           status: "1",
         },
       });
       for (let i = 0; i < results.length; i++) {
         if (
-          results[i].endDate <= toString(endDateFormate) &&
-          results[i].startDate <= toString(startDateFormate)
+          results[i].endDate <= endDateFormate &&
+          startDateFormate <= results[i].startDate
         ) {
           let convertUpdateAtDate = new Date(results[i].updatedAt);
 
@@ -844,7 +845,7 @@ exports.teacherSearchQuery = async (req, res) => {
         message: "Assessment found successfully ",
         data: data,
       });
-    } else if (assessmentType && startDate && endDate) {
+    } else if (assessmentType && startDate && endDate && !assessmentPurpose) {
       let startDateFormate = startDate.split("/").reverse().join("-");
 
       let endDateFormate = endDate.split("/").reverse().join("-");
@@ -852,14 +853,14 @@ exports.teacherSearchQuery = async (req, res) => {
         where: {
           assessmentType: assessmentType,
           teacherId: JSON.stringify(userId),
-          startDate: startDate.split("/").reverse().join("-"),
+
           status: "1",
         },
       });
       for (let i = 0; i < results.length; i++) {
         if (
-          results[i].endDate <= toString(endDateFormate) &&
-          results[i].startDate <= toString(startDateFormate)
+          results[i].endDate <= endDateFormate &&
+          startDateFormate <= results[i].startDate
         ) {
           let convertUpdateAtDate = new Date(results[i].updatedAt);
 
@@ -979,7 +980,7 @@ exports.teacherSearchQuery = async (req, res) => {
         message: "Assessment found successfully ",
         data: data1,
       });
-    } else if (assessmentPurpose && assessmentType) {
+    } else if (assessmentPurpose && assessmentType && !startDate && !endDate) {
       const data = [];
       const results = await TeacherAssessment.findAll({
         where: {
@@ -991,7 +992,7 @@ exports.teacherSearchQuery = async (req, res) => {
           ],
         },
       });
-
+      console.log(results, "assessmentTyp994e");
       for (let i = 0; i < results.length; i++) {
         let convertUpdateAtDate = new Date(results[i].updatedAt);
 
@@ -1059,7 +1060,7 @@ exports.teacherSearchQuery = async (req, res) => {
           ],
         },
       });
-
+      console.log(results, "assessmentType1049");
       for (let i = 0; i < results.length; i++) {
         let convertUpdateAtDate = new Date(results[i].updatedAt);
 
@@ -1122,6 +1123,7 @@ exports.teacherSearchQuery = async (req, res) => {
           status: "1",
         },
       });
+
       for (let i = 0; i < results.length; i++) {
         let convertUpdateAtDate = new Date(results[i].updatedAt);
 

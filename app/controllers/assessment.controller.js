@@ -201,11 +201,11 @@ exports.studentSearchQuery = async (req, res) => {
     ) {
       return res.status(400).send({
         status: false,
-        message: "Please enter valid assessment response type like 1,2",
+        message: "Please enter valid assessment response type like 1,2,3,4",
       });
     }
 
-    if (assessmentResponseType) {
+    if (assessmentResponseType && !assessmentPurpose) {
       const data = [];
       const results = await Assessment.findAll({
         where: {

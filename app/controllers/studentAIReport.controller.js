@@ -69,7 +69,7 @@ exports.getAllAIReport = async (req, res) => {
 
         const AIReport = await studentAIReport.findAll({
             where:{
-                id:userId
+                studentId:userId
             },
             order: [
                 ['id', 'DESC']

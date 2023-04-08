@@ -3,6 +3,7 @@ const config = require("../config/auth.config");
 const pagination = require("../middleware/pagination")
 const uploadFile = require("../middleware/questionUploads")
 const question = db.Question
+const department = db.Department
 const fs = require("fs");
 const sharp = require('sharp');
 
@@ -86,19 +87,56 @@ exports.getAllQuestion = async (req, res) => {
                 ['id', 'DESC']
             ]
         })
+        // console.log(allQuestion, "9999999999999")
+        const depName = await department.findAll({
+
+        })
         let fileInfos = [];
         allQuestion.forEach((file) => {
+
+            // console.log(depName, "111111111111")
+            // const showDepartmentName = (departments)=>{
+
+            // }
+
+
+            const departmentName = (id) => {
+                const singledpt = depName.filter((dpt) => {
+                    return dpt.id == id;
+                })
+
+                if (singledpt.length > 0) {
+                    return (singledpt[0].departmentName)
+                }
+                else {
+                    return null
+                }
+            }
+
+            const showLevelName = (id) => {
+                if (id == 0) {
+                    return "Beginner";
+                }
+                else if (id == 1) {
+                    return "Intermediate";
+                }
+                else {
+                    return "Expert";
+                }
+            }
+
             fileInfos.push({
                 id: file.id,
                 questionName: file.questionName,
-                departments: file.departments,
-                level: file.level,
+                departments: departmentName(file.departments),
+                level: showLevelName(file.level),
                 questionImgUrl: fullUrl + file.questionImgUrl,
                 status: file.status,
                 createdAt: file.createdAt,
                 updatedAt: file.updatedAt,
             });
         });
+
         const page = parseInt(req.query.page) || 0;
         const limit = parseInt(req.query.limit) || 10;
 

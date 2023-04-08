@@ -3,6 +3,7 @@ const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
 const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
+const { Sequelize } = require("sequelize");
 
 exports.createAssessment = async (req, res) => {
   try {
@@ -17,8 +18,8 @@ exports.createAssessment = async (req, res) => {
     const response = await TeacherAssessment.create({
       assessmentName: req.body.assessmentName,
       assessmentType: req.body.assessmentType,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
+      startDate: req.body.startDate.split("/").reverse().join("/"),
+      endDate: req.body.endDate.split("/").reverse().join("/"),
       description: req.body.description,
       assessmentPurpose: req.body.assessmentPurpose,
       assessmentAILevel: req.body.assessmentAILevel,
@@ -100,11 +101,11 @@ exports.getAssessmentOngoing = async (req, res) => {
     results.totalItems = ongoing.length;
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(ongoing.length / limit);
-
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "There are no ongoing assessment.",
+        message: "No ongoing assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -171,11 +172,11 @@ exports.getAssessmentUpcomming = async (req, res) => {
     results.totalItems = upcoming.length;
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(upcoming.length / limit);
-
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "There are no upcomming assessment.",
+        message: "There are no upcoming assessment.",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -245,9 +246,10 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(activeUpcomming.length / limit);
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "There are no previous assessment.",
+        message: "No previous assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -296,8 +298,8 @@ exports.updateAssessment = async (req, res) => {
       {
         assessmentName: req.body.assessmentName,
         assessmentType: req.body.assessmentType,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: req.body.startDate.split("/").reverse().join("/"),
+        endDate: req.body.endDate.split("/").reverse().join("/"),
         description: req.body.description,
         assessmentPurpose: req.body.assessmentPurpose,
         assessmentAILevel: req.body.assessmentAILevel,
@@ -490,9 +492,10 @@ exports.getAllAssessment = async (req, res) => {
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(assessmentData.length / limit);
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "No assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -545,9 +548,10 @@ exports.getAllActiveAssignedAssessment = async (req, res) => {
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(assessmentData.length / limit);
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "No assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -601,9 +605,10 @@ exports.getAllActiveAssessment = async (req, res) => {
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(assessmentData.length / limit);
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "No assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -658,9 +663,10 @@ exports.getAllActivePracticeAssessment = async (req, res) => {
     results.currentPage = parseInt(req.query.page) || 0;
     results.totalPages = Math.ceil(assessmentData.length / limit);
     if (results.dataItems.length <= 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "No assessment found",
+        data: results,
       });
     }
     return res.status(200).send({
@@ -673,10 +679,20 @@ exports.getAllActivePracticeAssessment = async (req, res) => {
   }
 };
 
-//13) Write a search teacher assessment Api which is using the key assessmentType and assessmentPurpose .
+//14) Write a search teacher assessment Api which is using the key assessmentType and  End Date .
 
-exports.teacherSearchQueryAssessmentPurpose = async (req, res) => {
+function dateFormate(date) {
+  let convertUpdateAtDate = new Date(date);
+
+  let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+  const inDate = new Date(convertUpdateAtEpoch * 1000);
+  let actualDate = inDate.toGMTString();
+  return actualDate;
+}
+
+exports.teacherSearchQuery = async (req, res) => {
   try {
+    const rangeDataDatee = [];
     const token = req.headers["x-access-token"];
     const tokenData = jwt.decode(token);
     const userId = tokenData.id;
@@ -695,7 +711,7 @@ exports.teacherSearchQueryAssessmentPurpose = async (req, res) => {
     }
     const { limit, offset } = pagination.getPagination(req.query.page, 10);
     const data = req.query;
-    const { assessmentType, assessmentPurpose } = data;
+    const { assessmentType, assessmentPurpose, startDate, endDate } = data;
     if (!assessmentType) {
       return res
         .status(400)
@@ -706,6 +722,7 @@ exports.teacherSearchQueryAssessmentPurpose = async (req, res) => {
         message: "Please enter valid assessment type like 1,2",
       });
     } else if (
+      assessmentPurpose &&
       assessmentPurpose != "1" &&
       assessmentPurpose != "2" &&
       assessmentPurpose != "3" &&
@@ -716,171 +733,451 @@ exports.teacherSearchQueryAssessmentPurpose = async (req, res) => {
         status: false,
         message: "Please enter valid assessment purpose like 1,2,3,4,5",
       });
-    }
-    const results = await TeacherAssessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        assessmentPurpose: assessmentPurpose,
-        teacherId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({ status: false, message: error.message });
-  }
-};
-
-//14) Write a search teacher assessment Api which is using the key assessmentType and Start Date .
-
-exports.teacherSearchQueryStartDate = async (req, res) => {
-  try {
-    const token = req.headers["x-access-token"];
-    const tokenData = jwt.decode(token);
-    const userId = tokenData.id;
-
-    const permissionRoles = await User.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
-    }
-    const { limit, offset } = pagination.getPagination(req.query.page, 10);
-    const data = req.query;
-    const { assessmentType, startDate } = data;
-    if (!assessmentType) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter assessment type" });
-    } else if (assessmentType != "1" && assessmentType != "2") {
+    } else if (endDate && !startDate) {
       return res.status(400).send({
         status: false,
-        message: "Please enter valid assessment type like 1,2",
+        message: "Please select start date also",
       });
-    } else if (
-      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(startDate)
-    ) {
+    }
+
+    let convertStartDate = new Date(startDate?.split("/").reverse().join("-"));
+    let convertEndDate = new Date(endDate?.split("/").reverse().join("-"));
+    let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+    let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+    // const currentTime = Math.floor(new Date().getTime() / 1000.0);
+    if (convertEndDateEpoch < convertStartDateEpoch) {
       return res.status(400).send({
         status: false,
-        message: "Please enter date in yyyy-mm-dd format",
+        message: "Start date should not greater than end date",
       });
     }
-    const results = await TeacherAssessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        startDate: startDate,
-        teacherId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({ status: false, message: error.message });
-  }
-};
 
-//15) Write a search teacher assessment Api which is using the key assessmentType and  End Date .
+    function endDateItems(items) {
+      if (items) {
+        return items;
+      } else {
+        return null;
+      }
+    }
+    function assessmentPurposeItems(items) {
+      if (items) {
+        return items;
+      } else {
+        return null;
+      }
+    }
+    function startDateItems(items) {
+      if (items) {
+        return items;
+      } else {
+        return null;
+      }
+    }
 
-exports.teacherSearchQueryEndDate = async (req, res) => {
-  try {
-    const token = req.headers["x-access-token"];
-    const tokenData = jwt.decode(token);
-    const userId = tokenData.id;
+    if (assessmentPurpose && assessmentType && startDate && endDate) {
+      let startDateFormate = startDate.split("/").reverse().join("-");
+      console.log(typeof startDateFormate, typeof startDate, "PALKJ");
+      let endDateFormate = endDate.split("/").reverse().join("-");
+      const results = await TeacherAssessment.findAll({
+        where: {
+          assessmentType: assessmentType,
+          assessmentPurpose: assessmentPurpose,
+          teacherId: JSON.stringify(userId),
 
-    const permissionRoles = await User.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
+          status: "1",
+        },
+      });
+      for (let i = 0; i < results.length; i++) {
+        if (
+          results[i].endDate <= endDateFormate &&
+          startDateFormate <= results[i].startDate
+        ) {
+          let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+          let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+          const date = new Date(convertUpdateAtEpoch * 1000);
+          let actualDate = date.toGMTString();
+          rangeDataDatee.push({
+            id: results[i].id,
+            assessmentName: results[i].assessmentName,
+            assessmentType: results[i].assessmentType,
+            description: results[i].description,
+            startDate: results[i].startDate.split("-").reverse().join("/"),
+            endDate: results[i].endDate.split("-").reverse().join("/"),
+            assessmentPurpose: results[i].assessmentPurpose,
+            assessmentAILevel: results[i].assessmentAILevel,
+            assessmentResponseType: results[i].assessmentResponseType,
+            questionId: results[i].questionId,
+            studentId: results[i].studentId,
+            aiParametersLevel: results[i].aiParametersLevel,
+            weightage: results[i].weightage,
+            aiParametersIntro: results[i].aiParametersIntro,
+            aiParametersMainContext: results[i].aiParametersMainContext,
+            aiParametersOutro: results[i].aiParametersOutro,
+            aiParametersEnvironment: results[i].aiParametersEnvironment,
+            teacherId: results[i].teacherId,
+            status: results[i].status,
+            createdAt: dateFormate(results[i].createdAt),
+            updatedAt: actualDate,
+          });
+        }
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data = {};
+      data.dataItems = rangeDataDatee.slice(startIndex, endIndex);
+      data.totalItems = rangeDataDatee.length;
+      data.currentPage = parseInt(req.query.page) || 0;
+      data.totalPages = Math.ceil(rangeDataDatee.length / limit);
+      if (data.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data,
+      });
+    } else if (assessmentType && startDate && endDate && !assessmentPurpose) {
+      let startDateFormate = startDate.split("/").reverse().join("-");
+
+      let endDateFormate = endDate.split("/").reverse().join("-");
+      const results = await TeacherAssessment.findAll({
+        where: {
+          assessmentType: assessmentType,
+          teacherId: JSON.stringify(userId),
+
+          status: "1",
+        },
+      });
+      for (let i = 0; i < results.length; i++) {
+        if (
+          results[i].endDate <= endDateFormate &&
+          startDateFormate <= results[i].startDate
+        ) {
+          let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+          let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+          const date = new Date(convertUpdateAtEpoch * 1000);
+          let actualDate = date.toGMTString();
+          rangeDataDatee.push({
+            id: results[i].id,
+            assessmentName: results[i].assessmentName,
+            assessmentType: results[i].assessmentType,
+            description: results[i].description,
+            startDate: results[i].startDate.split("-").reverse().join("/"),
+            endDate: results[i].endDate.split("-").reverse().join("/"),
+            assessmentPurpose: results[i].assessmentPurpose,
+            assessmentAILevel: results[i].assessmentAILevel,
+            assessmentResponseType: results[i].assessmentResponseType,
+            questionId: results[i].questionId,
+            studentId: results[i].studentId,
+            aiParametersLevel: results[i].aiParametersLevel,
+            weightage: results[i].weightage,
+            aiParametersIntro: results[i].aiParametersIntro,
+            aiParametersMainContext: results[i].aiParametersMainContext,
+            aiParametersOutro: results[i].aiParametersOutro,
+            aiParametersEnvironment: results[i].aiParametersEnvironment,
+            teacherId: results[i].teacherId,
+            status: results[i].status,
+            createdAt: dateFormate(results[i].createdAt),
+            updatedAt: actualDate,
+          });
+        }
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data = {};
+      data.dataItems = rangeDataDatee.slice(startIndex, endIndex);
+      data.totalItems = rangeDataDatee.length;
+      data.currentPage = parseInt(req.query.page) || 0;
+      data.totalPages = Math.ceil(rangeDataDatee.length / limit);
+      if (data.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data,
+      });
+    } else if (startDate && assessmentPurpose && assessmentType) {
+      const data = [];
+      const results = await TeacherAssessment.findAll({
+        where: {
+          teacherId: JSON.stringify(userId),
+          status: "1",
+          assessmentType: assessmentType,
+
+          startDate: startDate?.split("/").reverse().join("-"),
+          assessmentPurpose: assessmentPurpose,
+        },
+      });
+      for (let i = 0; i < results.length; i++) {
+        let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+        let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+        const date = new Date(convertUpdateAtEpoch * 1000);
+        let actualDate = date.toGMTString();
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentType: results[i].assessmentType,
+          description: results[i].description,
+          startDate: results[i].startDate.split("-").reverse().join("/"),
+          endDate: results[i].endDate.split("-").reverse().join("/"),
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentResponseType: results[i].assessmentResponseType,
+          questionId: results[i].questionId,
+          studentId: results[i].studentId,
+          aiParametersLevel: results[i].aiParametersLevel,
+          weightage: results[i].weightage,
+          aiParametersIntro: results[i].aiParametersIntro,
+          aiParametersMainContext: results[i].aiParametersMainContext,
+          aiParametersOutro: results[i].aiParametersOutro,
+          aiParametersEnvironment: results[i].aiParametersEnvironment,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: actualDate,
+        });
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
+      });
+    } else if (assessmentPurpose && assessmentType && !startDate && !endDate) {
+      const data = [];
+      const results = await TeacherAssessment.findAll({
+        where: {
+          assessmentType: assessmentType,
+          teacherId: JSON.stringify(userId),
+          status: "1",
+          [Sequelize.Op.and]: [
+            { assessmentPurpose: assessmentPurposeItems(assessmentPurpose) },
+          ],
+        },
+      });
+      console.log(results, "assessmentTyp994e");
+      for (let i = 0; i < results.length; i++) {
+        let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+        let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+        const date = new Date(convertUpdateAtEpoch * 1000);
+        let actualDate = date.toGMTString();
+
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentType: results[i].assessmentType,
+          description: results[i].description,
+          startDate: results[i].startDate.split("-").reverse().join("/"),
+          endDate: results[i].endDate.split("-").reverse().join("/"),
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentResponseType: results[i].assessmentResponseType,
+          questionId: results[i].questionId,
+          studentId: results[i].studentId,
+          aiParametersLevel: results[i].aiParametersLevel,
+          weightage: results[i].weightage,
+          aiParametersIntro: results[i].aiParametersIntro,
+          aiParametersMainContext: results[i].aiParametersMainContext,
+          aiParametersOutro: results[i].aiParametersOutro,
+          aiParametersEnvironment: results[i].aiParametersEnvironment,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: actualDate,
+        });
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
+      });
+    } else if (startDate && assessmentType) {
+      const data = [];
+      const results = await TeacherAssessment.findAll({
+        where: {
+          assessmentType: assessmentType,
+
+          teacherId: JSON.stringify(userId),
+          status: "1",
+          [Sequelize.Op.and]: [
+            { startDate: startDate?.split("/").reverse().join("-") },
+          ],
+        },
+      });
+      console.log(results, "assessmentType1049");
+      for (let i = 0; i < results.length; i++) {
+        let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+        let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+        const date = new Date(convertUpdateAtEpoch * 1000);
+        let actualDate = date.toGMTString();
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentType: results[i].assessmentType,
+          description: results[i].description,
+          startDate: results[i].startDate.split("-").reverse().join("/"),
+          endDate: results[i].endDate.split("-").reverse().join("/"),
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentResponseType: results[i].assessmentResponseType,
+          questionId: results[i].questionId,
+          studentId: results[i].studentId,
+          aiParametersLevel: results[i].aiParametersLevel,
+          weightage: results[i].weightage,
+          aiParametersIntro: results[i].aiParametersIntro,
+          aiParametersMainContext: results[i].aiParametersMainContext,
+          aiParametersOutro: results[i].aiParametersOutro,
+          aiParametersEnvironment: results[i].aiParametersEnvironment,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: actualDate,
+        });
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
+      });
+    } else if (assessmentType) {
+      const data = [];
+      const results = await TeacherAssessment.findAll({
+        where: {
+          assessmentType: assessmentType,
+          teacherId: JSON.stringify(userId),
+          status: "1",
+        },
+      });
+
+      for (let i = 0; i < results.length; i++) {
+        let convertUpdateAtDate = new Date(results[i].updatedAt);
+
+        let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+        const date = new Date(convertUpdateAtEpoch * 1000);
+        let actualDate = date.toGMTString();
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentType: results[i].assessmentType,
+          description: results[i].description,
+          startDate: results[i].startDate.split("-").reverse().join("/"),
+          endDate: results[i].endDate.split("-").reverse().join("/"),
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentResponseType: results[i].assessmentResponseType,
+          questionId: results[i].questionId,
+          studentId: results[i].studentId,
+          aiParametersLevel: results[i].aiParametersLevel,
+          weightage: results[i].weightage,
+          aiParametersIntro: results[i].aiParametersIntro,
+          aiParametersMainContext: results[i].aiParametersMainContext,
+          aiParametersOutro: results[i].aiParametersOutro,
+          aiParametersEnvironment: results[i].aiParametersEnvironment,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: actualDate,
+        });
+      }
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
       });
     }
-    const { limit, offset } = pagination.getPagination(req.query.page, 10);
-    const data = req.query;
-    const { assessmentType, endDate } = data;
-    if (!assessmentType) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter assessment type" });
-    } else if (assessmentType != "1" && assessmentType != "2") {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter valid assessment type like 1,2",
-      });
-    } else if (
-      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(endDate)
-    ) {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter date in yyyy-mm-dd format",
-      });
-    }
-    const results = await TeacherAssessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        endDate: endDate,
-        teacherId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: error.message });

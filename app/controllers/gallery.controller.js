@@ -11,133 +11,137 @@ const bcrypt = require("bcryptjs");
 
 exports.galleryAdd = async (req, res) => {
     try {
-        if ((req.file.mimetype != 'video/mp4')) {
-            if (!req.body.galleryType) {
-                return res.status(400).send({ success: false, message: "Please enter galleryType!" })
-            }
-            if (req.body.galleryType == "1") {
-                if (req.file == undefined) {
-                    return res.status(400).send({ message: "Please upload a file!" });
+        if (req.file == undefined) {
+            return res.status(400).send({ message: "Please upload a file!" });
+        }
+        if (req.file.originalname.split(".")[1] == "jpg" || req.file.originalname.split(".")[1] == "jpeg" || req.file.originalname.split(".")[1] == "png" || req.file.originalname.split(".")[1] == "mp4") {
+            if ((req.file.mimetype != 'video/mp4')) {
+                if (!req.body.galleryType) {
+                    return res.status(400).send({ success: false, message: "Please enter gallery type!" })
                 }
-                if (req.file.size < 50 * 1024) {
-                    return res.status(400).send({ success: false, message: "File too small, please select a file greater than 50kb" })
-                }
-
-                const newFilename = `${Date.now()}_${req.file.originalname}`;
-                await sharp(req.file.path).resize({ width: 520, height: 348 }).toFile(__basedir + "/uploads/gallery/gallerylist/" + newFilename)
-                await sharp(req.file.path).resize({ width: 1420, height: 732 }).toFile(__basedir + "/uploads/gallery/gallerydetails/" + newFilename)
-
-                if (!(req.body.title).trim()) {
-                    return res.status(400).send({ message: "Please enter title!" });
-                }
-                if ((req.body.title).length > 200) {
-                    return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
-                }
-                const existgallery = await gallery.findOne({
-                    where: {
-                        title: req.body.title
+                if (req.body.galleryType == "1") {
+                    if (req.file == undefined) {
+                        return res.status(400).send({ message: "Please upload a file!" });
                     }
-                })
-                if (existgallery) {
-                    return res.status(400).send({ success: false, message: "Gallery already exist!" })
+                    if (req.file.size < 50 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too small, please upload a image greater than 50kb" })
+                    }
+                    if (req.file.size > 3 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too larg, please upload a image less than 3mb" })
+                    }
+
+                    const newFilename = `${Date.now()}_${req.file.originalname}`;
+                    await sharp(req.file.path).resize({ width: 520, height: 348 }).toFile(__basedir + "/uploads/gallery/gallerylist/" + newFilename)
+                    await sharp(req.file.path).resize({ width: 1420, height: 732 }).toFile(__basedir + "/uploads/gallery/gallerydetails/" + newFilename)
+
+                    if (!(req.body.title).trim()) {
+                        return res.status(400).send({ message: "Please enter title!" });
+                    }
+                    if ((req.body.title).length > 200) {
+                        return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
+                    }
+                    const existgallery = await gallery.findOne({
+                        where: {
+                            title: req.body.title
+                        }
+                    })
+                    if (existgallery) {
+                        return res.status(400).send({ success: false, message: "Gallery already exist!" })
+                    }
+                    if (!(req.body.galleryType).trim()) {
+                        return res.status(400).send({ message: "Please enter galleryType!" });
+                    }
+                    if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery type!" });
+                    }
+                    if (!req.body.status) {
+                        return res
+                            .status(400)
+                            .send({ message: "Please enter gallery status!" });
+                    }
+                    if (!(req.body.status == 0) && !(req.body.status == 1)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery_status!" });
+                    }
+                    const result = await gallery.create({
+                        title: req.body.title,
+                        imgUrl: newFilename || null,
+                        galleryType: req.body.galleryType,
+                        status: req.body.status,
+                    });
                 }
-                if (!(req.body.galleryType).trim()) {
-                    return res.status(400).send({ message: "Please enter galleryType!" });
+                else {
+                    return res.status(400).send({ success: false, message: "Invalid gallery type for image!" })
                 }
-                if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum galleryType!" });
-                }
-                if (!req.body.status) {
-                    return res
-                        .status(400)
-                        .send({ message: "Please enter enum gallery status!" });
-                }
-                if (!(req.body.status == 0) && !(req.body.status == 1)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum gallery_status!" });
-                }
-                const result = await gallery.create({
-                    title: req.body.title,
-                    imgUrl: newFilename || null,
-                    galleryType: req.body.galleryType,
-                    status: req.body.status,
-                });
+
             }
             else {
-                return res.status(400).send({ success: false, message: "Invalid galleryType for image!" })
+                if (!req.body.galleryType) {
+                    return res.status(400).send({ success: false, message: "Please enter gallery type!" })
+                }
+                if (req.body.galleryType == "2") {
+                    if (req.file == undefined) {
+                        return res.status(400).send({ message: "Please upload a file!" });
+                    }
+                    if (req.file.size < 1 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too small, please upload a image greater than 1mb" })
+                    }
+                    if (req.file.size > 10 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too larg, please upload a video less than 10mb" })
+                    }
+                    if (!(req.body.title).trim()) {
+                        return res.status(400).send({ message: "Please enter title!" });
+                    }
+                    if ((req.body.title).length > 200) {
+                        return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
+                    }
+                    const existgallery = await gallery.findOne({
+                        where: {
+                            title: req.body.title
+                        }
+                    })
+                    if (existgallery) {
+                        return res.status(400).send({ success: false, message: "Gallery already exist!" })
+                    }
+                    if (!(req.body.galleryType).trim()) {
+                        return res.status(400).send({ message: "Please enter gallery type!" });
+                    }
+                    if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery type!" });
+                    }
+                    if (!req.body.status) {
+                        return res
+                            .status(400)
+                            .send({ message: "Please enter gallery status!" });
+                    }
+                    if (!(req.body.status == 0) && !(req.body.status == 1)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery_status!" });
+                    }
+                    const result = await gallery.create({
+                        title: req.body.title,
+                        imgUrl: req.file.filename || null,
+                        galleryType: req.body.galleryType,
+                        status: req.body.status,
+                    });
+                }
+                else {
+                    return res.status(400).send({ success: false, message: "Invalid gallery type for video!" })
+                }
             }
-
+            res.status(200).send({ success: true, message: "Gallery added successfully!" });
         }
         else {
-            if (!req.body.galleryType) {
-                return res.status(400).send({ success: false, message: "Please enter galleryType!" })
-            }
-            if (req.body.galleryType == "2") {
-                if (req.file == undefined) {
-                    return res.status(400).send({ message: "Please upload a file!" });
-                }
-                if (req.file.size < 50 * 1024) {
-                    return res.status(400).send({ success: false, message: "File too small, please select a file greater than 50kb" })
-                }
-                if (!(req.body.title).trim()) {
-                    return res.status(400).send({ message: "Please enter title!" });
-                }
-                if ((req.body.title).length > 200) {
-                    return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
-                }
-                const existgallery = await gallery.findOne({
-                    where: {
-                        title: req.body.title
-                    }
-                })
-                if (existgallery) {
-                    return res.status(400).send({ success: false, message: "Gallery already exist!" })
-                }
-                if (!(req.body.galleryType).trim()) {
-                    return res.status(400).send({ message: "Please enter galleryType!" });
-                }
-                if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum galleryType!" });
-                }
-                if (!req.body.status) {
-                    return res
-                        .status(400)
-                        .send({ message: "Please enter enum gallery status!" });
-                }
-                if (!(req.body.status == 0) && !(req.body.status == 1)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum gallery_status!" });
-                }
-                const result = await gallery.create({
-                    title: req.body.title,
-                    imgUrl: req.file.filename || null,
-                    galleryType: req.body.galleryType,
-                    status: req.body.status,
-                });
-            }
-            else {
-                return res.status(400).send({ success: false, message: "Invalid galleryType for video!" })
-            }
+            return res.status(400).send({ success: false, message: "File type does not allow!" })
         }
-        res.status(200).send({ success: true, message: "Gallery added successfully!" });
     } catch (error) {
-        if (error.message == "Cannot read property 'mimetype' of undefined") {
-            return res.status(400).send({ success: false, message: "Please upload file" });
-        }
-        if (error.message == "File type does not allow!") {
-            return res.status(400).send({ success: false, message: error.message });
-        }
-        else if (error.message == "File too large") {
-            return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
-        } else {
-            return res.status(500).send({ success: false, message: error.message });
-        }
+        return res.status(500).send({ success: false, message: error.message });
     }
 }
 
@@ -200,6 +204,7 @@ exports.getActiveGallery = async (req, res) => {
                 title: file.title,
                 imgUrllist: fullUrl + file.imgUrl,
                 imgUrlDetails: fullUrldetails + file.imgUrl,
+                galleryType: file.galleryType,
                 status: file.status
             });
         });
@@ -232,145 +237,136 @@ exports.updateGallery = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Gallery Not found!" });
         }
-
-        if ((req.file.mimetype != 'video/mp4')) {
-            if (!req.body.galleryType) {
-                return res.status(400).send({ success: false, message: "Please enter galleryType!" })
-            }
-            if (req.body.galleryType == "1") {
-                if (req.file == undefined) {
-                    return res.status(400).send({ message: "Please upload a file!" });
+        if (req.file == undefined) {
+            return res.status(400).send({ message: "Please upload a file!" });
+        }
+        if (req.file.originalname.split(".")[1] == "jpg" || req.file.originalname.split(".")[1] == "jpeg" || req.file.originalname.split(".")[1] == "png" || req.file.originalname.split(".")[1] == "mp4") {
+            if ((req.file.mimetype != 'video/mp4')) {
+                if (!req.body.galleryType) {
+                    return res.status(400).send({ success: false, message: "Please enter gallery type!" })
                 }
-                if (req.file.size < 50 * 1024) {
-                    return res.status(400).send({ success: false, message: "File too small, please select a file greater than 50kb" })
-                }
-                const newFilename = `${Date.now()}_${req.file.originalname}`;
-
-                await sharp(req.file.path).resize({ width: 520, height: 348 }).toFile(__basedir + "/uploads/gallery/gallerylist/" + newFilename)
-                await sharp(req.file.path).resize({ width: 1420, height: 732 }).toFile(__basedir + "/uploads/gallery/gallerydetails/" + newFilename)
-
-                if (!(req.body.title).trim()) {
-                    return res.status(400).send({ message: "Please enter title!" });
-                }
-                if ((req.body.title).length > 200) {
-                    return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
-                }
-                const existgallery = await gallery.findOne({
-                    where: {
-                        title: req.body.title
+                if (req.body.galleryType == "1") {
+                    if (req.file == undefined) {
+                        return res.status(400).send({ message: "Please upload a file!" });
                     }
-                })
-                if (existgallery) {
-                    return res.status(400).send({ success: false, message: "Gallery already exist!" })
+                    if (req.file.size < 50 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too small, please select a image greater than 50kb" })
+                    }
+                    if (req.file.size > 3 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too larg, please upload a image less than 3mb" })
+                    }
+                    const newFilename = `${Date.now()}_${req.file.originalname}`;
+
+                    await sharp(req.file.path).resize({ width: 520, height: 348 }).toFile(__basedir + "/uploads/gallery/gallerylist/" + newFilename)
+                    await sharp(req.file.path).resize({ width: 1420, height: 732 }).toFile(__basedir + "/uploads/gallery/gallerydetails/" + newFilename)
+
+                    if (!(req.body.title).trim()) {
+                        return res.status(400).send({ message: "Please enter title!" });
+                    }
+                    if ((req.body.title).length > 200) {
+                        return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
+                    }
+
+                    if (!(req.body.galleryType).trim()) {
+                        return res.status(400).send({ message: "Please enter gallery type!" });
+                    }
+                    if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery type!" });
+                    }
+                    if (!req.body.status) {
+                        return res
+                            .status(400)
+                            .send({ message: "Please enter gallery status!" });
+                    }
+                    if (!(req.body.status == 0) && !(req.body.status == 1)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery_status!" });
+                    }
+                    const result = await gallery.update({
+                        title: req.body.title,
+                        imgUrl: newFilename || null,
+                        galleryType: req.body.galleryType,
+                        status: req.body.status,
+                    },
+                        {
+                            where:
+                            {
+                                id: galleryId
+                            }
+                        });
                 }
-                if (!(req.body.galleryType).trim()) {
-                    return res.status(400).send({ message: "Please enter galleryType!" });
+                else {
+                    return res.status(400).send({ success: false, message: "Invalid gallery type for image!" })
                 }
-                if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum galleryType!" });
+
+            }
+            else {
+                if (!req.body.galleryType) {
+                    return res.status(400).send({ success: false, message: "Please enter gallery type!" })
                 }
-                if (!req.body.status) {
-                    return res
-                        .status(400)
-                        .send({ message: "Please enter enum gallery status!" });
-                }
-                if (!(req.body.status == 0) && !(req.body.status == 1)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum gallery_status!" });
-                }
-                const result = await gallery.update({
-                    title: req.body.title,
-                    imgUrl: newFilename || null,
-                    galleryType: req.body.galleryType,
-                    status: req.body.status,
-                },
-                    {
+                if (req.body.galleryType == "2") {
+                    if (req.file == undefined) {
+                        return res.status(400).send({ message: "Please upload a file!" });
+                    }
+                    if (req.file.size < 1 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too small, please select a video greater than 1mb" })
+                    }
+                    if (req.file.size > 10 * 1024 * 1024) {
+                        return res.status(400).send({ success: false, message: "File too larg, please upload a video less than 10mb" })
+                    }
+                    if (!(req.body.title).trim()) {
+                        return res.status(400).send({ message: "Please enter title!" });
+                    }
+                    if ((req.body.title).length > 200) {
+                        return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
+                    }
+
+                    if (!(req.body.galleryType).trim()) {
+                        return res.status(400).send({ message: "Please enter gallery type!" });
+                    }
+                    if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery type!" });
+                    }
+                    if (!req.body.status) {
+                        return res
+                            .status(400)
+                            .send({ message: "Please enter gallery status!" });
+                    }
+                    if (!(req.body.status == 0) && !(req.body.status == 1)) {
+                        return res
+                            .status(400)
+                            .send({ message: "Invalid input value for gallery_status!" });
+                    }
+                    const result = await gallery.update({
+                        title: req.body.title,
+                        imgUrl: req.file.filename || null,
+                        galleryType: req.body.galleryType,
+                        status: req.body.status,
+                    }, {
                         where:
                         {
                             id: galleryId
                         }
                     });
+                }
+                else {
+                    return res.status(400).send({ success: false, message: "Invalid gallery type for video!" })
+                }
             }
-            else {
-                return res.status(400).send({ success: false, message: "Invalid galleryType for image!" })
-            }
-
+            return res.status(200).send({ message: 'Gallery updated successfully' });
         }
         else {
-            if (!req.body.galleryType) {
-                return res.status(400).send({ success: false, message: "Please enter galleryType!" })
-            }
-            if (req.body.galleryType == "2") {
-                if (req.file == undefined) {
-                    return res.status(400).send({ message: "Please upload a file!" });
-                }
-                if (req.file.size < 50 * 1024) {
-                    return res.status(400).send({ success: false, message: "File too small, please select a file greater than 50kb" })
-                }
-                if (!(req.body.title).trim()) {
-                    return res.status(400).send({ message: "Please enter title!" });
-                }
-                if ((req.body.title).length > 200) {
-                    return res.status(400).send({ success: false, message: "Title length should be less than 200 character!" })
-                }
-                const existgallery = await gallery.findOne({
-                    where: {
-                        title: req.body.title
-                    }
-                })
-                if (existgallery) {
-                    return res.status(400).send({ success: false, message: "Gallery already exist!" })
-                }
-                if (!(req.body.galleryType).trim()) {
-                    return res.status(400).send({ message: "Please enter galleryType!" });
-                }
-                if (!(req.body.galleryType == 1) && !(req.body.galleryType == 2)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum galleryType!" });
-                }
-                if (!req.body.status) {
-                    return res
-                        .status(400)
-                        .send({ message: "Please enter enum gallery status!" });
-                }
-                if (!(req.body.status == 0) && !(req.body.status == 1)) {
-                    return res
-                        .status(400)
-                        .send({ message: "Invalid input value for enum gallery_status!" });
-                }
-                const result = await gallery.update({
-                    title: req.body.title,
-                    imgUrl: req.file.filename || null,
-                    galleryType: req.body.galleryType,
-                    status: req.body.status,
-                }, {
-                    where:
-                    {
-                        id: galleryId
-                    }
-                });
-            }
-            else {
-                return res.status(400).send({ success: false, message: "Invalid galleryType for video!" })
-            }
+            return res.status(400).send({ success: false, message: "File type does not allow!" })
         }
-        return res.status(200).send({ message: 'Gallery updated successfully' });
     } catch (error) {
-        if (error.message == "Cannot read property 'mimetype' of undefined") {
-            return res.status(400).send({ success: false, message: "Please upload file" });
-        }
-        if (error.message == "File type does not allow!") {
-            return res.status(400).send({ success: false, message: error.message });
-        }
-        else if (error.message == "File too large") {
-            return res.status(400).send({ success: false, message: "File too large, please select a file less than 3mb" });
-        } else {
-            return res.status(500).send({ success: false, message: error.message });
-        }
+
+        return res.status(500).send({ success: false, message: error.message });
+
     }
 }
 

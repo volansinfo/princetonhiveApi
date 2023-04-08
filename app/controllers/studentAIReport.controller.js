@@ -59,7 +59,16 @@ exports.addStudentAIReport = async (req, res) => {
 exports.getAllAIReport = async (req, res) => {
     try {
 
+        let token = req.headers["x-access-token"];
+
+        const tokenData = jwt.decode(token);
+
+        let userId = tokenData.id
+
         const AIReport = await studentAIReport.findAll({
+            where:{
+                id:userId
+            },
             order: [
                 ['id', 'DESC']
             ]

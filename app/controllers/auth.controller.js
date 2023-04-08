@@ -657,7 +657,7 @@ exports.signin = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, config.secret, {
-      expiresIn: 86400, // 24 hours
+      // expiresIn: 86400, // 24 hours
     });
 
     let authorities = [];

@@ -158,16 +158,6 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       status: false,
       message: "Please enter weightage",
     });
-  } else if (
-    weightage != "1" &&
-    weightage != "2" &&
-    weightage != "3" &&
-    weightage != "4"
-  ) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid weightage likes 1,2,3,4",
-    });
   } else if (!aiParametersIntro) {
     return res.status(400).send({
       status: false,
@@ -387,16 +377,6 @@ const erroHandlingUpdate = async (req, res, next) => {
     return res.status(400).send({
       status: false,
       message: "Please enter weightage",
-    });
-  } else if (
-    weightage != "1" &&
-    weightage != "2" &&
-    weightage != "3" &&
-    weightage != "4"
-  ) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid weightage likes 1,2,3,4",
     });
   } else if (!aiParametersIntro) {
     return res.status(400).send({

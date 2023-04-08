@@ -57,8 +57,8 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       allowNull: false,
     },
     weightage: {
-      type: Sequelize.ENUM("1", "2", "3", "4"),
-      comment: "1-intro,2-mainContext,3-environment,4-outro",
+      type: Sequelize.TEXT,
+
       allowNull: false,
     },
     aiParametersIntro: {

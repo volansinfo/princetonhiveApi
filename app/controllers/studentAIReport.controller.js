@@ -1,4 +1,6 @@
 const db = require("../models")
+const jwt = require("jsonwebtoken");
+
 const studentAIReport = db.studentAIReport
 
 exports.addStudentAIReport = async (req, res) => {

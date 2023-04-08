@@ -43,11 +43,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       allowNull: false,
     },
     questionId: {
-      type: Sequelize.TEXT,
+      type: Sequelize.ARRAY(Sequelize.TEXT),
       allowNull: false,
     },
     studentId: {
-      type: Sequelize.TEXT,
+      type: Sequelize.ARRAY(Sequelize.TEXT),
       allowNull: false,
     },
 
@@ -57,24 +57,24 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       allowNull: false,
     },
     weightage: {
-      type: Sequelize.TEXT,
+      type: Sequelize.JSON,
 
       allowNull: false,
     },
     aiParametersIntro: {
-      type: Sequelize.TEXT,
+      type: Sequelize.JSON,
       allowNull: false,
     },
     aiParametersMainContext: {
-      type: Sequelize.TEXT,
+      type: Sequelize.JSON,
       allowNull: false,
     },
     aiParametersOutro: {
-      type: Sequelize.TEXT,
+      type: Sequelize.JSON,
       allowNull: false,
     },
     aiParametersEnvironment: {
-      type: Sequelize.TEXT,
+      type: Sequelize.JSON,
       allowNull: false,
     },
     teacherId: {

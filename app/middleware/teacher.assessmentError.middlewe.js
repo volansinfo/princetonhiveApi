@@ -190,33 +190,36 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
     });
   }
 
-  const studentExist = await User.findOne({
-    where: {
-      id: studentId,
-    },
-  });
-  if (!studentExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
+  for (let i = 0; i < studentId.length; i++) {
+    const studentExist = await User.findOne({
+      where: {
+        id: studentId[i],
+      },
+    });
+    if (!studentExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
+    const uuidStudent = studentExist.uuid;
+    console.log(uuidStudent.slice(0, 3) != "STU");
+    if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
   }
-  const uuidStudent = studentExist.uuid;
-  console.log(uuidStudent.slice(0, 3) != "STU");
-  if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
-  }
-
-  const questionExist = await Question.findOne({
-    where: {
-      id: questionId,
-    },
-  });
-  if (!questionExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Question id does not exist!" });
+  for (let i = 0; i < questionId.length; i++) {
+    const questionExist = await Question.findOne({
+      where: {
+        id: questionId[i],
+      },
+    });
+    if (!questionExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Question id does not exist!" });
+    }
   }
 
   const startDateValidation = startDate.split("/").reverse().join("/");
@@ -399,26 +402,36 @@ const erroHandlingUpdate = async (req, res, next) => {
       message: "Please enter ai parameters environment",
     });
   }
-  const studentExist = await User.findOne({
-    where: {
-      id: studentId,
-    },
-  });
-  if (!studentExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
+  for (let i = 0; i < studentId.length; i++) {
+    const studentExist = await User.findOne({
+      where: {
+        id: studentId[i],
+      },
+    });
+    if (!studentExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
+    const uuidStudent = studentExist.uuid;
+    console.log(uuidStudent.slice(0, 3) != "STU");
+    if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
   }
-
-  const questionExist = await Question.findOne({
-    where: {
-      id: questionId,
-    },
-  });
-  if (!questionExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Question id does not exist!" });
+  for (let i = 0; i < questionId.length; i++) {
+    const questionExist = await Question.findOne({
+      where: {
+        id: questionId[i],
+      },
+    });
+    if (!questionExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Question id does not exist!" });
+    }
   }
   const startDateValidation = startDate.split("/").reverse().join("/");
   const endDateValidation = endDate.split("/").reverse().join("/");

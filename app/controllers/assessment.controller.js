@@ -3,6 +3,8 @@ const Assessment = db.assignment;
 const pagination = require("../middleware/pagination");
 const User = db.user;
 const jwt = require("jsonwebtoken");
+
+const { Sequelize } = require("sequelize");
 exports.assignment = async (req, res) => {
   try {
     const token = req.headers["x-access-token"];
@@ -53,11 +55,7 @@ exports.getAllAssessment = async (req, res) => {
       req.query.page,
       limit
     );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
+
     // console.log(response.dataItems, "aaaaaa");
     return res.status(200).send({
       status: true,
@@ -88,11 +86,7 @@ exports.getAssessmentBySelf = async (req, res) => {
       req.query.page,
       limit
     );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
+
     res.status(200).send({
       status: true,
       message: "Data found successfully ",
@@ -122,11 +116,7 @@ exports.getAssessmentByAssigned = async (req, res) => {
       req.query.page,
       limit
     );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
+
     res.status(200).send({
       status: true,
       message: "Data found successfully ",
@@ -156,11 +146,7 @@ exports.getAssessmentByCompleted = async (req, res) => {
       req.query.page,
       limit
     );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
+
     res.status(200).send({
       status: true,
       message: "Data found successfully ",
@@ -171,83 +157,17 @@ exports.getAssessmentByCompleted = async (req, res) => {
   }
 };
 
-//15) Write a search teacher assessment Api which is using the key assessmentType and  assessmentPurpose .
-
-exports.studentSearchQueryAssessmentPurpose = async (req, res) => {
-  try {
-    const token = req.headers["x-access-token"];
-    const tokenData = jwt.decode(token);
-    const userId = tokenData.id;
-
-    const permissionRoles = await User.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "STU") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
-    }
-    const { limit, offset } = pagination.getPagination(req.query.page, 10);
-    const data = req.query;
-    const { assessmentType, assessmentPurpose } = data;
-    if (!assessmentType) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter assessment type" });
-    } else if (assessmentType != "1" && assessmentType != "2") {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter valid assessment type like 1,2",
-      });
-    } else if (
-      assessmentPurpose != "1" &&
-      assessmentPurpose != "2" &&
-      assessmentPurpose != "3" &&
-      assessmentPurpose != "4" &&
-      assessmentPurpose != "5"
-    ) {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter valid assessment purpose like 1,2,3,4,5",
-      });
-    }
-    const results = await Assessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        assessmentPurpose: assessmentPurpose,
-        studentId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({ status: false, message: error.message });
-  }
-};
-
 //14) Write a search teacher assessment Api which is using the key assessmentType and Start Date .
+function dateFormate(date) {
+  let convertUpdateAtDate = new Date(date);
 
-exports.studentSearchQueryStartDate = async (req, res) => {
+  let convertUpdateAtEpoch = convertUpdateAtDate.getTime() / 1000.0;
+  const inDate = new Date(convertUpdateAtEpoch * 1000);
+  let actualDate = inDate.toGMTString();
+  return actualDate;
+}
+
+exports.studentSearchQuery = async (req, res) => {
   try {
     const token = req.headers["x-access-token"];
     const tokenData = jwt.decode(token);
@@ -265,120 +185,125 @@ exports.studentSearchQueryStartDate = async (req, res) => {
         message: "You don't have permission to access the asssessment",
       });
     }
-    const { limit, offset } = pagination.getPagination(req.query.page, 10);
+
     const data = req.query;
-    const { assessmentType, startDate } = data;
-    if (!assessmentType) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter assessment type" });
-    } else if (assessmentType != "1" && assessmentType != "2") {
+    const { assessmentResponseType, assessmentPurpose } = data;
+    if (!assessmentResponseType) {
       return res.status(400).send({
         status: false,
-        message: "Please enter valid assessment type like 1,2",
+        message: "Please enter assessment response type",
       });
     } else if (
-      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(startDate)
+      assessmentResponseType != "1" &&
+      assessmentResponseType != "2" &&
+      assessmentResponseType != "3" &&
+      assessmentResponseType != "4"
     ) {
       return res.status(400).send({
         status: false,
-        message: "Please enter date in yyyy-mm-dd format",
+        message: "Please enter valid assessment response type like 1,2,3,4",
       });
     }
-    const results = await Assessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        startDate: startDate,
-        teacherId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({ status: false, message: error.message });
-  }
-};
 
-//14) Write a search teacher assessment Api which is using the key assessmentType and end Date .
+    if (assessmentResponseType && !assessmentPurpose) {
+      const data = [];
+      const results = await Assessment.findAll({
+        where: {
+          assessmentResponseType: assessmentResponseType,
+          studentId: JSON.stringify(permissionRoles.id),
+          status: "1",
+        },
+      });
+      for (let i = 0; i < results.length; i++) {
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentResponseType: results[i].assessmentResponseType,
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentStatusType: results[i].assessmentStatusType,
+          studentId: results[i].studentId,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: dateFormate(results[i].createdAt),
+        });
+      }
 
-exports.studentSearchQueryEndDate = async (req, res) => {
-  try {
-    const token = req.headers["x-access-token"];
-    const tokenData = jwt.decode(token);
-    const userId = tokenData.id;
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
 
-    const permissionRoles = await User.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "STU") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
+      });
+    } else if (assessmentResponseType && assessmentPurpose) {
+      const data = [];
+      const results = await Assessment.findAll({
+        where: {
+          assessmentResponseType: assessmentResponseType,
+          assessmentPurpose: assessmentPurpose,
+          studentId: JSON.stringify(permissionRoles.id),
+          status: "1",
+        },
+      });
+      for (let i = 0; i < results.length; i++) {
+        data.push({
+          id: results[i].id,
+          assessmentName: results[i].assessmentName,
+          assessmentResponseType: results[i].assessmentResponseType,
+          assessmentPurpose: results[i].assessmentPurpose,
+          assessmentAILevel: results[i].assessmentAILevel,
+          assessmentStatusType: results[i].assessmentStatusType,
+          studentId: results[i].studentId,
+          teacherId: results[i].teacherId,
+          status: results[i].status,
+          createdAt: dateFormate(results[i].createdAt),
+          updatedAt: dateFormate(results[i].createdAt),
+        });
+      }
+
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const startIndex = page * limit;
+      const endIndex = (page + 1) * limit;
+
+      const data1 = {};
+      data1.dataItems = data.slice(startIndex, endIndex);
+      data1.totalItems = data.length;
+      data1.currentPage = parseInt(req.query.page) || 0;
+      data1.totalPages = Math.ceil(data.length / limit);
+      console.log(data1);
+      if (data1.dataItems.length <= 0) {
+        return res.status(200).send({
+          status: true,
+          message: "Assessment not found successfully ",
+          data: data1,
+        });
+      }
+      return res.status(200).send({
+        status: true,
+        message: "Assessment found successfully ",
+        data: data1,
       });
     }
-    const { limit, offset } = pagination.getPagination(req.query.page, 10);
-    const data = req.query;
-    const { assessmentType, endDate } = data;
-    if (!assessmentType) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter assessment type" });
-    } else if (assessmentType != "1" && assessmentType != "2") {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter valid assessment type like 1,2",
-      });
-    } else if (
-      !/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(endDate)
-    ) {
-      return res.status(400).send({
-        status: false,
-        message: "Please enter date in yyyy-mm-dd format",
-      });
-    }
-    const results = await Assessment.findAndCountAll({
-      limit,
-      offset,
-      where: {
-        assessmentType: assessmentType,
-        endDate: endDate,
-        teacherId: JSON.stringify(permissionRoles.id),
-      },
-    });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
-    if (response.dataItems.length <= 0) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Assessment not available" });
-    }
-    return res.status(200).send({
-      status: true,
-      message: "Assessment found successfully ",
-      data: response,
-    });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: error.message });

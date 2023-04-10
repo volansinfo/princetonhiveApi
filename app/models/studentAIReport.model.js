@@ -22,6 +22,18 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: Sequelize.STRING,
             allowNull: false
         },
+        videoUrl: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        totalAverage: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        reportDetails: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
         aiReport: {
             type: Sequelize.TEXT,
             allowNull: false

@@ -158,16 +158,6 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
       status: false,
       message: "Please enter weightage",
     });
-  } else if (
-    weightage != "1" &&
-    weightage != "2" &&
-    weightage != "3" &&
-    weightage != "4"
-  ) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid weightage likes 1,2,3,4",
-    });
   } else if (!aiParametersIntro) {
     return res.status(400).send({
       status: false,
@@ -200,37 +190,40 @@ const errorHandingTeacherAssessment = async (req, res, next) => {
     });
   }
 
-  const studentExist = await User.findOne({
-    where: {
-      id: studentId,
-    },
-  });
-  if (!studentExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
+  for (let i = 0; i < studentId.length; i++) {
+    const studentExist = await User.findOne({
+      where: {
+        id: studentId[i],
+      },
+    });
+    if (!studentExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
+    const uuidStudent = studentExist.uuid;
+    console.log(uuidStudent.slice(0, 3) != "STU");
+    if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
   }
-  const uuidStudent = studentExist.uuid;
-  console.log(uuidStudent.slice(0, 3) != "STU");
-  if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
+  for (let i = 0; i < questionId.length; i++) {
+    const questionExist = await Question.findOne({
+      where: {
+        id: questionId[i],
+      },
+    });
+    if (!questionExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Question id does not exist!" });
+    }
   }
 
-  const questionExist = await Question.findOne({
-    where: {
-      id: questionId,
-    },
-  });
-  if (!questionExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Question id does not exist!" });
-  }
-
-  const startDateValidation = startDate;
-  const endDateValidation = endDate;
+  const startDateValidation = startDate.split("/").reverse().join("/");
+  const endDateValidation = endDate.split("/").reverse().join("/");
   let convertStartDate = new Date(startDateValidation);
   let convertEndDate = new Date(endDateValidation);
   let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
@@ -388,16 +381,6 @@ const erroHandlingUpdate = async (req, res, next) => {
       status: false,
       message: "Please enter weightage",
     });
-  } else if (
-    weightage != "1" &&
-    weightage != "2" &&
-    weightage != "3" &&
-    weightage != "4"
-  ) {
-    return res.status(400).send({
-      status: false,
-      message: "Please enter valid weightage likes 1,2,3,4",
-    });
   } else if (!aiParametersIntro) {
     return res.status(400).send({
       status: false,
@@ -419,29 +402,39 @@ const erroHandlingUpdate = async (req, res, next) => {
       message: "Please enter ai parameters environment",
     });
   }
-  const studentExist = await User.findOne({
-    where: {
-      id: studentId,
-    },
-  });
-  if (!studentExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Student id does not exist!" });
+  for (let i = 0; i < studentId.length; i++) {
+    const studentExist = await User.findOne({
+      where: {
+        id: studentId[i],
+      },
+    });
+    if (!studentExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
+    const uuidStudent = studentExist.uuid;
+    console.log(uuidStudent.slice(0, 3) != "STU");
+    if (!studentExist || uuidStudent.slice(0, 3) != "STU") {
+      return res
+        .status(404)
+        .send({ status: false, message: "Student id does not exist!" });
+    }
   }
-
-  const questionExist = await Question.findOne({
-    where: {
-      id: questionId,
-    },
-  });
-  if (!questionExist) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Question id does not exist!" });
+  for (let i = 0; i < questionId.length; i++) {
+    const questionExist = await Question.findOne({
+      where: {
+        id: questionId[i],
+      },
+    });
+    if (!questionExist) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Question id does not exist!" });
+    }
   }
-  const startDateValidation = startDate;
-  const endDateValidation = endDate;
+  const startDateValidation = startDate.split("/").reverse().join("/");
+  const endDateValidation = endDate.split("/").reverse().join("/");
   let convertStartDate = new Date(startDateValidation);
   let convertEndDate = new Date(endDateValidation);
   let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;

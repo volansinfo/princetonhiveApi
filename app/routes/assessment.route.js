@@ -42,20 +42,11 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAssessmentByCompleted
   );
+
   app.get(
-    "/api/user/studentSearchQueryAssessmentPurpose",
+    "/api/user/studentSearchQuery",
     [authJwt.verifyToken],
-    controller.studentSearchQueryAssessmentPurpose
-  );
-  app.get(
-    "/api/user/studentSearchQueryStartDate",
-    [authJwt.verifyToken],
-    controller.studentSearchQueryStartDate
-  );
-  app.get(
-    "/api/user/studentSearchQueryEndDate",
-    [authJwt.verifyToken],
-    controller.studentSearchQueryEndDate
+    controller.studentSearchQuery
   );
   app.post(
     "/api/csv-file",

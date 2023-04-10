@@ -2,6 +2,11 @@ const db = require("../models");
 const pagination = require("../middleware/pagination");
 const adminUser = db.user;
 
+const transformDate = (date) => {
+  const dateArray = date.split("-").reverse().join("-")
+  return dateArray
+}
+
 exports.getAllAdmin = async (req, res) => {
   var fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
@@ -24,7 +29,7 @@ exports.getAllAdmin = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,
@@ -44,7 +49,7 @@ exports.getAllAdmin = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,

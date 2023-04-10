@@ -251,6 +251,14 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ status: 400, message: "Aadhaar number already exist" });
       }
+      if (!req.body.dob) {
+        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+      }
+      const dt = Date().split(" ")[3]
+      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
+        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      }
+
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -264,7 +272,7 @@ exports.signup = async (req, res) => {
         state: req.body.state,
         pincode: req.body.pincode,
         gender: req.body.gender,
-        dob: req.body.dob,
+        dob: (req.body.dob).split("-").reverse().join("-"),
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
@@ -532,7 +540,13 @@ exports.signup = async (req, res) => {
             .status(400)
             .send({ status: 400, message: "Aadhaar number already exist" });
         }
-
+        if (!req.body.dob) {
+          return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        }
+        const dt = Date().split(" ")[3]
+        if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
+          return res.status(400).send({ success: false, message: "Please enter valid date!" })
+        }
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -546,7 +560,7 @@ exports.signup = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: req.body.dob,
+          dob: (req.body.dob).split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
@@ -597,7 +611,11 @@ exports.signup = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
-    } else if (e.message == "File too large") {
+    }
+    if (e.message == "invalid input syntax for type date: \"Invalid date\"") {
+      return res.status(400).send({ success: false, message: "Please enter valid date!" })
+    }
+    else if (e.message == "File too large") {
       return res.status(400).send({
         success: false,
         message: "File too large, please select a file less than 3mb",

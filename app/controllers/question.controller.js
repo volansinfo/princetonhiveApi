@@ -94,12 +94,6 @@ exports.getAllQuestion = async (req, res) => {
         let fileInfos = [];
         allQuestion.forEach((file) => {
 
-            // console.log(depName, "111111111111")
-            // const showDepartmentName = (departments)=>{
-
-            // }
-
-
             const departmentName = (id) => {
                 const singledpt = depName.filter((dpt) => {
                     return dpt.id == id;

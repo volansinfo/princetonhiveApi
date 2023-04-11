@@ -12,6 +12,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { default: isEmail } = require("validator/lib/isEmail");
 
+const transformDate = (date) => {
+  const dateArray = date.split("-").reverse().join("-")
+  return dateArray
+}
+
 exports.allAccess = async (req, res) => {
   var fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
@@ -22,6 +27,7 @@ exports.allAccess = async (req, res) => {
     let fileInfos = [];
     allUser.forEach((file) => {
       if (file.profileImg !== null) {
+
         fileInfos.push({
           id: file.id,
           fname: file.fname,
@@ -34,7 +40,7 @@ exports.allAccess = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,
@@ -57,7 +63,7 @@ exports.allAccess = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,
@@ -136,7 +142,7 @@ exports.adminBoard = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,
@@ -156,7 +162,7 @@ exports.adminBoard = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,
@@ -312,6 +318,13 @@ exports.updateUserData = async (req, res) => {
           message: "Please enter numeric value in aadhaar number",
         });
       }
+      if (!req.body.dob) {
+        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+      }
+      const dt = Date().split(" ")[3]
+      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
+        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      }
 
       const userId = req.params.id;
       const result = await User.update(
@@ -324,7 +337,7 @@ exports.updateUserData = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: req.body.dob,
+          dob: (req.body.dob).split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
           aadharNo: req.body.aadharNo,
@@ -387,6 +400,18 @@ exports.updateUserData = async (req, res) => {
           message: "Please enter numeric value in aadhaar number",
         });
       }
+      if (!req.body.dob) {
+        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+      }
+
+      if (!req.body.dob) {
+        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+      }
+      const dt = Date().split(" ")[3]
+      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
+        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      }
+
       const userId = req.params.id;
       const result = await User.update(
         {
@@ -398,7 +423,7 @@ exports.updateUserData = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: req.body.dob,
+          dob: (req.body.dob).split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
           aadharNo: req.body.aadharNo,
@@ -418,7 +443,11 @@ exports.updateUserData = async (req, res) => {
   } catch (e) {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
-    } else if (e.message == "File too large") {
+    }
+    if (e.message == "invalid input syntax for type date: \"Invalid date\"") {
+      return res.status(400).send({ success: false, message: "Please enter valid date!" })
+    }
+    else if (e.message == "File too large") {
       return res.status(400).send({
         success: false,
         message: "File too large, please select a file less than 3mb",

@@ -3,6 +3,11 @@ const pagination = require("../middleware/pagination");
 const Op = db.Sequelize.Op;
 const universityUser = db.user;
 
+const transformDate = (date) => {
+  const dateArray = date.split("-").reverse().join("-")
+  return dateArray
+}
+
 exports.getAllUniversity = async (req, res) => {
   var fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
@@ -37,7 +42,7 @@ exports.getAllUniversity = async (req, res) => {
           state: file.state,
           pincode: file.pincode,
           gender: file.gender,
-          dob: file.dob,
+          dob: transformDate(file.dob),
           country: file.country,
           status: file.status,
           uuid: file.uuid,

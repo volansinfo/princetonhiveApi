@@ -20,9 +20,9 @@ global.__basedir = __dirname;
 // );
 app.get("/", (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  res.send("Hello World!");
   res.setHeader("Content-type", "multipart/form-data");
   res.setHeader("Content-Type", "text/csv");
+  res.send("Hello World!");
 });
 
 // database

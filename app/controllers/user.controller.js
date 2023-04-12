@@ -97,6 +97,8 @@ exports.allAccess = async (req, res) => {
 };
 
 exports.userBoard = async (req, res) => {
+  var fullUrl =
+  req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
   try {
     //Get token key
     const token = req.headers["x-access-token"];
@@ -104,15 +106,31 @@ exports.userBoard = async (req, res) => {
     const tokenData = jwt.decode(token);
 
     const userId = tokenData.id;
-
-    let data = await User.findAll({
+    let data = await User.findOne({
       where: {
         id: userId,
       },
     });
-    let sorted_data = data.sort((a, b) => b.id - a.id);
-    let response = {
-      userData: sorted_data,
+    const response = {
+      id: data.id,
+      fname: data.fname,
+      lname: data.lname,
+      profileImg: fullUrl + data.profileImg,
+      email: data.email,
+      mnumber: data.mnumber,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      pincode: data.pincode,
+      gender: data.gender,
+      dob: transformDate(data.dob),
+      country: data.country,
+      status: data.status,
+      uuid: data.uuid,
+      teacherId:data.teacherId,
+      aadharNo: data.aadharNo,
+      panNo: data.panNo,
+      department: data.department
     };
     res.status(200).json(response);
   } catch (error) {

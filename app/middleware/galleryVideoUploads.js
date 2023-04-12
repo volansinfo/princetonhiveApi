@@ -1,6 +1,6 @@
 const util = require("util");
 const multer = require("multer");
-const maxSize = 100 * 1024 * 1024;
+const maxSize = 200 * 1024 * 1024;
 var path = require('path');
 const multerStorage = multer.memoryStorage();
 

@@ -20,9 +20,9 @@ global.__basedir = __dirname;
 // );
 app.get("/", (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  res.send("Hello World!");
   res.setHeader("Content-type", "multipart/form-data");
   res.setHeader("Content-Type", "text/csv");
+  res.send("Hello World!");
 });
 
 // database
@@ -58,7 +58,6 @@ require("./app/routes/studentTeacher.routes")(app);
 require("./app/routes/blog.routes")(app);
 require("./app/routes/gallery.routes")(app);
 require("./app/routes/studentAiReport.routes")(app);
-require("./app/routes/testing.routes")(app)
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });

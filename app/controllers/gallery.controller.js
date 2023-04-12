@@ -89,7 +89,7 @@ exports.galleryAdd = async (req, res) => {
                     if (req.file.size < 1 * 1024 * 1024) {
                         return res.status(400).send({ success: false, message: "File too small, please upload a image greater than 1mb" })
                     }
-                    if (req.file.size > 10 * 1024 * 1024) {
+                    if (req.file.size > 200 * 1024 * 1024) {
                         return res.status(400).send({ success: false, message: "File too larg, please upload a video less than 10mb" })
                     }
                     if (!(req.body.title).trim()) {
@@ -314,7 +314,7 @@ exports.updateGallery = async (req, res) => {
                     if (req.file.size < 1 * 1024 * 1024) {
                         return res.status(400).send({ success: false, message: "File too small, please select a video greater than 1mb" })
                     }
-                    if (req.file.size > 10 * 1024 * 1024) {
+                    if (req.file.size > 200 * 1024 * 1024) {
                         return res.status(400).send({ success: false, message: "File too larg, please upload a video less than 10mb" })
                     }
                     if (!(req.body.title).trim()) {

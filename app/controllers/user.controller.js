@@ -111,27 +111,29 @@ exports.userBoard = async (req, res) => {
         id: userId,
       },
     });
-    const response = {
-      id: data.id,
-      fname: data.fname,
-      lname: data.lname,
-      profileImg: fullUrl + data.profileImg,
-      email: data.email,
-      mnumber: data.mnumber,
-      address: data.address,
-      city: data.city,
-      state: data.state,
-      pincode: data.pincode,
-      gender: data.gender,
-      dob: transformDate(data.dob),
-      country: data.country,
-      status: data.status,
-      uuid: data.uuid,
-      teacherId:data.teacherId,
-      aadharNo: data.aadharNo,
-      panNo: data.panNo,
-      department: data.department
-    };
+    
+      const response = {
+        id: data.id,
+        fname: data.fname,
+        lname: data.lname,
+        profileImg: data.profileImg ? fullUrl + data.profileImg :null,
+        email: data.email,
+        mnumber: data.mnumber,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        gender: data.gender,
+        dob: transformDate(data.dob),
+        country: data.country,
+        status: data.status,
+        uuid: data.uuid,
+        teacherId:data.teacherId,
+        aadharNo: data.aadharNo,
+        panNo: data.panNo,
+        department: data.department
+      };
+    
     res.status(200).json(response);
   } catch (error) {
     return res.status(500).send({ message: error.message });

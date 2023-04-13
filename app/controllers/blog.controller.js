@@ -42,9 +42,9 @@ exports.blogAdd = async (req, res) => {
         if (!(req.body.description).trim()) {
             return res.status(400).send({ message: "Please enter Description!" });
         }
-        if ((req.body.description).length > 200) {
-            return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })
-        }
+        // if ((req.body.description).length > 200) {
+        //     return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })
+        // }
         var data = req.body.title;
 
         var num = data.toLowerCase();
@@ -86,6 +86,7 @@ exports.getAllBlogs = async (req, res) => {
             fileInfos.push({
                 id: file.id,
                 title: file.title,
+                description:file.description,
                 imgUrl: fullUrl + file.imgUrl,
                 slug: file.slug,
                 metaData: file.metaData,
@@ -131,6 +132,7 @@ exports.getActiveBlogs = async (req, res) => {
             fileInfos.push({
                 id: file.id,
                 title: file.title,
+                description:file.description,
                 imgUrl: fullUrl + file.imgUrl,
                 slug: file.slug,
                 metaData: file.metaData,
@@ -265,9 +267,9 @@ exports.updateBlog = async (req, res) => {
         if (!(req.body.description).trim()) {
             return res.status(400).send({ message: "Please enter Description!" });
         }
-        if ((req.body.description).length > 200) {
-            return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })
-        }
+        // if ((req.body.description).length > 200) {
+        //     return res.status(400).send({ success: false, message: "Description length should be less than 200 character!" })
+        // }
         var data = req.body.title;
         var num = data.toLowerCase();
         var Slug = num.replace(/\s+/g, '-');

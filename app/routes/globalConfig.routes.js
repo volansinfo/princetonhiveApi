@@ -12,7 +12,7 @@ module.exports = function (app) {
 
   app.post(
     "/app/vol/globalConfig",
-    [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+    [authJwt.verifyToken],
     controller.addServerDetails
   );
 

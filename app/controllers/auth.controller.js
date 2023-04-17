@@ -667,12 +667,12 @@ exports.signin = async (req, res) => {
       });
     }
 
-    if (user.tokenKey) {
-      return res.status(401).send({
-        success: false,
-        message: "User already logged on another device",
-      });
-    }
+    // if (user.tokenKey) {
+    //   return res.status(401).send({
+    //     success: false,
+    //     message: "User already logged on another device",
+    //   });
+    // }
 
     const token = jwt.sign({ id: user.id }, config.secret, {
       // expiresIn: 86400, // 24 hours
@@ -759,12 +759,12 @@ exports.studentOrTeacherSignin = async (req, res) => {
       });
     }
 
-    if (user.tokenKey) {
-      return res.status(401).send({
-        success: false,
-        message: "User already logged on another device",
-      });
-    }
+    // if (user.tokenKey) {
+    //   return res.status(401).send({
+    //     success: false,
+    //     message: "User already logged on another device",
+    //   });
+    // }
 
     const token = jwt.sign({ id: user.id }, config.secret, {
       expiresIn: 86400, // 24 hours

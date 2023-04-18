@@ -20,7 +20,7 @@ exports.createContact=async(req,res)=>{
         message:req.body.message
     })
 
-    sendMail(req.body.email,req.body.fullname,"",req.body.phoneNumber,smtpServer,"contactUs")
+    sendMail(req.body.email,req.body.fullname,"",req.body.phoneNumber,smtpServer,req.body.message,"contactUs")
 
-   return res.status(200).send({status:true,message:"Create successfull contact",data:result})
+   return res.status(200).send({status:true,message:"Message sent successfully!"})
 }

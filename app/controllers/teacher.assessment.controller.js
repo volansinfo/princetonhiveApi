@@ -1196,7 +1196,9 @@ exports.getAssessmentStudent = async (req, res) => {
   const studentId = tokenData.id;
   const data = []
 
-  const result = await TeacherAssessment.findAll()
+  const result = await TeacherAssessment.findAll({
+    order: [["id", "DESC"]],
+  })
   for (let i = 0; i < result.length; i++) {
     const studentIdInArray = await result[i].studentId
     // console.log(mapId)

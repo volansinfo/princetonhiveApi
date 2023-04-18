@@ -467,11 +467,11 @@ const errorHandingContactUs = async (req, res, next) => {
   } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.trim())) {
     return res.status(400).send({ status: false, msg: "Please enter valid email" });
   } else if (!phoneNumber) {
-    return res.status(400).send({ status: false, msg: "Please enter phone number" });
+    return res.status(400).send({ status: false, msg: "Please enter mobile number" });
   } else if (isNaN(phoneNumber)) {
-    return res.status(400).send({ status: false, msg: "Please enter phone number in digits" });
+    return res.status(400).send({ status: false, msg: "Mobile number must be in digits" });
   } else if (phoneNumber.length != 10) {
-    return res.status(400).send({ status: false, msg: "Please enter valid 10 digit phone number" });
+    return res.status(400).send({ status: false, msg: "Please enter valid mobile number" });
   }
   next();
 }

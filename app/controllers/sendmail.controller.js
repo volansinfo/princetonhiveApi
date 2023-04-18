@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer")
 
-const sendMail = async (userEmail, username, generatedPwd,phoneNumber, smtpServer, type) => {
+const sendMail = async (userEmail, username, generatedPwd,phoneNumber, smtpServer,message, type) => {
 
     //     host: "smtp.office365.com",
     //     port: 587,
@@ -41,12 +41,14 @@ const sendMail = async (userEmail, username, generatedPwd,phoneNumber, smtpServe
     }else  if (type == 'contactUs'){
         info = await transporter.sendMail({
             from: `"Hive Step  "<${smtpServer.authUser}>`,
-            to: userEmail,
-            subject: "Welcome to Hive Step",
-            text: "Hello from the Hive Step side.",
-            html: `Welcome to hive steps<br><br>
-                    Dear  ${username},<br><br>
-                    Email : <th>${userEmail}</th><br> <br> <th> Phone Number: ${phoneNumber}</th><br>
+            to: "parvez.aalam@volansinfo.com",
+            subject: "Welcome to MyLanguage.AI",
+            text: "Welcome to MyLanguage.AI",
+            html: `Welcome to MyLanguage.AI<br><br>
+                    Name: ${username},<br><br>
+                    Email:${userEmail}<br><br>
+                     Phone Number: ${phoneNumber}<br><br>
+                     Message: ${message?message:"No message"}
                     <br><br>
                     Thanks<br>
                     Hive Steps Team<br>

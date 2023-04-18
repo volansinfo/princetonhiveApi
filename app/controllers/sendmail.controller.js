@@ -1,9 +1,6 @@
 const nodemailer = require("nodemailer")
 
-const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => {
-
-
-
+const sendMail = async (userEmail, username, generatedPwd,phoneNumber, smtpServer, type) => {
 
     //     host: "smtp.office365.com",
     //     port: 587,
@@ -20,7 +17,6 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
     //     text: "Hello from the Hive Step side.",
     //     html: `Your password has been changed and your new password is:<b><h1> ${generatedPwd}</h1></b>`
 
-
     /**
      * connect with the smpt
     */
@@ -32,7 +28,8 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
             pass: smtpServer.authPassword
         }
     })
-    // let info
+
+    let info
     if (type == 'forgotPassword') {
         info = await transporter.sendMail({
             from: `"Hive Step  "<${smtpServer.authUser}>`,
@@ -41,8 +38,22 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
             text: "Hello from the Hive Step side.",
             html: `Your password has been changed and your new password is:<b><h1> ${generatedPwd}</h1></b>`
         })
-    }
-    else {
+    }else  if (type == 'contactUs'){
+        info = await transporter.sendMail({
+            from: `"Hive Step  "<${smtpServer.authUser}>`,
+            to: userEmail,
+            subject: "Welcome to Hive Step",
+            text: "Hello from the Hive Step side.",
+            html: `Welcome to hive steps<br><br>
+                    Dear  ${username},<br><br>
+                    Email : <th>${userEmail}</th><br> <br> <th> Phone Number: ${phoneNumber}</th><br>
+                    <br><br>
+                    Thanks<br>
+                    Hive Steps Team<br>
+                    <br>`
+                })
+            
+    }else {
         info = await transporter.sendMail({
             from: `"Hive Step  "<${smtpServer.authUser}>`,
             to: userEmail,
@@ -54,7 +65,6 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
             We look forward to welcoming you soon!<br><br>
             
             Login Credentials<br>
-
             Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>
             <br><br>
             Thanks<br>
@@ -71,5 +81,5 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
 
 }
 
+module.exports=sendMail
 
-module.exports = sendMail

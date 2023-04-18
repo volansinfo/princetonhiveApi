@@ -1183,3 +1183,32 @@ exports.teacherSearchQuery = async (req, res) => {
     return res.status(500).send({ status: false, message: error.message });
   }
 };
+
+
+
+
+
+// get api assessment for student
+
+exports.getAssessmentStudent = async (req, res) => {
+  const token = req.headers["x-access-token"]
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+  const data = []
+
+  const result = await TeacherAssessment.findAll()
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId
+    // console.log(mapId)
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId) {
+        data.push(result[i])
+      }
+   
+    })
+  }
+  // console.log(data)
+
+  return res.status(200).send({success:true,data:data})
+}
+

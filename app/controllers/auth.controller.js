@@ -213,7 +213,7 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
-      const adharNUM = req.body.aadharNo;
+      const adharNUM = req.body?.aadharNo;
       if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
         return res.status(400).send({
           status: false,
@@ -292,7 +292,7 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "SMTP server not configured!" });
       }
 
-      sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+      sendMail(userEmail, username, generatedPwd, "",smtpServer, "signup");
 
       if (req.body.roles) {
         const roles = await Role.findAll({
@@ -580,7 +580,7 @@ exports.signup = async (req, res) => {
             .send({ success: false, message: "SMTP server not configured!" });
         }
 
-        sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+        sendMail(userEmail, username, generatedPwd, "",smtpServer, "signup");
 
         if (req.body.roles) {
           const roles = await Role.findAll({
@@ -950,7 +950,7 @@ exports.forgotPassword = async (req, res) => {
       }
     );
 
-    sendMail(userEmail, generatedPwd, smtpServer, "forgotPassword");
+    sendMail(userEmail, "",generatedPwd,"", smtpServer, "forgotPassword");
 
     res.status(200).send({
       success: true,

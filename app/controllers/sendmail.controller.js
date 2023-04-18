@@ -72,4 +72,39 @@ const sendMail = async (userEmail, username, generatedPwd, smtpServer, type) => 
 }
 
 
-module.exports = sendMail
+
+// email send for contact us 
+const sendMailContactUs = async ({fullname, email, phoneNumber, message}) => {
+    let transporter = await nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        auth: {
+            user: "vipulchoudhary566@gmail.com",
+            pass: "rfawvxmwthhrjldn"
+        }
+    })
+    // console.log(fullname, email, phoneNumber, message,"rrrrrrr")
+    message = await transporter.sendMail({
+        from: `"Hive Step  <vipulchoudhary566@gmail.com>`,
+        to: email,
+        subject: "Welcome to Hive Step",
+        text: "Hello from the Hive Step side.",
+        html: `Welcome to hive steps<br><br>
+        Dear  ${fullname},<br><br>
+        Email : <th>${email}</th><br> <br> <th> Phone Number: ${phoneNumber}</th><br><br> <th>Message: ${message}</th>
+        <br><br>
+        Thanks<br>
+        Hive Steps Team<br>
+        <br>`
+    })
+
+}
+
+
+
+
+
+module.exports = {
+    sendMail,
+    sendMailContactUs
+}

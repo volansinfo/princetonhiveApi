@@ -449,7 +449,39 @@ const erroHandlingUpdate = async (req, res, next) => {
   next();
 };
 
+const errorHandingContactUs = async (req, res, next) => {
+  const data = req.body;
+  const { fullname, email, phoneNumber } = data
+  const isValidRequestBody = function (requestBody) {
+    return Object.keys(requestBody).length > 0;
+  };
+
+  if (!isValidRequestBody(data)) {
+    return res.status(400).send({ status: false, msg: "Please enter data" });
+  }
+
+  if (!fullname) {
+    return res.status(400).send({ status: false, msg: "Please enter full name" });
+  } else if (!email) {
+    return res.status(400).send({ status: false, msg: "Please enter email" });
+  } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.trim())) {
+    return res.status(400).send({ status: false, msg: "Please enter valid email" });
+  } else if (!phoneNumber) {
+    return res.status(400).send({ status: false, msg: "Please enter phone number" });
+  } else if (isNaN(phoneNumber)) {
+    return res.status(400).send({ status: false, msg: "Please enter phone number in digits" });
+  } else if (phoneNumber.length != 10) {
+    return res.status(400).send({ status: false, msg: "Please enter valid 10 digit phone number" });
+  }
+  next();
+}
+
+
+
+
+
 module.exports = {
   errorHandingTeacherAssessment,
   erroHandlingUpdate,
+  errorHandingContactUs
 };

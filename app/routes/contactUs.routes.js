@@ -1,7 +1,7 @@
 
-const controller=require("../controllers/contactUs.controller")
-const authJwt=require("../middleware/authJwt")
-const errorHanding=require("../middleware/teacher.assessmentError.middlewe")
+const controller = require("../controllers/contactUs.controller")
+const authJwt = require("../middleware/authJwt")
+const errorHanding = require("../middleware/teacher.assessmentError.middlewe")
 module.exports = function (app) {
     app.use(function (req, res, next) {
         res.header(
@@ -12,7 +12,7 @@ module.exports = function (app) {
     });
     app.post(
         "/api/vol/contactUs",
-        [authJwt.verifyToken,errorHanding.errorHandingContactUs],
+        [errorHanding.errorHandingContactUs],
         controller.createContact
     );
 }

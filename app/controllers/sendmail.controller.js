@@ -45,13 +45,13 @@ const sendMail = async (userEmail, username, generatedPwd,phoneNumber, smtpServe
             subject: "Welcome to MyLanguage.AI",
             text: "Welcome to MyLanguage.AI",
             html: `Welcome to MyLanguage.AI<br><br>
-                    Name: ${username},<br><br>
-                    Email:${userEmail}<br><br>
+                    Name: ${username}<br><br>
+                    Email: ${userEmail}<br><br>
                      Phone Number: ${phoneNumber}<br><br>
                      Message: ${message?message:"No message"}
                     <br><br>
                     Thanks<br>
-                    Hive Steps Team<br>
+                    MyLanguage.AI Team<br>
                     <br>`
                 })
             

@@ -1,6 +1,7 @@
 const db = require("../models");
 const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
+const Role = db.role;
 const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
@@ -1184,33 +1185,130 @@ exports.teacherSearchQuery = async (req, res) => {
   }
 };
 
-
-
-
-
 // get api assessment for student
 
 exports.getAssessmentStudent = async (req, res) => {
-  const token = req.headers["x-access-token"]
+  const token = req.headers["x-access-token"];
   const tokenData = jwt.decode(token);
   const studentId = tokenData.id;
-  const data = []
+  const data = [];
 
   const result = await TeacherAssessment.findAll({
     order: [["id", "DESC"]],
-  })
+  });
   for (let i = 0; i < result.length; i++) {
-    const studentIdInArray = await result[i].studentId
+    const studentIdInArray = await result[i].studentId;
     // console.log(mapId)
     const mapId = await studentIdInArray.map((id) => {
       if (id == studentId) {
-        data.push(result[i])
+        data.push(result[i]);
       }
-   
-    })
+    });
   }
   // console.log(data)
 
-  return res.status(200).send({success:true,data:data})
-}
+  return res.status(200).send({ success: true, data: data });
+};
 
+// Api for pending assessment
+exports.getPendingAssessment = async (req, res) => {
+  const token = req.headers["x-access-token"];
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+
+  //give permission only student
+  const getRoles = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  const roles = await getRoles.getRoles();
+  for (let i = 0; i < roles.length; i++) {
+    if (roles[i].name != "student") {
+      return res.status(400).send({
+        status: false,
+        message: `You don't have permission to access this module!`,
+      });
+    }
+  }
+
+  const data = [];
+  const result = await TeacherAssessment.findAll({
+    order: [["id", "DESC"]],
+  });
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId;
+    const startingDate = result[i].startDate;
+    let currentDate = new Date().toJSON().slice(0, 10);
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId && startingDate == currentDate) {
+        data.push(result[i]);
+      }
+    });
+  }
+  if (data.length == 0) {
+    return res
+      .status(200)
+      .send({ status: false, message: "No assessment found", data: data });
+  }
+  return res.status(200).send({
+    status: true,
+    message: "Assessment found successfully",
+    data: data[0],
+  });
+};
+
+//Get Api for student find assessment by params
+exports.getAssessmentByParams = async (req, res) => {
+  const token = req.headers["x-access-token"];
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+
+  //give permission only student
+  const getRoles = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  const roles = await getRoles.getRoles();
+  for (let i = 0; i < roles.length; i++) {
+    if (roles[i].name != "student") {
+      return res.status(400).send({
+        status: false,
+        message: `You don't have permission to access this module!`,
+      });
+    }
+  }
+
+  const data = [];
+  const result = await TeacherAssessment.findAll({
+    where: {
+      status: "1",
+      teacherId: req.params.teacherId,
+    },
+    order: [["id", "DESC"]],
+  });
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId;
+
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId) {
+        data.push({
+          id: result[i].id,
+          assessmentName: result[i].assessmentName,
+          startDate: result[i].startDate,
+        });
+      }
+    });
+  }
+  if (data.length == 0) {
+    return res
+      .status(200)
+      .send({ status: false, message: "No assessment found", data: data });
+  }
+  return res.status(200).send({
+    status: true,
+    message: "Assessment found successfully",
+    data: data,
+  });
+};

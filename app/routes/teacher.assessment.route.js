@@ -88,4 +88,9 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAssessmentByParams
   );
+  app.get(
+    "/api/getCompletedAssessment",
+    [authJwt.verifyToken],
+    controller.getCompletedAssessment
+  );
 };

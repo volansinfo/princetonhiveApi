@@ -1312,3 +1312,73 @@ exports.getAssessmentByParams = async (req, res) => {
     data: data,
   });
 };
+
+// Get api for completed assessment
+exports.getCompletedAssessment = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+    const getRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = await getRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "student") {
+        return res.status(400).send({
+          status: false,
+          message: `You don't have permission to access this module!`,
+        });
+      }
+    }
+    const assessmentData = await TeacherAssessment.findAll({
+      where: {
+        status: "1",
+      },
+      order: [["id", "DESC"]],
+    });
+    // console.log(assessmentData);
+    const resultData = [];
+
+    for (let i = 0; i < assessmentData.length; i++) {
+      {
+        const studentIdInArray = await assessmentData[i].studentId;
+        const endDate = assessmentData[i].endDate;
+        let currentDate = new Date().toJSON().slice(0, 10);
+        // console.log(currentDate, endDate);
+        const mapId = await studentIdInArray.map((id) => {
+          if (id == userId && endDate < currentDate) {
+            resultData.push(assessmentData[i]);
+          }
+        });
+      }
+    }
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const results = {};
+    results.dataItems = resultData.slice(startIndex, endIndex);
+    results.totalItems = resultData.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil(resultData.length / limit);
+    if (results.dataItems.length <= 0) {
+      return res.status(200).send({
+        status: false,
+        message: "No completed assessment found",
+        data: results,
+      });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "All completed assessment found",
+      data: results,
+    });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};

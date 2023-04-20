@@ -22,6 +22,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
             type: Sequelize.STRING,
             allowNull: false
         },
+        videoPath: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
         videoUrl: {
             type: Sequelize.STRING,
             allowNull: true

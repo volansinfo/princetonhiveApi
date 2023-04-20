@@ -1,11 +1,15 @@
 const db = require("../models")
 const jwt = require("jsonwebtoken");
+const uploadVideo = require("../middleware/studentAIVideo")
 
 const studentAIReport = db.studentAIReport
 
 exports.addStudentAIReport = async (req, res) => {
     try {
 
+        await uploadVideo(req, res)
+
+        
         const max = 60
         const min = 30
 
@@ -20,36 +24,58 @@ exports.addStudentAIReport = async (req, res) => {
         let outro = Math.floor(Math.random() * (max - min)) + min;
 
         let videoQuality = Math.floor(Math.random() * (max - min)) + min;
-        
+
 
 
         let AiReport = JSON.stringify({
-             yourAverage: yourAverage, 
-             industryAverage: industryAverage, 
-             videoQuality:videoQuality,
-             intro: intro,
-             bodyLanguage: bodyLanguage, 
-             facialExpression: facialExpression, 
-             language: language, 
-             voice: voice, 
-             presence: presence, 
-             outro: outro 
-            })
-
-            console.log(AiReport)
-
-        await studentAIReport.create({
-            studentId: req.body.studentId,
-            teacherId: req.body.teacherId,
-            universityId: req.body.universityId,
-            studentUUID: req.body.studentUUID,
-            aiReport: AiReport,
-            totalAverage:yourAverage,
-            videoUrl:req.body.videoUrl,
-            // aiReport: req.body.aiReport,
-            status: req.body.status ? req.body.status : 1
-
+            yourAverage: yourAverage,
+            industryAverage: industryAverage,
+            videoQuality: videoQuality,
+            intro: intro,
+            bodyLanguage: bodyLanguage,
+            facialExpression: facialExpression,
+            language: language,
+            voice: voice,
+            presence: presence,
+            outro: outro
         })
+
+        console.log(AiReport)
+
+        if (req.file == undefined) {
+            console.log("Undefined file!")
+        } else {
+
+            const fullUrl = req.protocol + "://"+req.get("host") +"//princetonhive/img/studentai/"
+            
+            await studentAIReport.create({
+                studentId: req.body.studentId,
+                teacherId: req.body.teacherId,
+                universityId: req.body.universityId,
+                studentUUID: req.body.studentUUID,
+                aiReport: AiReport,
+                totalAverage: yourAverage,
+                videoPath:req.file.path,
+                videoUrl: fullUrl+req.file.filename,
+                status: req.body.status ? req.body.status : 1
+    
+            })
+        }
+
+
+
+        // await studentAIReport.create({
+        //     studentId: req.body.studentId,
+        //     teacherId: req.body.teacherId,
+        //     universityId: req.body.universityId,
+        //     studentUUID: req.body.studentUUID,
+        //     aiReport: AiReport,
+        //     totalAverage: yourAverage,
+        //     videoUrl: req.body.videoUrl,
+        //     // aiReport: req.body.aiReport,
+        //     status: req.body.status ? req.body.status : 1
+
+        // })
 
         return res.status(200).send({ success: true, message: "AI Report received successfully." })
 
@@ -68,8 +94,8 @@ exports.getAllAIReport = async (req, res) => {
         let userId = tokenData.id
 
         const AIReport = await studentAIReport.findAll({
-            where:{
-                studentId:userId
+            where: {
+                studentId: userId
             },
             order: [
                 ['id', 'DESC']

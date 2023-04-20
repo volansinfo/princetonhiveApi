@@ -38,8 +38,6 @@ exports.addStudentAIReport = async (req, res) => {
             outro: outro
         })
 
-        console.log(AiReport)
-
         if (req.file == undefined) {
             console.log("Undefined file!")
         } else {

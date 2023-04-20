@@ -6,10 +6,8 @@ const studentAIReport = db.studentAIReport
 
 exports.addStudentAIReport = async (req, res) => {
     try {
-
         await uploadVideo(req, res)
 
-        
         const max = 60
         const min = 30
 
@@ -46,23 +44,26 @@ exports.addStudentAIReport = async (req, res) => {
             console.log("Undefined file!")
         } else {
 
-            const fullUrl = req.protocol + "://"+req.get("host") +"//princetonhive/img/studentai/"
-            
-            await studentAIReport.create({
-                studentId: req.body.studentId,
-                teacherId: req.body.teacherId,
-                universityId: req.body.universityId,
-                studentUUID: req.body.studentUUID,
-                aiReport: AiReport,
-                totalAverage: yourAverage,
-                videoPath:req.file.path,
-                videoUrl: fullUrl+req.file.filename,
-                status: req.body.status ? req.body.status : 1
-    
-            })
+            if (req.file.originalname.split(".")[1] == "mp4") {
+
+                const fullUrl = req.protocol + "://" + req.get("host") + "/princetonhive/img/studentai/"
+
+                await studentAIReport.create({
+                    studentId: req.body.studentId,
+                    teacherId: req.body.teacherId,
+                    universityId: req.body.universityId,
+                    studentUUID: req.body.studentUUID,
+                    aiReport: AiReport,
+                    totalAverage: yourAverage,
+                    videoPath: req.file.path,
+                    videoUrl: fullUrl + req.file.filename,
+                    status: req.body.status ? req.body.status : 1
+
+                })
+            } else {
+                return res.status(400).send({ success: false, message: "File type does not allowed!" })
+            }
         }
-
-
 
         // await studentAIReport.create({
         //     studentId: req.body.studentId,
@@ -99,7 +100,10 @@ exports.getAllAIReport = async (req, res) => {
             },
             order: [
                 ['id', 'DESC']
-            ]
+            ],
+            attributes: {
+                exclude: ['videoPath',"reportDetails"]
+              }
         })
 
         return res.status(200).send({ success: true, AllAIReports: AIReport })

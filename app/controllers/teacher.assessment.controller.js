@@ -1234,7 +1234,7 @@ exports.getPendingAssessment = async (req, res) => {
 
   const data = [];
   const result = await TeacherAssessment.findAll({
-    order: [["id", "DESC"]],
+    order: [["startDate", "ASC"]],
   });
   for (let i = 0; i < result.length; i++) {
     const studentIdInArray = await result[i].studentId;

@@ -11,6 +11,9 @@ exports.departmentAdd = async (req, res) => {
     if (!isValidRequestBody(req.body)) {
       return res.status(400).send({ status: false, msg: "Please enter data" });
     }
+    if (req.body?.departmentName == "" || !req.body.departmentName) {
+      return res.status(400).send({ message: "Please enter department name!" });
+    }
     const existdepartment = await department.findOne({
       where: {
         departmentName: req.body?.departmentName,
@@ -23,9 +26,6 @@ exports.departmentAdd = async (req, res) => {
         .send({ success: false, message: "Department already exist!" });
     }
 
-    if (req.body?.departmentName == "") {
-      return res.status(400).send({ message: "Please enter department name!" });
-    }
     if (req.body?.status == "") {
       return res
         .status(400)

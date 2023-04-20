@@ -65,18 +65,6 @@ exports.addStudentAIReport = async (req, res) => {
             }
         }
 
-        // await studentAIReport.create({
-        //     studentId: req.body.studentId,
-        //     teacherId: req.body.teacherId,
-        //     universityId: req.body.universityId,
-        //     studentUUID: req.body.studentUUID,
-        //     aiReport: AiReport,
-        //     totalAverage: yourAverage,
-        //     videoUrl: req.body.videoUrl,
-        //     // aiReport: req.body.aiReport,
-        //     status: req.body.status ? req.body.status : 1
-
-        // })
 
         return res.status(200).send({ success: true, message: "AI Report received successfully." })
 
@@ -118,7 +106,10 @@ exports.getAIReportDetails = async (req, res) => {
         const AIReport = await studentAIReport.findOne({
             where: {
                 id: req.params.reportId
-            }
+            },
+            attributes: {
+                exclude: ['videoPath',"reportDetails"]
+              }
         })
 
         if (!AIReport) {

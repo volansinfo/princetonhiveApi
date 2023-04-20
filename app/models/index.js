@@ -85,7 +85,7 @@ db.Gallery = require("../models/gallery.model")(
   DataTypes
 );
 db.studentAIReport = require("./studentAIReport.model.js")(sequelize,Sequelize,DataTypes)
-
+db.contactUs = require("./contactUs.model.js")(sequelize,Sequelize,DataTypes)
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",
   foreignKey: "roleId",

@@ -213,7 +213,7 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
-      const adharNUM = req.body.aadharNo;
+      const adharNUM = req.body?.aadharNo;
       if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
         return res.status(400).send({
           status: false,
@@ -229,7 +229,7 @@ exports.signup = async (req, res) => {
       if (!req.body.department) {
         return res.status(400).send({
           status: false,
-          message: "Please enter department",
+          message: "Please select department",
         });
       }
       if (isNaN(req.body.department)) {
@@ -252,11 +252,20 @@ exports.signup = async (req, res) => {
           .send({ status: 400, message: "Aadhaar number already exist" });
       }
       if (!req.body.dob) {
-        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        return res
+          .status(400)
+          .send({ success: false, message: "Please select date of birth!" });
       }
-      const dt = Date().split(" ")[3]
-      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      const dt = Date().split(" ")[3];
+      if (
+        req.body.dob.split("-").length != 3 ||
+        req.body.dob.split("-")[2] == "" ||
+        req.body.dob.split("-")[2] > dt ||
+        req.body.dob.split("-")[2].length != 4
+      ) {
+        return res
+          .status(400)
+          .send({ success: false, message: "Please select valid date!" });
       }
 
       const user = await User.create({
@@ -272,7 +281,7 @@ exports.signup = async (req, res) => {
         state: req.body.state,
         pincode: req.body.pincode,
         gender: req.body.gender,
-        dob: (req.body.dob).split("-").reverse().join("-"),
+        dob: req.body.dob.split("-").reverse().join("-"),
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
@@ -292,7 +301,7 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "SMTP server not configured!" });
       }
 
-      sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+      sendMail(userEmail, username, generatedPwd, "", smtpServer, "", "signup");
 
       if (req.body.roles) {
         const roles = await Role.findAll({
@@ -518,7 +527,7 @@ exports.signup = async (req, res) => {
         if (!req.body.department) {
           return res.status(400).send({
             status: false,
-            message: "Please enter department",
+            message: "Please select department",
           });
         }
         if (isNaN(req.body.department)) {
@@ -541,11 +550,20 @@ exports.signup = async (req, res) => {
             .send({ status: 400, message: "Aadhaar number already exist" });
         }
         if (!req.body.dob) {
-          return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+          return res
+            .status(400)
+            .send({ success: false, message: "Please select date of birth!" });
         }
-        const dt = Date().split(" ")[3]
-        if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-          return res.status(400).send({ success: false, message: "Please enter valid date!" })
+        const dt = Date().split(" ")[3];
+        if (
+          req.body.dob.split("-").length != 3 ||
+          req.body.dob.split("-")[2] == "" ||
+          req.body.dob.split("-")[2] > dt ||
+          req.body.dob.split("-")[2].length != 4
+        ) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please select valid date!" });
         }
         const user = await User.create({
           fname: req.body.fname,
@@ -560,7 +578,7 @@ exports.signup = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: (req.body.dob).split("-").reverse().join("-"),
+          dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
@@ -580,7 +598,15 @@ exports.signup = async (req, res) => {
             .send({ success: false, message: "SMTP server not configured!" });
         }
 
-        sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+        sendMail(
+          userEmail,
+          username,
+          generatedPwd,
+          "",
+          smtpServer,
+          "",
+          "signup"
+        );
 
         if (req.body.roles) {
           const roles = await Role.findAll({
@@ -612,10 +638,11 @@ exports.signup = async (req, res) => {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
     }
-    if (e.message == "invalid input syntax for type date: \"Invalid date\"") {
-      return res.status(400).send({ success: false, message: "Please enter valid date!" })
-    }
-    else if (e.message == "File too large") {
+    if (e.message == 'invalid input syntax for type date: "Invalid date"') {
+      return res
+        .status(400)
+        .send({ success: false, message: "Please enter valid date!" });
+    } else if (e.message == "File too large") {
       return res.status(400).send({
         success: false,
         message: "File too large, please select a file less than 3mb",
@@ -950,7 +977,7 @@ exports.forgotPassword = async (req, res) => {
       }
     );
 
-    sendMail(userEmail, generatedPwd, smtpServer, "forgotPassword");
+    sendMail(userEmail, "", generatedPwd, "", smtpServer, "", "forgotPassword");
 
     res.status(200).send({
       success: true,

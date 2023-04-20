@@ -69,12 +69,17 @@ exports.getAllAssessment = async (req, res) => {
 
 exports.getAssessmentBySelf = async (req, res) => {
   try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const studentId = tokenData.id;
     const { limit, offset } = pagination.getPagination(req.query.page, 10);
     // const studentId = req.params.studentId;
+    // console.log(studentId, "studentId");
     const results = await Assessment.findAndCountAll({
       limit,
       offset,
       where: {
+        studentId: studentId,
         assessmentStatusType: "1",
         status: "1",
       },

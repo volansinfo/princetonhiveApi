@@ -71,4 +71,26 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.teacherSearchQuery
   );
+
+  app.get(
+    "/api/vol/getAssessmentStudent",
+    [authJwt.verifyToken],
+    controller.getAssessmentStudent
+  );
+  app.get(
+    "/api/getPendingAssessment",
+    [authJwt.verifyToken],
+    controller.getPendingAssessment
+  );
+
+  app.get(
+    "/api/getAssessmentByParams/:teacherId",
+    [authJwt.verifyToken],
+    controller.getAssessmentByParams
+  );
+  app.get(
+    "/api/getCompletedAssessment",
+    [authJwt.verifyToken],
+    controller.getCompletedAssessment
+  );
 };

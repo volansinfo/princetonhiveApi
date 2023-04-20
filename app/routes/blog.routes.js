@@ -10,7 +10,7 @@ module.exports = function (app) {
         next();
     });
 
-    app.post("/api/hiv/blog", [authJwt.verifyToken, authJwt.isSupportOrAdmin], controller.blogAdd);
+    app.post("/api/hiv/blog",  controller.blogAdd);
 
     app.get("/api/hiv/allblog", [authJwt.verifyToken, authJwt.isSupportOrAdmin], controller.getAllBlogs);
 

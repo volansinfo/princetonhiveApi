@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
         var fileType = file.mimetype
         var fileformate = fileType.split("/")[1]
 
-        var imageName = req.body.studentUUID
+        var imageName = (req.body.studentUUID == undefined ? "hiveSteps" : req.body.studentUUID)
 
         cb(null, `${Date.now()}_${imageName}.${fileformate}`)
     }

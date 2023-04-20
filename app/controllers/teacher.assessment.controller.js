@@ -1241,7 +1241,7 @@ exports.getPendingAssessment = async (req, res) => {
     const startingDate = result[i].startDate;
     let currentDate = new Date().toJSON().slice(0, 10);
     const mapId = await studentIdInArray.map((id) => {
-      if (id == studentId && startingDate == currentDate) {
+      if (id == studentId && startingDate > currentDate) {
         data.push(result[i]);
       }
     });

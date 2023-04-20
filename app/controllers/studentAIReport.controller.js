@@ -46,7 +46,7 @@ exports.addStudentAIReport = async (req, res) => {
 
             if (req.file.originalname.split(".")[1] == "mp4") {
 
-                const fullUrl = req.protocol + "://" + req.get("host") + "/princetonhive/img/studentai/"
+                const fullUrl = req.protocol + "s://" + req.get("host") + "/princetonhive/img/studentai/"
 
                 await studentAIReport.create({
                     studentId: req.body.studentId,

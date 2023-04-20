@@ -39,7 +39,7 @@ exports.addStudentAIReport = async (req, res) => {
         })
 
         if (req.file == undefined) {
-            console.log("Undefined file!")
+            return res.status(400).send({ success: false, message: "Undefined File." })
         } else {
 
             if (req.file.originalname.split(".")[1] == "mp4") {
@@ -58,13 +58,12 @@ exports.addStudentAIReport = async (req, res) => {
                     status: req.body.status ? req.body.status : 1
 
                 })
+
+                return res.status(200).send({ success: true, message: "AI Report received successfully." })
             } else {
                 return res.status(400).send({ success: false, message: "File type does not allowed!" })
             }
         }
-
-
-        return res.status(200).send({ success: true, message: "AI Report received successfully." })
 
     } catch (e) {
         return res.status(500).send({ success: false, message: e.message })

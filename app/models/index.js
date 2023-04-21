@@ -73,19 +73,27 @@ db.teacherAssessment = require("../models/teacher.assessment.model")(
   Sequelize,
   DataTypes
 );
-db.Blog = require("../models/blog.model")(
-  sequelize,
-  Sequelize,
-  DataTypes
-);
+db.Blog = require("../models/blog.model")(sequelize, Sequelize, DataTypes);
 
 db.Gallery = require("../models/gallery.model")(
   sequelize,
   Sequelize,
   DataTypes
 );
-db.studentAIReport = require("./studentAIReport.model.js")(sequelize, Sequelize, DataTypes)
-db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes)
+
+db.studentAIReport = require("./studentAIReport.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
+
+db.studentAIReport = require("./studentAIReport.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
 
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",
@@ -100,10 +108,10 @@ db.user.belongsToMany(db.role, {
   as: "roles",
 });
 
-db.studentAIReport.hasMany(db.user, {
-  as: "hiv_users",
-  foreignKey: "id"
-})
+// db.studentAIReport.hasMany(db.user, {
+//   as: "hiv_users",
+//   foreignKey: "id"
+// })
 
 
 db.ROLES = ["admin", "university", "teacher", "student", "support"];

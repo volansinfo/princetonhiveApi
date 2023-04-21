@@ -51,6 +51,7 @@ exports.addStudentAIReport = async (req, res) => {
                     studentId: req.body.studentId,
                     teacherId: req.body.teacherId,
                     universityId: req.body.universityId,
+                    assignmentName:req.body.assignmentName,
                     studentUUID: req.body.studentUUID,
                     aiReport: AiReport,
                     totalAverage: yourAverage,
@@ -123,7 +124,7 @@ exports.getAIReportDetails = async (req, res) => {
 
 exports.getAssignedTaskStudent = async (req, res) => {
     try {
-        const teacherId = req.query.teacherId
+        const studentId = req.query.studentId
 
         const studentData = await studentAIReport.findAll({
             
@@ -134,7 +135,7 @@ exports.getAssignedTaskStudent = async (req, res) => {
                     required: true,
                     as:"hiv_users",
                     where:{
-                        teacherId:teacherId
+                        id:studentId
                     }
                 }
             ]
@@ -148,7 +149,9 @@ exports.getAssignedTaskStudent = async (req, res) => {
                 name:element.hiv_users[0].fname + " "+element.hiv_users[0].lname,
                 phoneNumber:element.hiv_users[0].mnumber,
                 email:element.hiv_users[0].email,
-                reportId:element.id
+                reportId:element.id,
+                assignmentName:element.assignmentName,
+                totalAverage:element.totalAverage
             })
         });
 

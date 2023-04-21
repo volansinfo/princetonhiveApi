@@ -16,4 +16,6 @@ module.exports = function (app) {
 
     app.get("/api/hiv/student/ai/report/:reportId", [authJwt.verifyToken], controller.getAIReportDetails)
 
+    app.get("/api/hiv/student/ai/getAssignedTaskStudent",controller.getAssignedTaskStudent)
+
 }

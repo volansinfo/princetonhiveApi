@@ -1,5 +1,6 @@
 const db = require("../models")
 const jwt = require("jsonwebtoken");
+const Users = db.user
 const uploadVideo = require("../middleware/studentAIVideo")
 
 const studentAIReport = db.studentAIReport
@@ -87,8 +88,8 @@ exports.getAllAIReport = async (req, res) => {
                 ['id', 'DESC']
             ],
             attributes: {
-                exclude: ['videoPath',"reportDetails"]
-              }
+                exclude: ['videoPath', "reportDetails"]
+            }
         })
 
         return res.status(200).send({ success: true, AllAIReports: AIReport })
@@ -105,8 +106,8 @@ exports.getAIReportDetails = async (req, res) => {
                 id: req.params.reportId
             },
             attributes: {
-                exclude: ['videoPath',"reportDetails"]
-              }
+                exclude: ['videoPath', "reportDetails"]
+            }
         })
 
         if (!AIReport) {
@@ -114,6 +115,46 @@ exports.getAIReportDetails = async (req, res) => {
         }
 
         return res.status(200).send({ success: true, AIReport: AIReport })
+
+    } catch (e) {
+        return res.status(500).send({ success: false, message: e.message })
+    }
+}
+
+exports.getAssignedTaskStudent = async (req, res) => {
+    try {
+        const teacherId = req.query.teacherId
+
+        const studentData = await studentAIReport.findAll({
+            where: {
+                teacherId: teacherId
+            },
+            order: [['id', 'DESC']],
+            include: [
+                {
+                    model: Users,
+                    required: true,
+                    as:"hiv_users",
+                    where:{
+                        teacherId:teacherId
+                    }
+                }
+            ]
+
+        })
+
+        let response =[]
+
+        studentData.forEach(element => {
+            response.push({
+                name:element.hiv_users[0].fname + " "+element.hiv_users[0].lname,
+                phoneNumber:element.hiv_users[0].mnumber,
+                email:element.hiv_users[0].email,
+                reportId:element.id
+            })
+        });
+
+        return res.status(200).send({ success: true, data: response })
 
     } catch (e) {
         return res.status(500).send({ success: false, message: e.message })

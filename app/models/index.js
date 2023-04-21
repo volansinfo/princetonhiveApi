@@ -100,10 +100,10 @@ db.user.belongsToMany(db.role, {
   as: "roles",
 });
 
-db.studentAIReport.hasMany(db.user, {
-  as: "hiv_users",
-  foreignKey: "id"
-})
+// db.studentAIReport.hasMany(db.user, {
+//   as: "hiv_users",
+//   foreignKey: "id"
+// })
 
 
 db.ROLES = ["admin", "university", "teacher", "student", "support"];

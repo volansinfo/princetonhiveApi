@@ -1,5 +1,6 @@
 const db = require("../models")
 const jwt = require("jsonwebtoken");
+const Users = db.user
 const uploadVideo = require("../middleware/studentAIVideo")
 
 const studentAIReport = db.studentAIReport
@@ -50,6 +51,7 @@ exports.addStudentAIReport = async (req, res) => {
                     studentId: req.body.studentId,
                     teacherId: req.body.teacherId,
                     universityId: req.body.universityId,
+                    assignmentName:req.body.assignmentName,
                     studentUUID: req.body.studentUUID,
                     aiReport: AiReport,
                     totalAverage: yourAverage,
@@ -87,8 +89,8 @@ exports.getAllAIReport = async (req, res) => {
                 ['id', 'DESC']
             ],
             attributes: {
-                exclude: ['videoPath',"reportDetails"]
-              }
+                exclude: ['videoPath', "reportDetails"]
+            }
         })
 
         return res.status(200).send({ success: true, AllAIReports: AIReport })
@@ -105,8 +107,8 @@ exports.getAIReportDetails = async (req, res) => {
                 id: req.params.reportId
             },
             attributes: {
-                exclude: ['videoPath',"reportDetails"]
-              }
+                exclude: ['videoPath', "reportDetails"]
+            }
         })
 
         if (!AIReport) {
@@ -114,6 +116,46 @@ exports.getAIReportDetails = async (req, res) => {
         }
 
         return res.status(200).send({ success: true, AIReport: AIReport })
+
+    } catch (e) {
+        return res.status(500).send({ success: false, message: e.message })
+    }
+}
+
+exports.getAssignedTaskStudent = async (req, res) => {
+    try {
+        const studentId = req.query.studentId
+
+        const studentData = await studentAIReport.findAll({
+            
+            order: [['id', 'DESC']],
+            include: [
+                {
+                    model: Users,
+                    required: true,
+                    as:"hiv_users",
+                    where:{
+                        id:studentId
+                    }
+                }
+            ]
+
+        })
+
+        let response =[]
+
+        studentData.forEach(element => {
+            response.push({
+                name:element.hiv_users[0].fname + " "+element.hiv_users[0].lname,
+                phoneNumber:element.hiv_users[0].mnumber,
+                email:element.hiv_users[0].email,
+                reportId:element.id,
+                assignmentName:element.assignmentName,
+                totalAverage:element.totalAverage
+            })
+        });
+
+        return res.status(200).send({ success: true, data: response })
 
     } catch (e) {
         return res.status(500).send({ success: false, message: e.message })

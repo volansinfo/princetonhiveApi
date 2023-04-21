@@ -80,12 +80,21 @@ db.Gallery = require("../models/gallery.model")(
   Sequelize,
   DataTypes
 );
+
 db.studentAIReport = require("./studentAIReport.model.js")(
   sequelize,
   Sequelize,
   DataTypes
 );
 db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
+
+db.studentAIReport = require("./studentAIReport.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
+
 db.role.belongsToMany(db.user, {
   through: "vol_user_roles",
   foreignKey: "roleId",
@@ -104,6 +113,10 @@ db.category = require("../models/centralLibrary.category.model.js")(
   Sequelize,
   DataTypes
 );
+db.studentAIReport.hasMany(db.user, {
+  as: "hiv_users",
+  foreignKey: "id",
+});
 
 db.ROLES = ["admin", "university", "teacher", "student", "support"];
 

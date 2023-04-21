@@ -126,9 +126,7 @@ exports.getAssignedTaskStudent = async (req, res) => {
         const teacherId = req.query.teacherId
 
         const studentData = await studentAIReport.findAll({
-            where: {
-                teacherId: teacherId
-            },
+            
             order: [['id', 'DESC']],
             include: [
                 {

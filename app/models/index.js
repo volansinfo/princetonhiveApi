@@ -118,6 +118,11 @@ db.studentAIReport.hasMany(db.user, {
   foreignKey: "id",
 });
 
+db.library = require("../models/central.library.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
 db.ROLES = ["admin", "university", "teacher", "student", "support"];
 
 module.exports = db;

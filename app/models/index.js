@@ -108,12 +108,21 @@ db.user.belongsToMany(db.role, {
   as: "roles",
 });
 
-// db.studentAIReport.hasMany(db.user, {
-//   as: "hiv_users",
-//   foreignKey: "id"
-// })
+db.category = require("../models/centralLibrary.category.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+db.studentAIReport.hasMany(db.user, {
+  as: "hiv_users",
+  foreignKey: "id",
+});
 
-
+db.library = require("../models/central.library.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
 db.ROLES = ["admin", "university", "teacher", "student", "support"];
 
 module.exports = db;

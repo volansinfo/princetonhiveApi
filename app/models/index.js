@@ -113,11 +113,6 @@ db.category = require("../models/centralLibrary.category.model.js")(
   Sequelize,
   DataTypes
 );
-db.library = require("../models/central.library.model.js")(
-  sequelize,
-  Sequelize,
-  DataTypes
-);
 db.studentAIReport.hasMany(db.user, {
   as: "hiv_users",
   foreignKey: "id",

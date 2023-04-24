@@ -127,18 +127,21 @@ exports.getAssignedTaskStudent = async (req, res) => {
         const studentId = req.query.studentId
 
         const studentData = await studentAIReport.findAll({
+            where:{
+                studentId:studentId
+            }
             
-            order: [['id', 'DESC']],
-            include: [
-                {
-                    model: Users,
-                    required: true,
-                    as:"hiv_users",
-                    where:{
-                        id:studentId
-                    }
-                }
-            ]
+            // order: [['id', 'DESC']],
+            // include: [
+            //     {
+            //         model: Users,
+            //         required: true,
+            //         as:"hiv_users",
+            //         where:{
+            //             id:studentId
+            //         }
+            //     }
+            // ]
 
         })
 
@@ -146,12 +149,13 @@ exports.getAssignedTaskStudent = async (req, res) => {
 
         studentData.forEach(element => {
             response.push({
-                name:element.hiv_users[0].fname + " "+element.hiv_users[0].lname,
-                phoneNumber:element.hiv_users[0].mnumber,
-                email:element.hiv_users[0].email,
+                // name:element.hiv_users[0].fname + " "+element.hiv_users[0].lname,
+                // phoneNumber:element.hiv_users[0].mnumber,
+                // email:element.hiv_users[0].email,
                 reportId:element.id,
                 assignmentName:element.assignmentName,
-                totalAverage:element.totalAverage
+                totalAverage:element.totalAverage,
+                createdAt:element.createdAt
             })
         });
 

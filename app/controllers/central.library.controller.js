@@ -100,7 +100,7 @@ exports.createLibrary = async (req, res) => {
     if (!existCategory) {
       return res.status(400).send({
         success: false,
-        message: "Category does not exist",
+        message: "Category id does not exist",
       });
     }
 

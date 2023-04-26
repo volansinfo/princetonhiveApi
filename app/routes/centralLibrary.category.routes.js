@@ -25,7 +25,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAllCategory
   );
-  app.post(
+  app.patch(
     "/api/updateCategoryStatus/:categoryId",
     [authJwt.verifyToken],
     controller.updateCategoryStatus

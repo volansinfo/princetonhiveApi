@@ -25,7 +25,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAllLibrary
   );
-  app.post(
+  app.patch(
     "/api/updateLibraryStatus/:libraryId",
     [authJwt.verifyToken],
     controller.updateLibraryStatus

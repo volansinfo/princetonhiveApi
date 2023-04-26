@@ -115,7 +115,7 @@ db.category = require("../models/centralLibrary.category.model.js")(
 );
 db.studentAIReport.hasMany(db.user, {
   as: "hiv_users",
-  foreignKey: "id",
+  foreignKey: "teacherId",
 });
 
 db.library = require("../models/central.library.model.js")(

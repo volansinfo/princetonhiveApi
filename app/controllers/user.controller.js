@@ -13,9 +13,9 @@ const bcrypt = require("bcryptjs");
 const { default: isEmail } = require("validator/lib/isEmail");
 
 const transformDate = (date) => {
-  const dateArray = date.split("-").reverse().join("-")
-  return dateArray
-}
+  const dateArray = date.split("-").reverse().join("-");
+  return dateArray;
+};
 
 exports.allAccess = async (req, res) => {
   var fullUrl =
@@ -27,7 +27,6 @@ exports.allAccess = async (req, res) => {
     let fileInfos = [];
     allUser.forEach((file) => {
       if (file.profileImg !== null) {
-
         fileInfos.push({
           id: file.id,
           fname: file.fname,
@@ -98,7 +97,7 @@ exports.allAccess = async (req, res) => {
 
 exports.userBoard = async (req, res) => {
   var fullUrl =
-  req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
+    req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
   try {
     //Get token key
     const token = req.headers["x-access-token"];
@@ -111,29 +110,31 @@ exports.userBoard = async (req, res) => {
         id: userId,
       },
     });
-    
-      const response = {
-        id: data.id,
-        fname: data.fname,
-        lname: data.lname,
-        profileImg: data.profileImg ? fullUrl + data.profileImg :null,
-        email: data.email,
-        mnumber: data.mnumber,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        pincode: data.pincode,
-        gender: data.gender,
-        dob: transformDate(data.dob),
-        country: data.country,
-        status: data.status,
-        uuid: data.uuid,
-        teacherId:data.teacherId,
-        aadharNo: data.aadharNo,
-        panNo: data.panNo,
-        department: data.department
-      };
-    
+    const roles = await data.getRoles();
+    // console.log(roles[0].name, "44444444444444444444444");
+    const response = {
+      id: data.id,
+      fname: data.fname,
+      lname: data.lname,
+      profileImg: data.profileImg ? fullUrl + data.profileImg : null,
+      email: data.email,
+      mnumber: data.mnumber,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      pincode: data.pincode,
+      gender: data.gender,
+      dob: transformDate(data.dob),
+      country: data.country,
+      status: data.status,
+      uuid: data.uuid,
+      teacherId: data.teacherId,
+      aadharNo: data.aadharNo,
+      panNo: data.panNo,
+      department: data.department,
+      roles: roles[0]?.name,
+    };
+
     res.status(200).json(response);
   } catch (error) {
     return res.status(500).send({ message: error.message });
@@ -339,11 +340,20 @@ exports.updateUserData = async (req, res) => {
         });
       }
       if (!req.body.dob) {
-        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        return res
+          .status(400)
+          .send({ success: false, message: "Please enter date of birth!" });
       }
-      const dt = Date().split(" ")[3]
-      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      const dt = Date().split(" ")[3];
+      if (
+        req.body.dob.split("-").length != 3 ||
+        req.body.dob.split("-")[2] == "" ||
+        req.body.dob.split("-")[2] > dt ||
+        req.body.dob.split("-")[2].length != 4
+      ) {
+        return res
+          .status(400)
+          .send({ success: false, message: "Please enter valid date!" });
       }
 
       const userId = req.params.id;
@@ -357,10 +367,10 @@ exports.updateUserData = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: (req.body.dob).split("-").reverse().join("-"),
+          dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
-          aadharNo: req.body.aadharNo?req.body.aadharNo:null,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo,
           department: req.body.department,
         },
@@ -421,15 +431,26 @@ exports.updateUserData = async (req, res) => {
         });
       }
       if (!req.body.dob) {
-        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        return res
+          .status(400)
+          .send({ success: false, message: "Please enter date of birth!" });
       }
 
       if (!req.body.dob) {
-        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        return res
+          .status(400)
+          .send({ success: false, message: "Please enter date of birth!" });
       }
-      const dt = Date().split(" ")[3]
-      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      const dt = Date().split(" ")[3];
+      if (
+        req.body.dob.split("-").length != 3 ||
+        req.body.dob.split("-")[2] == "" ||
+        req.body.dob.split("-")[2] > dt ||
+        req.body.dob.split("-")[2].length != 4
+      ) {
+        return res
+          .status(400)
+          .send({ success: false, message: "Please enter valid date!" });
       }
 
       const userId = req.params.id;
@@ -443,10 +464,10 @@ exports.updateUserData = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: (req.body.dob).split("-").reverse().join("-"),
+          dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
-          aadharNo: req.body.aadharNo?req.body.aadharNo:null,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo,
           department: req.body.department,
         },
@@ -464,10 +485,11 @@ exports.updateUserData = async (req, res) => {
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
     }
-    if (e.message == "invalid input syntax for type date: \"Invalid date\"") {
-      return res.status(400).send({ success: false, message: "Please enter valid date!" })
-    }
-    else if (e.message == "File too large") {
+    if (e.message == 'invalid input syntax for type date: "Invalid date"') {
+      return res
+        .status(400)
+        .send({ success: false, message: "Please enter valid date!" });
+    } else if (e.message == "File too large") {
       return res.status(400).send({
         success: false,
         message: "File too large, please select a file less than 3mb",

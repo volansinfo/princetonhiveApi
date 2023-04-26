@@ -12,7 +12,7 @@ module.exports = function (app) {
 
   app.post(
     "/api/hiv/student/ai/report",
-    // [authJwt.verifyAISecretKey],
+    [authJwt.verifyAISecretKey],
     controller.addStudentAIReport
   );
 

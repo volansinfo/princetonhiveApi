@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
 const db = require("../models");
-const UserPermission = db.UserPermissions
+const UserPermission = db.UserPermissions;
 const User = db.user;
 const bcrypt = require("bcryptjs");
 
@@ -19,9 +19,9 @@ verifyToken = async (req, res, next) => {
 
     const user = await User.findOne({
       where: {
-        id: tokenData.id
-      }
-    })
+        id: tokenData.id,
+      },
+    });
 
     if (user.tokenKey == token) {
       jwt.verify(token, config.secret, (err, decoded) => {
@@ -34,7 +34,9 @@ verifyToken = async (req, res, next) => {
         next();
       });
     } else {
-      return res.status(401).send({ success: false, message: "User token not matched!" });
+      return res
+        .status(401)
+        .send({ success: false, message: "User token not matched!" });
     }
   } catch (e) {
     return res.status(500).send({ success: false, message: e.message });
@@ -45,25 +47,27 @@ verifyAISecretKey = async (req, res, next) => {
   try {
     let aiSecretKey = req.headers["ai-secret-key"];
 
-
     if (!aiSecretKey) {
-      return res.status(401).send({success: false,message: "AI secret key not provided!"});
-      
+      return res
+        .status(401)
+        .send({ success: false, message: "AI secret key not provided!" });
     }
 
-   const isValidAISecretKey = bcrypt.compareSync(
+    const isValidAISecretKey = bcrypt.compareSync(
       config.aiReportSecret,
       aiSecretKey
-    )
+    );
 
-    if(!isValidAISecretKey){
-      return res.status(401).send({success: false,message: "AI secret key does not matched!"});
+    if (!isValidAISecretKey) {
+      return res
+        .status(401)
+        .send({ success: false, message: "AI secret key does not matched!" });
     }
     next();
   } catch (e) {
     return res.status(500).send({ success: false, message: e.message });
   }
-}
+};
 
 isAdmin = async (req, res, next) => {
   try {
@@ -157,7 +161,7 @@ isSupportOrAdminOrTeacher = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.userId);
     const roles = await user.getRoles();
-
+    console.log(roles);
     for (let i = 0; i < roles.length; i++) {
       if (roles[i].name === "support") {
         return next();
@@ -167,6 +171,9 @@ isSupportOrAdminOrTeacher = async (req, res, next) => {
         return next();
       }
       if (roles[i].name === "teacher") {
+        return next();
+      }
+      if (roles[i].name === "university") {
         return next();
       }
     }
@@ -183,7 +190,7 @@ isSupportOrAdminOrTeacher = async (req, res, next) => {
 
 checkUserAddPermission = async (req, res, next) => {
   try {
-    let token = req.headers["x-access-token"]
+    let token = req.headers["x-access-token"];
 
     if (!token) {
       return res.status(401).send({
@@ -192,7 +199,7 @@ checkUserAddPermission = async (req, res, next) => {
       });
     }
 
-    const tokenData = jwt.decode(token)
+    const tokenData = jwt.decode(token);
     const user = await User.findByPk(tokenData.id);
     const roles = await user.getRoles();
     for (let i = 0; i < roles.length; i++) {
@@ -202,9 +209,9 @@ checkUserAddPermission = async (req, res, next) => {
     }
     const userAccess = await UserPermission.findOne({
       where: {
-        userId: tokenData.id
-      }
-    })
+        userId: tokenData.id,
+      },
+    });
 
     if (!userAccess) {
       return res.status(400).send({
@@ -213,8 +220,7 @@ checkUserAddPermission = async (req, res, next) => {
       });
     }
 
-
-    if (userAccess.isAdd == '1') {
+    if (userAccess.isAdd == "1") {
       return next();
     } else {
       return res.status(400).send({
@@ -222,16 +228,13 @@ checkUserAddPermission = async (req, res, next) => {
         message: "You don't have permission to access this module.",
       });
     }
-
-
   } catch (error) {
-    return res.status(500).send({ success: false, message: e.message })
+    return res.status(500).send({ success: false, message: e.message });
   }
-}
+};
 
 checkUserUpdatePermission = async (req, res, next) => {
   try {
-
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -253,9 +256,9 @@ checkUserUpdatePermission = async (req, res, next) => {
 
     const userAccess = await UserPermission.findOne({
       where: {
-        userId: tokenData.id
-      }
-    })
+        userId: tokenData.id,
+      },
+    });
 
     if (!userAccess) {
       return res.status(400).send({
@@ -264,8 +267,8 @@ checkUserUpdatePermission = async (req, res, next) => {
       });
     }
 
-    if (userAccess.isUpdate == '1') {
-      return next()
+    if (userAccess.isUpdate == "1") {
+      return next();
     } else {
       return res.status(400).send({
         success: false,
@@ -273,14 +276,12 @@ checkUserUpdatePermission = async (req, res, next) => {
       });
     }
   } catch (e) {
-    return res.status(500).send({ success: false, message: e.message })
+    return res.status(500).send({ success: false, message: e.message });
   }
-}
-
+};
 
 checkUserReadPermission = async (req, res, next) => {
   try {
-
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -302,9 +303,9 @@ checkUserReadPermission = async (req, res, next) => {
 
     const userAccess = await UserPermission.findOne({
       where: {
-        userId: tokenData.id
-      }
-    })
+        userId: tokenData.id,
+      },
+    });
 
     if (!userAccess) {
       return res.status(400).send({
@@ -313,8 +314,8 @@ checkUserReadPermission = async (req, res, next) => {
       });
     }
 
-    if (userAccess.isRead == '1') {
-      return next()
+    if (userAccess.isRead == "1") {
+      return next();
     } else {
       return res.status(400).send({
         success: false,
@@ -322,14 +323,12 @@ checkUserReadPermission = async (req, res, next) => {
       });
     }
   } catch (e) {
-    return res.status(500).send({ success: false, message: e.message })
+    return res.status(500).send({ success: false, message: e.message });
   }
-}
-
+};
 
 checkUserDeletePermission = async (req, res, next) => {
   try {
-
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -351,9 +350,9 @@ checkUserDeletePermission = async (req, res, next) => {
 
     const userAccess = await UserPermission.findOne({
       where: {
-        userId: tokenData.id
-      }
-    })
+        userId: tokenData.id,
+      },
+    });
 
     if (!userAccess) {
       return res.status(400).send({
@@ -362,8 +361,8 @@ checkUserDeletePermission = async (req, res, next) => {
       });
     }
 
-    if (userAccess.isDelete == '1') {
-      return next()
+    if (userAccess.isDelete == "1") {
+      return next();
     } else {
       return res.status(400).send({
         success: false,
@@ -371,14 +370,12 @@ checkUserDeletePermission = async (req, res, next) => {
       });
     }
   } catch (e) {
-    return res.status(500).send({ success: false, message: e.message })
+    return res.status(500).send({ success: false, message: e.message });
   }
-}
-
+};
 
 checkUserUpdateStatusPermission = async (req, res, next) => {
   try {
-
     let token = req.headers["x-access-token"];
 
     if (!token) {
@@ -399,9 +396,9 @@ checkUserUpdateStatusPermission = async (req, res, next) => {
 
     const userAccess = await UserPermission.findOne({
       where: {
-        userId: tokenData.id
-      }
-    })
+        userId: tokenData.id,
+      },
+    });
 
     if (!userAccess) {
       return res.status(400).send({
@@ -410,8 +407,8 @@ checkUserUpdateStatusPermission = async (req, res, next) => {
       });
     }
 
-    if (userAccess.isStatus == '1') {
-      return next()
+    if (userAccess.isStatus == "1") {
+      return next();
     } else {
       return res.status(400).send({
         success: false,
@@ -419,9 +416,9 @@ checkUserUpdateStatusPermission = async (req, res, next) => {
       });
     }
   } catch (e) {
-    return res.status(500).send({ success: false, message: e.message })
+    return res.status(500).send({ success: false, message: e.message });
   }
-}
+};
 
 const authJwt = {
   verifyToken,
@@ -435,6 +432,6 @@ const authJwt = {
   checkUserUpdatePermission,
   checkUserReadPermission,
   checkUserDeletePermission,
-  checkUserUpdateStatusPermission
+  checkUserUpdateStatusPermission,
 };
 module.exports = authJwt;

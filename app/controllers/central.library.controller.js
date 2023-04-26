@@ -164,6 +164,7 @@ exports.getLibraryById = async (req, res) => {
       title: response?.title,
       bookUrl: response?.bookUrl,
       fileUpload: fullUrl + response?.fileUpload,
+      categoryId: response?.categoryId,
       status: response?.status,
       createdAt: response?.createdAt,
       updatedAt: response?.updatedAt,
@@ -211,6 +212,7 @@ exports.getAllLibrary = async (req, res) => {
         title: results[i]?.title,
         bookUrl: results[i]?.bookUrl,
         fileUpload: fullUrl + results[i]?.fileUpload,
+        categoryId: results[i]?.categoryId,
         status: results[i]?.status,
         createdAt: results[i]?.createdAt,
         updatedAt: results[i]?.updatedAt,
@@ -399,7 +401,7 @@ exports.updateLibrary = async (req, res) => {
     if (existTitle) {
       return res.status(400).send({
         success: false,
-        message: "Title already exist",
+        message: "Library already exist",
       });
     }
 
@@ -432,6 +434,7 @@ exports.updateLibrary = async (req, res) => {
         categoryId: req.body.categoryId,
         bookUrl: req.body.bookUrl,
         fileUpload: newFilename,
+
         status: req.body.status,
       },
       {

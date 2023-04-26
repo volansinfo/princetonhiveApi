@@ -1382,3 +1382,48 @@ exports.getCompletedAssessment = async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 };
+
+exports.getStudentDetailsAssinedAssessment = async (req, res) => {
+  try {
+    const studentDetailsData = [];
+
+    const studentId = [];
+    const token = req.headers["x-access-token"];
+    const decode = jwt.decode(token);
+    const teacherId = decode.id;
+    const assessmentData = await TeacherAssessment.findAll({
+      where: {
+        teacherId: JSON.stringify(teacherId),
+        status: "1",
+      },
+    });
+    for (let i = 0; i < assessmentData.length; i++) {
+      const studentIdInArray = await assessmentData[i].studentId;
+      const mapStudentDetails = await studentIdInArray.map((id) => {
+        studentId.push(id);
+      });
+    }
+    let arrayStudentId = [...new Set(studentId)];
+    for (let i = 0; i < arrayStudentId.length; i++) {
+      const studentDetails = await User.findOne({
+        where: {
+          id: parseInt(arrayStudentId[i]),
+        },
+      });
+      studentDetailsData.push({
+        id: studentDetails.id,
+        fname: studentDetails.fname,
+        lname: studentDetails.lname,
+        email: studentDetails.email,
+        mnumber: studentDetails.mnumber,
+      });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "All student details",
+      studentDetailsData,
+    });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};

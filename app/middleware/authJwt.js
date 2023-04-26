@@ -161,7 +161,7 @@ isSupportOrAdminOrTeacher = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.userId);
     const roles = await user.getRoles();
-    console.log(roles);
+    // console.log(roles);
     for (let i = 0; i < roles.length; i++) {
       if (roles[i].name === "support") {
         return next();

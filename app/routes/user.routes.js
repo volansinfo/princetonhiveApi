@@ -13,11 +13,7 @@ module.exports = function (app) {
 
   app.get("/api/vol/all", [authJwt.verifyToken], controller.allAccess);
 
-  app.get(
-    "/api/vol/user",
-    [authJwt.verifyToken],
-    controller.userBoard
-  );
+  app.get("/api/vol/user", [authJwt.verifyToken], controller.userBoard);
 
   app.get(
     "/api/vol/mod",
@@ -32,21 +28,23 @@ module.exports = function (app) {
   );
 
   // Delete a User with id
-  app.delete("/api/vol/user/:id",
-    [authJwt.verifyToken, authJwt.isSupportOrAdmin],
+  app.delete(
+    "/api/vol/user/:id",
+    [authJwt.verifyToken, authJwt.isSupportOrAdminOrTeacher],
     controller.userdelete
   );
 
   // status a User with id
-  app.patch("/api/vol/user/:id",
+  app.patch(
+    "/api/vol/user/:id",
     [authJwt.verifyToken, authJwt.isSupportOrAdmin],
     controller.userstatus
   );
 
   // Update a User data using id
-  app.post("/api/vol/user/:id",
+  app.post(
+    "/api/vol/user/:id",
     [authJwt.verifyToken],
     controller.updateUserData
   );
-
 };

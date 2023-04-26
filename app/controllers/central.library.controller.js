@@ -393,17 +393,17 @@ exports.updateLibrary = async (req, res) => {
       .resize({ width: 67, height: 67 })
       .toFile(__basedir + "/uploads/fileUpload/" + newFilename);
 
-    const existTitle = await Library.findOne({
-      where: {
-        title: req.body.title,
-      },
-    });
-    if (existTitle) {
-      return res.status(400).send({
-        success: false,
-        message: "Library already exist",
-      });
-    }
+    // const existTitle = await Library.findOne({
+    //   where: {
+    //     title: req.body.title,
+    //   },
+    // });
+    // if (existTitle) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "Library already exist",
+    //   });
+    // }
 
     const existCategory = await Category.findOne({
       where: {

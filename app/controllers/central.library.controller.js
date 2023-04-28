@@ -65,7 +65,7 @@ exports.createLibrary = async (req, res) => {
     if (fileType != "jpg" && fileType != "jpeg" && fileType != "png") {
       return res.status(400).send({
         success: false,
-        message: "Please Upload file jpg,png,jpeg fle",
+        message: "Please Upload file jpg,png,jpeg file",
       });
     }
     if (req.file.size > 1024 * 1024 * 1024 * 1024) {
@@ -88,7 +88,7 @@ exports.createLibrary = async (req, res) => {
     if (existTitle) {
       return res.status(400).send({
         success: false,
-        message: "Title already exist",
+        message: "Library already exist",
       });
     }
 
@@ -148,7 +148,7 @@ exports.getLibraryById = async (req, res) => {
     if (!response) {
       return res.status(200).send({
         status: false,
-        message: "Library does not found",
+        message: "Library not found",
         data: response?.length > 0 ? response : [],
       });
     }
@@ -232,7 +232,7 @@ exports.getAllLibrary = async (req, res) => {
     if (responce.dataItems.length <= 0) {
       return res.status(200).send({
         status: false,
-        message: "Library does not found",
+        message: "Library not found",
         data: results,
       });
     }
@@ -287,7 +287,7 @@ exports.updateLibraryStatus = async (req, res) => {
     if (!existLibrary) {
       return res
         .status(404)
-        .send({ status: false, message: "Library does not found" });
+        .send({ status: false, message: "Library not found" });
     }
     if (status == "1") {
       const response = await Library.update(
@@ -300,7 +300,7 @@ exports.updateLibraryStatus = async (req, res) => {
       );
       return res.status(200).send({
         status: true,
-        message: "status has been enable",
+        message: "Status has been enabled",
       });
     } else {
       const responce = await Library.update(
@@ -313,7 +313,7 @@ exports.updateLibraryStatus = async (req, res) => {
       );
       return res.status(200).send({
         status: true,
-        message: "status has been disabled",
+        message: "Status has been disabled",
       });
     }
   } catch (error) {
@@ -378,7 +378,7 @@ exports.updateLibrary = async (req, res) => {
     if (fileType != "jpg" && fileType != "jpeg" && fileType != "png") {
       return res.status(400).send({
         success: false,
-        message: "Please Upload file jpg,png,jpeg fle",
+        message: "Please Upload file jpg,png,jpeg file",
       });
     }
     if (req.file.size > 1024 * 1024 * 1024 * 1024) {
@@ -413,7 +413,7 @@ exports.updateLibrary = async (req, res) => {
     if (!existCategory) {
       return res.status(400).send({
         success: false,
-        message: "Category not exist",
+        message: "Category does not exist",
       });
     }
 
@@ -424,8 +424,8 @@ exports.updateLibrary = async (req, res) => {
     });
     if (!existLibrary) {
       return res
-        .status(404)
-        .send({ status: false, message: "Library does not found" });
+        .status(200)
+        .send({ status: false, message: "Library not found" });
     }
 
     const response = await Library.update(
@@ -476,7 +476,7 @@ exports.deleteLibrary = async (req, res) => {
   if (!existLibrary) {
     return res
       .status(404)
-      .send({ status: false, message: "Library does not found" });
+      .send({ status: false, message: "Library not found" });
   }
 
   const response = await Library.destroy({

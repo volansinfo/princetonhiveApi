@@ -35,7 +35,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.updateLibrary
   );
-  app.get(
+  app.delete(
     "/api/deleteLibrary/:libraryId",
     [authJwt.verifyToken],
     controller.deleteLibrary

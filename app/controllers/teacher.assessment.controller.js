@@ -1412,16 +1412,27 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
       });
       studentDetailsData.push({
         id: studentDetails.id,
-        fname: studentDetails.fname,
-        lname: studentDetails.lname,
+        name: studentDetails.fname + " " + studentDetails.lname,
         email: studentDetails.email,
         mnumber: studentDetails.mnumber,
       });
     }
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const data1 = {};
+    data1.dataItems = studentDetailsData.slice(startIndex, endIndex);
+    data1.totalItems = studentDetailsData.length;
+    data1.currentPage = parseInt(req.query.page) || 0;
+    data1.totalPages = Math.ceil(studentDetailsData.length / limit);
+
     return res.status(200).send({
       status: true,
       message: "All student details",
-      studentDetailsData,
+      data: data1,
     });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });

@@ -199,7 +199,7 @@ exports.updateCategoryStatus = async (req, res) => {
     if (!existCategory) {
       return res
         .status(404)
-        .send({ status: false, message: "Category does not found" });
+        .send({ status: false, message: "Category not found" });
     }
     if (status == "1") {
       const response = await Category.update(
@@ -212,7 +212,7 @@ exports.updateCategoryStatus = async (req, res) => {
       );
       return res.status(200).send({
         status: true,
-        message: "status has been enable",
+        message: "Status has been enabled",
       });
     } else {
       const responce = await Category.update(
@@ -225,7 +225,7 @@ exports.updateCategoryStatus = async (req, res) => {
       );
       return res.status(200).send({
         status: true,
-        message: "status has been disabled",
+        message: "Status has been disabled",
       });
     }
   } catch (error) {
@@ -258,13 +258,13 @@ exports.updateCategory = async (req, res) => {
     if (!categoryName) {
       return res
         .status(400)
-        .send({ status: false, msg: "Please select category name" });
+        .send({ status: false, msg: "Please enter category name!" });
     }
 
     if (!status) {
       return res
         .status(400)
-        .send({ status: false, msg: "Please select status " });
+        .send({ status: false, msg: "Please select status! " });
     } else if (status != "0" && status != "1") {
       return res
         .status(400)
@@ -278,7 +278,7 @@ exports.updateCategory = async (req, res) => {
     if (!existCategory) {
       return res
         .status(404)
-        .send({ status: false, message: "Category does not found" });
+        .send({ status: false, message: "Category not found!" });
     }
 
     const response = await Category.update(
@@ -325,7 +325,7 @@ exports.deleteCategory = async (req, res) => {
   if (!existCategory) {
     return res
       .status(404)
-      .send({ status: false, message: "Category does not found" });
+      .send({ status: false, message: "Category not found" });
   }
 
   const response = await Category.destroy({

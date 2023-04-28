@@ -40,4 +40,9 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.deleteLibrary
   );
+  app.get(
+    "/api/searchLibraryByCategoryId",
+    [authJwt.verifyToken],
+    controller.searchLibraryByCategoryId
+  );
 };

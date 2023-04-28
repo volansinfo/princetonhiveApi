@@ -68,12 +68,12 @@ exports.createLibrary = async (req, res) => {
         message: "Please Upload file jpg,png,jpeg file",
       });
     }
-    if (req.file.size > 1024 * 1024 * 1024 * 1024) {
-      return res.status(400).send({
-        success: false,
-        message: "Please Upload file less 4mb",
-      });
-    }
+    // if (req.file.size > 1024 * 1024 * 1024 * 1024) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "Please Upload file less 4mb",
+    //   });
+    // }
     const newFilename = `${Date.now()}_${req.file.originalname}`;
 
     await sharp(req.file.buffer)
@@ -413,7 +413,7 @@ exports.updateLibrary = async (req, res) => {
     if (!existCategory) {
       return res.status(400).send({
         success: false,
-        message: "Category does not exist",
+        message: "Category id does not exist",
       });
     }
 
@@ -451,41 +451,98 @@ exports.updateLibrary = async (req, res) => {
 };
 
 exports.deleteLibrary = async (req, res) => {
-  const token = req.headers["x-access-token"];
-  const decodeToken = jwt.decode(token);
-  const roleId = decodeToken.id;
-  const roleExist = await User.findOne({
-    where: {
-      id: roleId,
-    },
-  });
-  const roles = await roleExist.getRoles();
-  for (let i = 0; i < roles.length; i++) {
-    if (roles[i].name != "admin" && roles[i].name != "support") {
-      return res.status(400).send({
-        status: false,
-        message: `You don't have permission to access this module!`,
+  try {
+    const token = req.headers["x-access-token"];
+    const decodeToken = jwt.decode(token);
+    const roleId = decodeToken.id;
+    const roleExist = await User.findOne({
+      where: {
+        id: roleId,
+      },
+    });
+    const roles = await roleExist.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "admin" && roles[i].name != "support") {
+        return res.status(400).send({
+          status: false,
+          message: `You don't have permission to access this module!`,
+        });
+      }
+    }
+    const existLibrary = await Library.findOne({
+      where: {
+        id: req.params.libraryId,
+      },
+    });
+    if (!existLibrary) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Library not found" });
+    }
+
+    const response = await Library.destroy({
+      where: {
+        id: req.params.libraryId,
+      },
+    });
+    return res.status(200).send({
+      status: true,
+      message: "Library deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+exports.searchLibraryByCategoryId = async (req, res) => {
+  try {
+    const libraryData = [];
+    const fullUrl =
+      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+    const results = await Library.findAll({
+      where: {
+        categoryId: req.query.categoryId,
+      },
+      order: [["id", "DESC"]],
+    });
+    for (let i = 0; i < results.length; i++) {
+      libraryData.push({
+        id: results[i]?.id,
+        title: results[i]?.title,
+        bookUrl: results[i]?.bookUrl,
+        fileUpload: fullUrl + results[i]?.fileUpload,
+        categoryId: results[i]?.categoryId,
+        status: results[i]?.status,
+        createdAt: results[i]?.createdAt,
+        updatedAt: results[i]?.updatedAt,
       });
     }
-  }
-  const existLibrary = await Library.findOne({
-    where: {
-      id: req.params.libraryId,
-    },
-  });
-  if (!existLibrary) {
-    return res
-      .status(404)
-      .send({ status: false, message: "Library not found" });
-  }
+    const page = parseInt(req.query.page) || 0;
+    const limit = 10;
 
-  const response = await Library.destroy({
-    where: {
-      id: req.params.libraryId,
-    },
-  });
-  return res.status(200).send({
-    status: true,
-    message: "Library deleted successfully",
-  });
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+    const responce = {};
+    responce.dataItems = libraryData.slice(startIndex, endIndex);
+    responce.totalItems = libraryData.length;
+    responce.currentPage = parseInt(req.query.page) || 0;
+    responce.totalPages = Math.ceil(libraryData.length / limit);
+    if (responce.dataItems.length == 0) {
+      return res.status(200).send({
+        status: true,
+        message: "Library not found",
+        data: responce,
+      });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "Library found successfully",
+      data: responce,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: true,
+      message: error.message,
+    });
+  }
 };

@@ -233,7 +233,7 @@ exports.getAllLibrary = async (req, res) => {
       return res.status(200).send({
         status: false,
         message: "Library not found",
-        data: results,
+        data: responce,
       });
     }
     return res.status(200).send({

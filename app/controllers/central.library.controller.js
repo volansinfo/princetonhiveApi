@@ -398,7 +398,9 @@ exports.updateLibrary = async (req, res) => {
         message: "Please Upload file less 4mb",
       });
     }
-    const newFilename = `${Date.now()}_${req.file.originalname}`;
+    const newFilename = `${Date.now()}_${req.file?.originalname
+      .split(" ")
+      .join("")}`;
 
     await sharp(req.file.buffer)
       .resize({ width: 67, height: 67 })

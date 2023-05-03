@@ -220,7 +220,7 @@ exports.getAllLibrary = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 0;
-    const limit = 10;
+    const limit = 12;
 
     const startIndex = page * limit;
     const endIndex = (page + 1) * limit;
@@ -518,7 +518,7 @@ exports.searchLibraryByCategoryId = async (req, res) => {
       });
     }
     const page = parseInt(req.query.page) || 0;
-    const limit = 10;
+    const limit = 12;
 
     const startIndex = page * limit;
     const endIndex = (page + 1) * limit;

@@ -172,7 +172,7 @@ exports.getLibraryById = async (req, res) => {
 
     // console.log(response);
     const fullUrl =
-      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+      req.protocol + "s://" + req.get("host") + "/princetonhive/img/fileUpload/";
 
     const result = {
       id: response?.id,
@@ -218,7 +218,7 @@ exports.getAllLibrary = async (req, res) => {
       }
     }
     const fullUrl =
-      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+      req.protocol + "s://" + req.get("host") + "/princetonhive/img/fileUpload/";
     const results = await Library.findAll({
       where: {
         status: "1",
@@ -519,7 +519,7 @@ exports.searchLibraryByCategoryId = async (req, res) => {
   try {
     const libraryData = [];
     const fullUrl =
-      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+      req.protocol + "s://" + req.get("host") + "/princetonhive/img/fileUpload/";
     const results = await Library.findAll({
       where: {
         categoryId: req.query.categoryId,

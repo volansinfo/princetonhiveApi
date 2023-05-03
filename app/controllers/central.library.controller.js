@@ -75,10 +75,18 @@ exports.createLibrary = async (req, res) => {
     //   });
     // }
     // console.log(req.file.originalname.split(" ").join(""));
-    const newFilename = `${Date.now()}_${req.file?.originalname
-      .split(" ")
-      .join("")}`;
+    const findLastEntry = await Library.findAll({
+      order: [["id", "DESC"]],
+    });
+    // console.log(findLastEntry[0].id);
+    const fileName = req.file.originalname.split(".")[1];
+    const newFilename = `${Date.now()}${
+      findLastEntry[0]?.id ? findLastEntry[0]?.id : 0
+    }.${fileName}`;
 
+    // const filePath1 = newFilename.split("(").join("");
+    // const filePath = filePath1.split(")").join("");
+    // console.log(req.file, "knkdsfaskjhnk");
     await sharp(req.file.buffer)
       .resize({ width: 67, height: 67 })
       .toFile(__basedir + "/uploads/fileUpload/" + newFilename);

@@ -79,7 +79,11 @@ exports.getCategoryById = async (req, res) => {
     });
     const roles = await roleExist.getRoles();
     for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name != "admin" && roles[i].name != "support") {
+      if (
+        roles[i].name != "admin" &&
+        roles[i].name != "support" &&
+        roles[i].name != "student"
+      ) {
         return res.status(400).send({
           status: false,
           message: `You don't have permission to access this module!`,
@@ -120,7 +124,11 @@ exports.getAllCategory = async (req, res) => {
     });
     const roles = await roleExist.getRoles();
     for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name != "admin" && roles[i].name != "support") {
+      if (
+        roles[i].name != "admin" &&
+        roles[i].name != "support" &&
+        roles[i].name != "student"
+      ) {
         return res.status(400).send({
           status: false,
           message: `You don't have permission to access this module!`,

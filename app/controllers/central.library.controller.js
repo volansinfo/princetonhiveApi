@@ -88,7 +88,7 @@ exports.createLibrary = async (req, res) => {
     // const filePath = filePath1.split(")").join("");
     // console.log(req.file, "knkdsfaskjhnk");
     await sharp(req.file.buffer)
-      .resize({ width: 67, height: 67 })
+      .resize({ width: 413, height: 269 })
       .toFile(__basedir + "/uploads/fileUpload/" + newFilename);
 
     const existTitle = await Library.findOne({

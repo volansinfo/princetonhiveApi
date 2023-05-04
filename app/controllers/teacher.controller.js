@@ -4,9 +4,9 @@ const Op = db.Sequelize.Op;
 const teacherUser = db.user;
 
 const transformDate = (date) => {
-  const dateArray = date.split("-").reverse().join("-")
-  return dateArray
-}
+  const dateArray = date.split("-").reverse().join("-");
+  return dateArray;
+};
 
 exports.getAllTeacher = async (req, res) => {
   var fullUrl =
@@ -49,6 +49,7 @@ exports.getAllTeacher = async (req, res) => {
           aadharNo: file.aadharNo,
           panNo: file.panNo,
           department: file.department,
+          roles: "teacher",
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });
@@ -72,6 +73,7 @@ exports.getAllTeacher = async (req, res) => {
           aadharNo: file.aadharNo,
           panNo: file.panNo,
           department: file.department,
+          roles: "teacher",
           createdAt: file.createdAt,
           updatedAt: file.updatedAt,
         });

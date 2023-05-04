@@ -25,7 +25,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getAllCategory
   );
-  app.post(
+  app.patch(
     "/api/updateCategoryStatus/:categoryId",
     [authJwt.verifyToken],
     controller.updateCategoryStatus
@@ -35,7 +35,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.updateCategory
   );
-  app.get(
+  app.delete(
     "/api/deleteCategory/:categoryId",
     [authJwt.verifyToken],
     controller.deleteCategory

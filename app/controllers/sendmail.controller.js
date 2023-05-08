@@ -81,9 +81,9 @@ const sendMail = async (
     });
   }
 
-  console.log("Message sent: %s", info.messageId);
+  // console.log("Message sent: %s", info.messageId);
 
-  console.log(info);
+  // console.log(info);
 };
 
 module.exports = sendMail;

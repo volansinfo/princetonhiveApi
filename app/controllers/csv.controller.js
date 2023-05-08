@@ -216,8 +216,9 @@ const uploadCsv = async (req, res) => {
             document.email,
             userrname,
             document.actualPassword,
+            "",
             smtpServer,
-            "signup"
+            ""
           );
 
           if (i == bulkData.length - 1) {

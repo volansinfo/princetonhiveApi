@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
+app.enable('trust proxy');
 app.use(express.urlencoded({ extended: true }));
 app.use("/princetonhive/img", express.static("uploads"));
 global.__basedir = __dirname;

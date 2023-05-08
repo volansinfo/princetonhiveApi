@@ -526,9 +526,7 @@ exports.searchLibraryByCategoryId = async (req, res) => {
   try {
     const libraryData = [];
     const fullUrl =
-      req.secure == true
-        ? "https"
-        : "http" + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
     // console.log(req.headers.protocol, "pankaj kumar"); here req.secure gives the true or false for http protocol
     // console.log(req.headers.host, "pankaj");
     const results = await Library.findAll({

@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
   res.setHeader("Content-Type", "text/csv");
   res.send("Hello World!");
 });
-
+app.enable("trust proxy");
 // database
 const db = require("./app/models");
 const Role = db.role;

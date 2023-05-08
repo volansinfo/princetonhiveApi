@@ -406,12 +406,19 @@ exports.updateLibrary = async (req, res) => {
         message: "Please Upload file less 4mb",
       });
     }
-    const newFilename = `${Date.now()}_${req.file?.originalname
-      .split(" ")
-      .join("")}`;
+    const findLastEntry = await Library.findAll({
+      order: [["id", "DESC"]],
+    });
+    const fileName = req.file.originalname.split(".")[1];
+    const newFilename = `${Date.now()}${
+      findLastEntry[0]?.id ? findLastEntry[0]?.id : 0
+    }.${fileName}`;
 
+    // const filePath1 = newFilename.split("(").join("");
+    // const filePath = filePath1.split(")").join("");
+    // console.log(req.file, "knkdsfaskjhnk");
     await sharp(req.file.buffer)
-      .resize({ width: 67, height: 67 })
+      .resize({ width: 413, height: 269 })
       .toFile(__basedir + "/uploads/fileUpload/" + newFilename);
 
     // const existTitle = await Library.findOne({
@@ -519,7 +526,11 @@ exports.searchLibraryByCategoryId = async (req, res) => {
   try {
     const libraryData = [];
     const fullUrl =
-      req.protocol + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+      req.secure == true
+        ? "https"
+        : "http" + "://" + req.get("host") + "/princetonhive/img/fileUpload/";
+    // console.log(req.headers.protocol, "pankaj kumar"); here req.secure gives the true or false for http protocol
+    // console.log(req.headers.host, "pankaj");
     const results = await Library.findAll({
       where: {
         categoryId: req.query.categoryId,

@@ -136,21 +136,14 @@ exports.getAllCategory = async (req, res) => {
       }
     }
 
-    const results = await Category.findAndCountAll({
-      limit,
-      offset,
+    const results = await Category.findAll({
       where: {
         status: "1",
       },
-      order: [["id", "DESC"]],
+      // order: [["id", "DESC"]],
     });
-    const response = pagination.getPaginationData(
-      results,
-      req.query.page,
-      limit
-    );
 
-    if (response?.dataItems.length == 0) {
+    if (results?.length == 0) {
       return res.status(200).send({
         status: false,
         message: "Category not found",
@@ -160,7 +153,7 @@ exports.getAllCategory = async (req, res) => {
     return res.status(200).send({
       status: true,
       message: "Category found successfully",
-      data: response,
+      data: results,
     });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });

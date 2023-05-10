@@ -2,6 +2,7 @@ const db = require("../models");
 const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
 const Role = db.role;
+const Question = db.Question;
 const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
@@ -1437,4 +1438,81 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
+};
+
+/**
+ * // get student details and question details by teacher assessment id
+ */
+
+// finding student details
+async function studentDetails(studentIds) {
+  const allStudents = [];
+  for (let i = 0; i < studentIds.length; i++) {
+    let details = await User.findOne({
+      where: {
+        id: studentIds[i],
+      },
+    });
+    allStudents.push({
+      id: details.id,
+      name: details.fname + " " + details.lname,
+      email: details.email,
+      mobileNumber: details.mnumber,
+    });
+  }
+  return allStudents;
+}
+
+// find question details
+async function qustionDetails(questionIds, fullUrl) {
+  const allQuestions = [];
+
+  for (let i = 0; i < questionIds.length; i++) {
+    let details = await Question.findOne({
+      where: {
+        id: questionIds[i],
+      },
+    });
+    allQuestions.push({
+      id: details.id,
+      questionName: details.questionName,
+      departments: details.departments,
+      questionImage: fullUrl + details.questionImgUrl,
+      level: details.level,
+    });
+  }
+  return allQuestions;
+}
+
+exports.getStudentAndQuestionDetails = async (req, res) => {
+  const fullUrl =
+    req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
+  console.log(fullUrl);
+  const getAssessmentByParams = await TeacherAssessment.findOne({
+    where: {
+      id: req.params.assessmentId,
+    },
+  });
+  // console.log(getAssessmentByParams);
+  if (!getAssessmentByParams) {
+    return res.status(200).send({
+      status: false,
+      message: "Data does not found",
+      data: getAssessmentByParams == null ? [] : [],
+    });
+  }
+  let questionDetails = await qustionDetails(
+    getAssessmentByParams?.questionId,
+    fullUrl
+  );
+
+  let allStudentDetails = await studentDetails(getAssessmentByParams.studentId);
+  return res.status(200).send({
+    status: true,
+    data: {
+      assessmentDetails: getAssessmentByParams,
+      questionDetails,
+      allStudentDetails,
+    },
+  });
 };

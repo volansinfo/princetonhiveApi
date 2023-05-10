@@ -98,4 +98,9 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isTeacher],
     controller.getStudentDetailsAssinedAssessment
   );
+  app.get(
+    "/api/getStudentAndQuestionDetails/:assessmentId",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.getStudentAndQuestionDetails
+  );
 };

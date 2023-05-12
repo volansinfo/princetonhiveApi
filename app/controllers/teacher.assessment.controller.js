@@ -1452,7 +1452,7 @@ async function studentDetails(studentIds) {
   for (let i = 0; i < studentIds.length; i++) {
     let details = await User.findOne({
       where: {
-        id: studentIds[i],
+        id: parseInt(studentIds[i]),
       },
     });
     allStudents.push({

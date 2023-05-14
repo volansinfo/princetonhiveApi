@@ -3,9 +3,11 @@ const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
 const Role = db.role;
 const Question = db.Question;
+const Department = db.Department;
 const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
+const authJwt = require("../middleware/authJwt");
 
 exports.createAssessment = async (req, res) => {
   try {
@@ -1450,7 +1452,7 @@ async function studentDetails(studentIds) {
   for (let i = 0; i < studentIds.length; i++) {
     let details = await User.findOne({
       where: {
-        id: studentIds[i],
+        id: parseInt(studentIds[i]),
       },
     });
     allStudents.push({
@@ -1463,6 +1465,19 @@ async function studentDetails(studentIds) {
   return allStudents;
 }
 
+// for level
+function levelNumber(level) {
+  if (level == "0") {
+    return "Beginner";
+  } else if (level == "1") {
+    return "Intermediate";
+  } else if (level == "2") {
+    return "Expert";
+  } else {
+    return "No level";
+  }
+}
+
 // find question details
 async function qustionDetails(questionIds, fullUrl) {
   const allQuestions = [];
@@ -1470,15 +1485,21 @@ async function qustionDetails(questionIds, fullUrl) {
   for (let i = 0; i < questionIds.length; i++) {
     let details = await Question.findOne({
       where: {
-        id: questionIds[i],
+        id: parseInt(questionIds[i]),
       },
     });
+    const findDepartment = await Department.findOne({
+      where: {
+        id: parseInt(details.departments),
+      },
+    });
+
     allQuestions.push({
       id: details.id,
       questionName: details.questionName,
-      departments: details.departments,
+      departments: findDepartment.departmentName,
       questionImage: fullUrl + details.questionImgUrl,
-      level: details.level,
+      level: levelNumber(details.level),
     });
   }
   return allQuestions;
@@ -1487,10 +1508,15 @@ async function qustionDetails(questionIds, fullUrl) {
 exports.getStudentAndQuestionDetails = async (req, res) => {
   const fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
-  console.log(fullUrl);
+  // console.log(fullUrl);
+  const token = req.headers["x-access-token"];
+  const decodeToken = jwt.decode(token);
+  const teacherId = decodeToken.id;
+  // console.log(typeof teacherId);
   const getAssessmentByParams = await TeacherAssessment.findOne({
     where: {
       id: req.params.assessmentId,
+      teacherId: JSON.stringify(teacherId),
     },
   });
   // console.log(getAssessmentByParams);

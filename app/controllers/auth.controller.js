@@ -764,7 +764,7 @@ exports.signup = async (req, res) => {
         message: "File too large, please select a file less than 3mb",
       });
     } else {
-      return res.status(500).send({ success: false, message: e.message });
+      return res.status(500).send({ success: false, message: e });
     }
   }
 };

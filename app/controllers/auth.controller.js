@@ -93,7 +93,7 @@ exports.signup = async (req, res) => {
 
       if (req.body.roles[0] == "student") {
         const userId = req.body.teacherId;
-        if (!userId.trim()) {
+        if (!userId) {
           return res
             .status(400)
             .send({ success: false, message: "Please enter teacher id!" });
@@ -124,6 +124,33 @@ exports.signup = async (req, res) => {
           return res
             .status(400)
             .send({ success: false, message: "Teacher does not exist!" });
+        }
+        if (!req.body.universityId) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter universityId" });
+        }
+        const existUniversity = await User.findOne({
+          where: {
+            id: userId,
+          },
+          attributes: {
+            exclude: ["password", "actualPassword"],
+          },
+          include: [
+            {
+              model: db.role,
+              as: "roles",
+              where: { id: "2" },
+              required: true,
+              attributes: [],
+            },
+          ],
+        });
+        if (existUniversity == null) {
+          return res
+            .status(400)
+            .send({ success: false, message: "UniversityId does not exist" });
         }
       }
 
@@ -293,26 +320,33 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "Please select valid date!" });
       }
 
-      if (
-        (req.body.roles[0] == "teacher" || !req.body.universityId) &&
-        universityIdTypeRoles != "university"
-      ) {
-        console.log(req.body.roles[0]);
-        return res
-          .status(400)
-          .send({ status: false, message: "Please enter universityId" });
+      if (req.body.roles[0] == "teacher") {
+        const universityId = req.body.universityId;
+        if (!universityId) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter universityId" });
+        }
+        const ExistUniversity = await User.findOne({
+          where: {
+            id: parseInt(universityId),
+          },
+          include: [
+            {
+              model: db.role,
+              as: "roles",
+              where: { id: "2" },
+              required: true,
+              attributes: [],
+            },
+          ],
+        });
+        if (!ExistUniversity) {
+          return res
+            .status(404)
+            .send({ status: false, message: "UniversityId does not exist" });
+        }
       }
-
-      if (
-        (req.body.roles[0] == "student" || !req.body.universityId) &&
-        universityIdTypeRoles != "university"
-      ) {
-        console.log(req.body.roles[0]);
-        return res
-          .status(400)
-          .send({ status: false, message: "Please enter universityId" });
-      }
-
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -409,7 +443,7 @@ exports.signup = async (req, res) => {
 
         if (req.body.roles[0] == "student") {
           const userId = req.body.teacherId;
-          if (!userId.trim()) {
+          if (!userId) {
             return res
               .status(400)
               .send({ success: false, message: "Please enter teacher id!" });
@@ -440,6 +474,16 @@ exports.signup = async (req, res) => {
             return res
               .status(400)
               .send({ success: false, message: "Teacher does not exist!" });
+          }
+          if (!req.body.universityId) {
+            return res
+              .status(400)
+              .send({ status: false, message: "Please enter universityId" });
+          }
+          if (universityIdTypeRoles != "university") {
+            return res
+              .status(400)
+              .send({ status: false, message: "UniversityId does not exist" });
           }
         }
 
@@ -612,24 +656,34 @@ exports.signup = async (req, res) => {
             .status(400)
             .send({ success: false, message: "Please select valid date!" });
         }
+        if (req.body.roles[0] == "teacher") {
+          const universityId = req.body.universityId;
+          if (!universityId) {
+            return res
+              .status(400)
+              .send({ status: false, message: "Please enter universityId" });
+          }
+          const ExistUniversity = await User.findOne({
+            where: {
+              id: parseInt(universityId),
+            },
+            include: [
+              {
+                model: db.role,
+                as: "roles",
+                where: { id: "2" },
+                required: true,
+                attributes: [],
+              },
+            ],
+          });
+          if (!ExistUniversity) {
+            return res
+              .status(404)
+              .send({ status: false, message: "UniversityId does not exist" });
+          }
+        }
 
-        if (
-          (req.body.roles[0] == "teacher" || !req.body.universityId) &&
-          universityIdTypeRoles != "university"
-        ) {
-          return res
-            .status(400)
-            .send({ status: false, message: "Please enter universityId!" });
-        }
-        if (
-          (req.body.roles[0] == "student" || !req.body.universityId) &&
-          universityIdTypeRoles != "university"
-        ) {
-          console.log(req.body.roles[0]);
-          return res
-            .status(400)
-            .send({ status: false, message: "Please enter universityId" });
-        }
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -647,7 +701,7 @@ exports.signup = async (req, res) => {
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
-          universityId: req.body.universityId,
+          universityId: req.body.universityId ? req.body.universityId : null,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
           aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo ? req.body.panNo : null,

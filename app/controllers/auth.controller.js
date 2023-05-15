@@ -20,9 +20,34 @@ const { check } = require("express-validator");
 const { validateEmail } = require("../middleware/verifySignUp");
 const { default: isEmail } = require("validator/lib/isEmail");
 
+async function universityIdExist(universityId) {
+  const existUniversityId = await User.findOne({
+    where: {
+      id: parseInt(universityId),
+    },
+  });
+  if (existUniversityId) {
+    const isRoles = await existUniversityId.getRoles();
+    for (let i = 0; i < isRoles.length; i++) {
+      if (isRoles[i].name == "university") {
+        return isRoles[i].name;
+      } else {
+        return isRoles[i].name;
+      }
+    }
+  } else {
+    return null;
+  }
+}
+
 exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
+    const universityIdTypeRoles = await universityIdExist(
+      req.body.universityId ? req.body.universityId : 0
+    );
+
+    console.log(universityIdTypeRoles);
     if (req.file !== undefined) {
       if (req.file.size < 2 * 1024) {
         return res.status(400).send({
@@ -268,6 +293,26 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "Please select valid date!" });
       }
 
+      if (
+        (req.body.roles[0] == "teacher" || !req.body.universityId) &&
+        universityIdTypeRoles != "university"
+      ) {
+        console.log(req.body.roles[0]);
+        return res
+          .status(400)
+          .send({ status: false, message: "Please enter universityId" });
+      }
+
+      if (
+        (req.body.roles[0] == "student" || !req.body.universityId) &&
+        universityIdTypeRoles != "university"
+      ) {
+        console.log(req.body.roles[0]);
+        return res
+          .status(400)
+          .send({ status: false, message: "Please enter universityId" });
+      }
+
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -285,6 +330,7 @@ exports.signup = async (req, res) => {
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
+        universityId: req.body.universityId,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
         aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
         panNo: req.body.panNo ? req.body.panNo : null,
@@ -303,7 +349,8 @@ exports.signup = async (req, res) => {
 
       sendMail(userEmail, username, generatedPwd, "", smtpServer, "", "signup");
 
-      if (req.body.roles) {
+      if (req.body.roles[0]) {
+        console.log(req.body.roles[0]);
         const roles = await Role.findAll({
           where: {
             name: {
@@ -565,6 +612,24 @@ exports.signup = async (req, res) => {
             .status(400)
             .send({ success: false, message: "Please select valid date!" });
         }
+
+        if (
+          (req.body.roles[0] == "teacher" || !req.body.universityId) &&
+          universityIdTypeRoles != "university"
+        ) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter universityId!" });
+        }
+        if (
+          (req.body.roles[0] == "student" || !req.body.universityId) &&
+          universityIdTypeRoles != "university"
+        ) {
+          console.log(req.body.roles[0]);
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter universityId" });
+        }
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -582,6 +647,7 @@ exports.signup = async (req, res) => {
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
+          universityId: req.body.universityId,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
           aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo ? req.body.panNo : null,
@@ -608,7 +674,8 @@ exports.signup = async (req, res) => {
           "signup"
         );
 
-        if (req.body.roles) {
+        if (req.body.roles[0]) {
+          console.log(req.body.roles[0], "line639");
           const roles = await Role.findAll({
             where: {
               name: {
@@ -635,6 +702,7 @@ exports.signup = async (req, res) => {
       }
     }
   } catch (e) {
+    console.log(e);
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
     }

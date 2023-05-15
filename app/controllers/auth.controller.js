@@ -20,34 +20,10 @@ const { check } = require("express-validator");
 const { validateEmail } = require("../middleware/verifySignUp");
 const { default: isEmail } = require("validator/lib/isEmail");
 
-async function universityIdExist(universityId) {
-  const existUniversityId = await User.findOne({
-    where: {
-      id: parseInt(universityId),
-    },
-  });
-  if (existUniversityId) {
-    const isRoles = await existUniversityId.getRoles();
-    for (let i = 0; i < isRoles.length; i++) {
-      if (isRoles[i].name == "university") {
-        return isRoles[i].name;
-      } else {
-        return isRoles[i].name;
-      }
-    }
-  } else {
-    return null;
-  }
-}
-
 exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
-    const universityIdTypeRoles = await universityIdExist(
-      req.body.universityId ? req.body.universityId : 0
-    );
 
-    console.log(universityIdTypeRoles);
     if (req.file !== undefined) {
       if (req.file.size < 2 * 1024) {
         return res.status(400).send({
@@ -132,7 +108,7 @@ exports.signup = async (req, res) => {
         }
         const existUniversity = await User.findOne({
           where: {
-            id: userId,
+            id: parseInt(req.body.universityId),
           },
           attributes: {
             exclude: ["password", "actualPassword"],
@@ -480,10 +456,30 @@ exports.signup = async (req, res) => {
               .status(400)
               .send({ status: false, message: "Please enter universityId" });
           }
-          if (universityIdTypeRoles != "university") {
+          const existUniversity = await User.findOne({
+            where: {
+              id: parseInt(req.body.universityId),
+            },
+            attributes: {
+              exclude: ["password", "actualPassword"],
+            },
+            include: [
+              {
+                model: db.role,
+                as: "roles",
+                where: { id: "2" },
+                required: true,
+                attributes: [],
+              },
+            ],
+          });
+          if (existUniversity == null) {
             return res
               .status(400)
-              .send({ status: false, message: "UniversityId does not exist" });
+              .send({
+                success: false,
+                message: "UniversityId does not exist!",
+              });
           }
         }
 

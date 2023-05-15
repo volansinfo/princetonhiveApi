@@ -95,11 +95,6 @@ db.studentAIReport = require("./studentAIReport.model.js")(
 );
 db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
 
-db.role.belongsToMany(db.user, {
-  through: "vol_user_roles",
-  foreignKey: "roleId",
-  otherKey: "userId",
-});
 
 db.user.belongsToMany(db.role, {
   through: "hiv_user_roles",

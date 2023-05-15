@@ -23,6 +23,7 @@ const { default: isEmail } = require("validator/lib/isEmail");
 exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
+
     if (req.file !== undefined) {
       if (req.file.size < 2 * 1024) {
         return res.status(400).send({
@@ -68,7 +69,7 @@ exports.signup = async (req, res) => {
 
       if (req.body.roles[0] == "student") {
         const userId = req.body.teacherId;
-        if (!userId.trim()) {
+        if (!userId) {
           return res
             .status(400)
             .send({ success: false, message: "Please enter teacher id!" });
@@ -99,6 +100,33 @@ exports.signup = async (req, res) => {
           return res
             .status(400)
             .send({ success: false, message: "Teacher does not exist!" });
+        }
+        if (!req.body.universityId) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please enter universityId" });
+        }
+        const existUniversity = await User.findOne({
+          where: {
+            id: parseInt(req.body.universityId),
+          },
+          attributes: {
+            exclude: ["password", "actualPassword"],
+          },
+          include: [
+            {
+              model: db.role,
+              as: "roles",
+              where: { id: "2" },
+              required: true,
+              attributes: [],
+            },
+          ],
+        });
+        if (existUniversity == null) {
+          return res
+            .status(400)
+            .send({ success: false, message: "UniversityId does not exist" });
         }
       }
 
@@ -213,7 +241,7 @@ exports.signup = async (req, res) => {
           .status(400)
           .send({ success: false, message: "Role does not exist!" });
       }
-      const adharNUM = req.body.aadharNo;
+      const adharNUM = req.body?.aadharNo;
       if (adharNUM.length != 0 && adharNUM.length != 12 && adharNUM != null) {
         return res.status(400).send({
           status: false,
@@ -229,7 +257,7 @@ exports.signup = async (req, res) => {
       if (!req.body.department) {
         return res.status(400).send({
           status: false,
-          message: "Please enter department",
+          message: "Please select department",
         });
       }
       if (isNaN(req.body.department)) {
@@ -252,13 +280,49 @@ exports.signup = async (req, res) => {
           .send({ status: 400, message: "Aadhaar number already exist" });
       }
       if (!req.body.dob) {
-        return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+        return res
+          .status(400)
+          .send({ success: false, message: "Please select date of birth!" });
       }
-      const dt = Date().split(" ")[3]
-      if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-        return res.status(400).send({ success: false, message: "Please enter valid date!" })
+      const dt = Date().split(" ")[3];
+      if (
+        req.body.dob.split("-").length != 3 ||
+        req.body.dob.split("-")[2] == "" ||
+        req.body.dob.split("-")[2] > dt ||
+        req.body.dob.split("-")[2].length != 4
+      ) {
+        return res
+          .status(400)
+          .send({ success: false, message: "Please select valid date!" });
       }
 
+      if (req.body.roles[0] == "teacher") {
+        const universityId = req.body.universityId;
+        if (!universityId) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter universityId" });
+        }
+        const ExistUniversity = await User.findOne({
+          where: {
+            id: parseInt(universityId),
+          },
+          include: [
+            {
+              model: db.role,
+              as: "roles",
+              where: { id: "2" },
+              required: true,
+              attributes: [],
+            },
+          ],
+        });
+        if (!ExistUniversity) {
+          return res
+            .status(404)
+            .send({ status: false, message: "UniversityId does not exist" });
+        }
+      }
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -272,10 +336,11 @@ exports.signup = async (req, res) => {
         state: req.body.state,
         pincode: req.body.pincode,
         gender: req.body.gender,
-        dob: (req.body.dob).split("-").reverse().join("-"),
+        dob: req.body.dob.split("-").reverse().join("-"),
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
+        universityId: req.body.universityId ? req.body.universityId : null,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
         aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
         panNo: req.body.panNo ? req.body.panNo : null,
@@ -292,9 +357,10 @@ exports.signup = async (req, res) => {
           .send({ success: false, message: "SMTP server not configured!" });
       }
 
-      sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+      sendMail(userEmail, username, generatedPwd, "", smtpServer, "", "signup");
 
-      if (req.body.roles) {
+      if (req.body.roles[0]) {
+        console.log(req.body.roles[0]);
         const roles = await Role.findAll({
           where: {
             name: {
@@ -353,7 +419,7 @@ exports.signup = async (req, res) => {
 
         if (req.body.roles[0] == "student") {
           const userId = req.body.teacherId;
-          if (!userId.trim()) {
+          if (!userId) {
             return res
               .status(400)
               .send({ success: false, message: "Please enter teacher id!" });
@@ -384,6 +450,34 @@ exports.signup = async (req, res) => {
             return res
               .status(400)
               .send({ success: false, message: "Teacher does not exist!" });
+          }
+          if (!req.body.universityId) {
+            return res
+              .status(400)
+              .send({ status: false, message: "Please enter universityId" });
+          }
+          const existUniversity = await User.findOne({
+            where: {
+              id: parseInt(req.body.universityId),
+            },
+            attributes: {
+              exclude: ["password", "actualPassword"],
+            },
+            include: [
+              {
+                model: db.role,
+                as: "roles",
+                where: { id: "2" },
+                required: true,
+                attributes: [],
+              },
+            ],
+          });
+          if (existUniversity == null) {
+            return res.status(400).send({
+              success: false,
+              message: "UniversityId does not exist!",
+            });
           }
         }
 
@@ -518,7 +612,7 @@ exports.signup = async (req, res) => {
         if (!req.body.department) {
           return res.status(400).send({
             status: false,
-            message: "Please enter department",
+            message: "Please select department",
           });
         }
         if (isNaN(req.body.department)) {
@@ -541,12 +635,49 @@ exports.signup = async (req, res) => {
             .send({ status: 400, message: "Aadhaar number already exist" });
         }
         if (!req.body.dob) {
-          return res.status(400).send({ success: false, message: "Please enter date of birth!" })
+          return res
+            .status(400)
+            .send({ success: false, message: "Please select date of birth!" });
         }
-        const dt = Date().split(" ")[3]
-        if (req.body.dob.split("-").length != 3 || req.body.dob.split("-")[2] == "" || req.body.dob.split("-")[2] > dt || req.body.dob.split("-")[2].length != 4) {
-          return res.status(400).send({ success: false, message: "Please enter valid date!" })
+        const dt = Date().split(" ")[3];
+        if (
+          req.body.dob.split("-").length != 3 ||
+          req.body.dob.split("-")[2] == "" ||
+          req.body.dob.split("-")[2] > dt ||
+          req.body.dob.split("-")[2].length != 4
+        ) {
+          return res
+            .status(400)
+            .send({ success: false, message: "Please select valid date!" });
         }
+        if (req.body.roles[0] == "teacher") {
+          const universityId = req.body.universityId;
+          if (!universityId) {
+            return res
+              .status(400)
+              .send({ status: false, message: "Please enter universityId" });
+          }
+          const ExistUniversity = await User.findOne({
+            where: {
+              id: parseInt(universityId),
+            },
+            include: [
+              {
+                model: db.role,
+                as: "roles",
+                where: { id: "2" },
+                required: true,
+                attributes: [],
+              },
+            ],
+          });
+          if (ExistUniversity == null) {
+            return res
+              .status(404)
+              .send({ status: false, message: "UniversityId does not exist" });
+          }
+        }
+
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -560,10 +691,11 @@ exports.signup = async (req, res) => {
           state: req.body.state,
           pincode: req.body.pincode,
           gender: req.body.gender,
-          dob: (req.body.dob).split("-").reverse().join("-"),
+          dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
+          universityId: req.body.universityId ? req.body.universityId : null,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
           aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo ? req.body.panNo : null,
@@ -580,9 +712,18 @@ exports.signup = async (req, res) => {
             .send({ success: false, message: "SMTP server not configured!" });
         }
 
-        sendMail(userEmail, username, generatedPwd, smtpServer, "signup");
+        sendMail(
+          userEmail,
+          username,
+          generatedPwd,
+          "",
+          smtpServer,
+          "",
+          "signup"
+        );
 
-        if (req.body.roles) {
+        if (req.body.roles[0]) {
+          console.log(req.body.roles[0], "line639");
           const roles = await Role.findAll({
             where: {
               name: {
@@ -609,19 +750,21 @@ exports.signup = async (req, res) => {
       }
     }
   } catch (e) {
+    console.log(e);
     if (e.message == "File type does not allow!") {
       return res.status(400).send({ success: false, message: e.message });
     }
-    if (e.message == "invalid input syntax for type date: \"Invalid date\"") {
-      return res.status(400).send({ success: false, message: "Please enter valid date!" })
-    }
-    else if (e.message == "File too large") {
+    if (e.message == 'invalid input syntax for type date: "Invalid date"') {
+      return res
+        .status(400)
+        .send({ success: false, message: "Please enter valid date!" });
+    } else if (e.message == "File too large") {
       return res.status(400).send({
         success: false,
         message: "File too large, please select a file less than 3mb",
       });
     } else {
-      return res.status(500).send({ success: false, message: e.message });
+      return res.status(500).send({ success: false, message: e });
     }
   }
 };
@@ -950,7 +1093,7 @@ exports.forgotPassword = async (req, res) => {
       }
     );
 
-    sendMail(userEmail, generatedPwd, smtpServer, "forgotPassword");
+    sendMail(userEmail, "", generatedPwd, "", smtpServer, "", "forgotPassword");
 
     res.status(200).send({
       success: true,

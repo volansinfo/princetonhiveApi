@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
+app.enable("trust proxy");
 app.use(express.urlencoded({ extended: true }));
 app.use("/princetonhive/img", express.static("uploads"));
 global.__basedir = __dirname;
@@ -24,7 +25,7 @@ app.get("/", (req, res) => {
   res.setHeader("Content-Type", "text/csv");
   res.send("Hello World!");
 });
-
+app.enable("trust proxy");
 // database
 const db = require("./app/models");
 const Role = db.role;
@@ -58,6 +59,9 @@ require("./app/routes/studentTeacher.routes")(app);
 require("./app/routes/blog.routes")(app);
 require("./app/routes/gallery.routes")(app);
 require("./app/routes/studentAiReport.routes")(app);
+require("./app/routes/contactUs.routes")(app);
+require("./app/routes/centralLibrary.category.routes")(app);
+require("./app/routes/central.library.routes")(app);
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });

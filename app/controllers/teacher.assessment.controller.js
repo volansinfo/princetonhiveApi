@@ -1,9 +1,13 @@
 const db = require("../models");
 const TeacherAssessment = db.teacherAssessment;
 const User = db.user;
+const Role = db.role;
+const Question = db.Question;
+const Department = db.Department;
 const pagination = require("../middleware/pagination");
 const jwt = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
+const authJwt = require("../middleware/authJwt");
 
 exports.createAssessment = async (req, res) => {
   try {
@@ -1182,4 +1186,359 @@ exports.teacherSearchQuery = async (req, res) => {
     console.log(error);
     return res.status(500).send({ status: false, message: error.message });
   }
+};
+
+// get api assessment for student
+
+exports.getAssessmentStudent = async (req, res) => {
+  const token = req.headers["x-access-token"];
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+  const data = [];
+
+  const result = await TeacherAssessment.findAll({
+    order: [["id", "DESC"]],
+  });
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId;
+    // console.log(mapId)
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId) {
+        data.push(result[i]);
+      }
+    });
+  }
+  // console.log(data)
+
+  return res.status(200).send({ success: true, data: data });
+};
+
+// Api for pending assessment
+exports.getPendingAssessment = async (req, res) => {
+  const token = req.headers["x-access-token"];
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+
+  //give permission only student
+  const getRoles = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  const roles = await getRoles.getRoles();
+  for (let i = 0; i < roles.length; i++) {
+    if (roles[i].name != "student") {
+      return res.status(400).send({
+        status: false,
+        message: `You don't have permission to access this module!`,
+      });
+    }
+  }
+
+  const data = [];
+  const result = await TeacherAssessment.findAll({
+    order: [["startDate", "ASC"]],
+  });
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId;
+    const startingDate = result[i].startDate;
+    let currentDate = new Date().toJSON().slice(0, 10);
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId && startingDate > currentDate) {
+        data.push(result[i]);
+      }
+    });
+  }
+  if (data.length == 0) {
+    return res
+      .status(200)
+      .send({ status: false, message: "No assessment found", data: data });
+  }
+  return res.status(200).send({
+    status: true,
+    message: "Assessment found successfully",
+    data: data[0],
+  });
+};
+
+//Get Api for student find assessment by params
+exports.getAssessmentByParams = async (req, res) => {
+  const token = req.headers["x-access-token"];
+  const tokenData = jwt.decode(token);
+  const studentId = tokenData.id;
+
+  //give permission only student
+  const getRoles = await User.findOne({
+    where: {
+      id: studentId,
+    },
+  });
+  const roles = await getRoles.getRoles();
+  for (let i = 0; i < roles.length; i++) {
+    if (roles[i].name != "student") {
+      return res.status(400).send({
+        status: false,
+        message: `You don't have permission to access this module!`,
+      });
+    }
+  }
+
+  const data = [];
+  const result = await TeacherAssessment.findAll({
+    where: {
+      status: "1",
+      teacherId: req.params.teacherId,
+    },
+    order: [["id", "DESC"]],
+  });
+  for (let i = 0; i < result.length; i++) {
+    const studentIdInArray = await result[i].studentId;
+
+    const mapId = await studentIdInArray.map((id) => {
+      if (id == studentId) {
+        data.push({
+          id: result[i].id,
+          assessmentName: result[i].assessmentName,
+          startDate: result[i].startDate,
+        });
+      }
+    });
+  }
+  if (data.length == 0) {
+    return res
+      .status(200)
+      .send({ status: false, message: "No assessment found", data: data });
+  }
+  return res.status(200).send({
+    status: true,
+    message: "Assessment found successfully",
+    data: data,
+  });
+};
+
+// Get api for completed assessment
+exports.getCompletedAssessment = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const userId = tokenData.id;
+    const getRoles = await User.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    const roles = await getRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "student") {
+        return res.status(400).send({
+          status: false,
+          message: `You don't have permission to access this module!`,
+        });
+      }
+    }
+    const assessmentData = await TeacherAssessment.findAll({
+      where: {
+        status: "1",
+      },
+      order: [["id", "DESC"]],
+    });
+    // console.log(assessmentData);
+    const resultData = [];
+
+    for (let i = 0; i < assessmentData.length; i++) {
+      {
+        const studentIdInArray = await assessmentData[i].studentId;
+        const endDate = assessmentData[i].endDate;
+        let currentDate = new Date().toJSON().slice(0, 10);
+        // console.log(currentDate, endDate);
+        const mapId = await studentIdInArray.map((id) => {
+          if (id == userId && endDate < currentDate) {
+            resultData.push(assessmentData[i]);
+          }
+        });
+      }
+    }
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const results = {};
+    results.dataItems = resultData.slice(startIndex, endIndex);
+    results.totalItems = resultData.length;
+    results.currentPage = parseInt(req.query.page) || 0;
+    results.totalPages = Math.ceil(resultData.length / limit);
+    if (results.dataItems.length <= 0) {
+      return res.status(200).send({
+        status: false,
+        message: "No completed assessment found",
+        data: results,
+      });
+    }
+    return res.status(200).send({
+      status: true,
+      message: "All completed assessment found",
+      data: results,
+    });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+exports.getStudentDetailsAssinedAssessment = async (req, res) => {
+  try {
+    const studentDetailsData = [];
+
+    const studentId = [];
+    const token = req.headers["x-access-token"];
+    const decode = jwt.decode(token);
+    const teacherId = decode.id;
+    const assessmentData = await TeacherAssessment.findAll({
+      where: {
+        teacherId: JSON.stringify(teacherId),
+        status: "1",
+      },
+    });
+    for (let i = 0; i < assessmentData.length; i++) {
+      const studentIdInArray = await assessmentData[i].studentId;
+      const mapStudentDetails = await studentIdInArray.map((id) => {
+        studentId.push(id);
+      });
+    }
+    let arrayStudentId = [...new Set(studentId)];
+    for (let i = 0; i < arrayStudentId.length; i++) {
+      const studentDetails = await User.findOne({
+        where: {
+          id: parseInt(arrayStudentId[i]),
+        },
+      });
+      studentDetailsData.push({
+        id: studentDetails.id,
+        name: studentDetails.fname + " " + studentDetails.lname,
+        email: studentDetails.email,
+        mnumber: studentDetails.mnumber,
+      });
+    }
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+
+    const data1 = {};
+    data1.dataItems = studentDetailsData.slice(startIndex, endIndex);
+    data1.totalItems = studentDetailsData.length;
+    data1.currentPage = parseInt(req.query.page) || 0;
+    data1.totalPages = Math.ceil(studentDetailsData.length / limit);
+
+    return res.status(200).send({
+      status: true,
+      message: "All student details",
+      data: data1,
+    });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+/**
+ * // get student details and question details by teacher assessment id
+ */
+
+// finding student details
+async function studentDetails(studentIds) {
+  const allStudents = [];
+  for (let i = 0; i < studentIds.length; i++) {
+    let details = await User.findOne({
+      where: {
+        id: parseInt(studentIds[i]),
+      },
+    });
+    allStudents.push({
+      id: details.id,
+      name: details.fname + " " + details.lname,
+      email: details.email,
+      mobileNumber: details.mnumber,
+    });
+  }
+  return allStudents;
+}
+
+// for level
+function levelNumber(level) {
+  if (level == "0") {
+    return "Beginner";
+  } else if (level == "1") {
+    return "Intermediate";
+  } else if (level == "2") {
+    return "Expert";
+  } else {
+    return "No level";
+  }
+}
+
+// find question details
+async function qustionDetails(questionIds, fullUrl) {
+  const allQuestions = [];
+
+  for (let i = 0; i < questionIds.length; i++) {
+    let details = await Question.findOne({
+      where: {
+        id: parseInt(questionIds[i]),
+      },
+    });
+    const findDepartment = await Department.findOne({
+      where: {
+        id: parseInt(details.departments),
+      },
+    });
+
+    allQuestions.push({
+      id: details.id,
+      questionName: details.questionName,
+      departments: findDepartment.departmentName,
+      questionImage: fullUrl + details.questionImgUrl,
+      level: levelNumber(details.level),
+    });
+  }
+  return allQuestions;
+}
+
+exports.getStudentAndQuestionDetails = async (req, res) => {
+  const fullUrl =
+    req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
+  // console.log(fullUrl);
+  const token = req.headers["x-access-token"];
+  const decodeToken = jwt.decode(token);
+  const teacherId = decodeToken.id;
+  // console.log(typeof teacherId);
+  const getAssessmentByParams = await TeacherAssessment.findOne({
+    where: {
+      id: req.params.assessmentId,
+      teacherId: JSON.stringify(teacherId),
+    },
+  });
+  // console.log(getAssessmentByParams);
+  if (!getAssessmentByParams) {
+    return res.status(200).send({
+      status: false,
+      message: "Data does not found",
+      data: getAssessmentByParams == null ? [] : [],
+    });
+  }
+  let questionDetails = await qustionDetails(
+    getAssessmentByParams?.questionId,
+    fullUrl
+  );
+
+  let allStudentDetails = await studentDetails(getAssessmentByParams.studentId);
+  return res.status(200).send({
+    status: true,
+    data: {
+      assessmentDetails: getAssessmentByParams,
+      questionDetails,
+      allStudentDetails,
+    },
+  });
 };

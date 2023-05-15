@@ -73,24 +73,27 @@ db.teacherAssessment = require("../models/teacher.assessment.model")(
   Sequelize,
   DataTypes
 );
-db.Blog = require("../models/blog.model")(
-  sequelize,
-  Sequelize,
-  DataTypes
-);
+db.Blog = require("../models/blog.model")(sequelize, Sequelize, DataTypes);
 
 db.Gallery = require("../models/gallery.model")(
   sequelize,
   Sequelize,
   DataTypes
 );
-db.studentAIReport = require("./studentAIReport.model.js")(sequelize,Sequelize,DataTypes)
 
-db.role.belongsToMany(db.user, {
-  through: "vol_user_roles",
-  foreignKey: "roleId",
-  otherKey: "userId",
-});
+db.studentAIReport = require("./studentAIReport.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
+
+// db.studentAIReport = require("./studentAIReport.model.js")(
+//   sequelize,
+//   Sequelize,
+//   DataTypes
+// );
+// db.contactUs = require("./contactUs.model.js")(sequelize, Sequelize, DataTypes);
 
 db.user.belongsToMany(db.role, {
   through: "hiv_user_roles",
@@ -99,6 +102,21 @@ db.user.belongsToMany(db.role, {
   as: "roles",
 });
 
+db.category = require("../models/centralLibrary.category.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
+// db.studentAIReport.hasMany(db.user, {
+//   as: "hiv_users",
+//   foreignKey: "teacherId",
+// });
+
+db.library = require("../models/central.library.model.js")(
+  sequelize,
+  Sequelize,
+  DataTypes
+);
 db.ROLES = ["admin", "university", "teacher", "student", "support"];
 
 module.exports = db;

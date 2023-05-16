@@ -24,7 +24,8 @@ const uploadCsv = async (req, res) => {
         id: teacherId,
       },
     });
-
+    const universityId = teacherExist?.universityId;
+    // console.log(universityId, "pankaj");
     const teacherUuid = teacherExist.uuid.slice(0, 3);
     if (teacherUuid != "TEA") {
       return res.status(401).send({
@@ -191,6 +192,7 @@ const uploadCsv = async (req, res) => {
             aadharNo: bulkData[i].aadharNo,
             panNo: bulkData[i].panNo,
             teacherId: teacherId,
+            universityId: universityId,
           };
 
           let user = await User.create(document);

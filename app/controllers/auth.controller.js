@@ -317,6 +317,21 @@ exports.signup = async (req, res) => {
       });
       const universityIdForStudent = universityNameByTeacherId?.universityId;
 
+      if (!req.body.gender) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Please enter gender" });
+      }
+      if (
+        req.body.gender != 1 &&
+        req.body.gender != 2 &&
+        req.body.gender != 3
+      ) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Please enter gender likes 1,2,3" });
+      }
+
       const user = await User.create({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -674,6 +689,22 @@ exports.signup = async (req, res) => {
             id: req.body.teacherId ? req.body.teacherId : 0,
           },
         });
+
+        if (!req.body.gender) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter gender" });
+        }
+        if (
+          req.body.gender != 1 &&
+          req.body.gender != 2 &&
+          req.body.gender != 3
+        ) {
+          return res.status(400).send({
+            status: false,
+            message: "Please enter gender likes 1,2,3",
+          });
+        }
         const universityIdForStudent = universityNameByTeacherId?.universityId;
         const user = await User.create({
           fname: req.body.fname,

@@ -141,13 +141,58 @@ exports.userBoard = async (req, res) => {
   }
 };
 
+async function UniversityName(universityId) {
+  let university = User.findOne({
+    where: {
+      id: universityId,
+    },
+  });
+  return university.name;
+}
+
 exports.adminBoard = async (req, res) => {
   var fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
   try {
+    const data = [];
     const allUser = await User.findAll({
       order: [["id", "DESC"]],
     });
+
+    // for (let i = 0; i < allUser.length; i++) {
+    //   console.log(allUser[i].universityId);
+    //   const universityIdwithName = await UniversityName(
+    //     allUser[i].universityId
+    //   );
+    //   console.log(universityIdwithName);
+    //   let university = await User.findAll({
+    //     where: {
+    //       id: allUser[i].universityId,
+    //     },
+    //   });
+    //   console.log(university);
+    //   data.push({
+    //     id: allUser[i].id,
+    //     fname: allUser[i].fname,
+    //     lname: allUser[i].lname,
+    //     profileImg: fullUrl + allUser[i].profileImg,
+    //     email: allUser[i].email,
+    //     mnumber: allUser[i].mnumber,
+    //     address: allUser[i].address,
+    //     city: allUser[i].city,
+    //     state: allUser[i].state,
+    //     pincode: allUser[i].pincode,
+    //     gender: allUser[i].gender,
+    //     dob: transformDate(allUser[i].dob),
+    //     country: allUser[i].country,
+    //     status: allUser[i].status,
+    //     uuid: allUser[i].uuid,
+    //     university: university.fname + " " + university.lname,
+    //     createdAt: allUser[i].createdAt,
+    //     updatedAt: allUser[i].updatedAt,
+    //   });
+    // }
+
     let fileInfos = [];
     allUser.forEach((file) => {
       if (file.profileImg !== null) {

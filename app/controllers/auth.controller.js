@@ -20,6 +20,20 @@ const { check } = require("express-validator");
 const { validateEmail } = require("../middleware/verifySignUp");
 const { default: isEmail } = require("validator/lib/isEmail");
 
+// async function cheackUniversityId(teacherId) {
+//   if (teacherId) {
+//     const universityNameByTeacherId = await User.findOne({
+//       where: {
+//         id: req.body.teacherId ? req.body.teacherId : 0,
+//       },
+//     });
+//     const universityIdForStudent = universityNameByTeacherId?.universityId;
+//     return universityIdForStudent;
+//   } else {
+//     return null;
+//   }
+// }
+
 exports.signup = async (req, res) => {
   try {
     await uploadFile(req, res);
@@ -320,7 +334,9 @@ exports.signup = async (req, res) => {
         country: req.body.country,
         status: req.body.status ? req.body.status : 1,
         uuid: uuid,
-        universityId: universityIdForStudent ? universityIdForStudent : null,
+        universityId: universityIdForStudent
+          ? universityIdForStudent
+          : req.body.universityId,
         teacherId: req.body.teacherId ? req.body.teacherId : null,
         aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
         panNo: req.body.panNo ? req.body.panNo : null,
@@ -659,7 +675,6 @@ exports.signup = async (req, res) => {
           },
         });
         const universityIdForStudent = universityNameByTeacherId?.universityId;
-
         const user = await User.create({
           fname: req.body.fname,
           lname: req.body.lname,
@@ -677,7 +692,9 @@ exports.signup = async (req, res) => {
           country: req.body.country,
           status: req.body.status ? req.body.status : 1,
           uuid: uuid,
-          universityId: universityIdForStudent ? universityIdForStudent : null,
+          universityId: universityIdForStudent
+            ? universityIdForStudent
+            : req.body.universityId,
           teacherId: req.body.teacherId ? req.body.teacherId : null,
           aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
           panNo: req.body.panNo ? req.body.panNo : null,

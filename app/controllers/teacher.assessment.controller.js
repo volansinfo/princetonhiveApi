@@ -1191,26 +1191,37 @@ exports.teacherSearchQuery = async (req, res) => {
 // get api assessment for student
 
 exports.getAssessmentStudent = async (req, res) => {
-  const token = req.headers["x-access-token"];
-  const tokenData = jwt.decode(token);
-  const studentId = tokenData.id;
-  const data = [];
-
-  const result = await TeacherAssessment.findAll({
-    order: [["id", "DESC"]],
-  });
-  for (let i = 0; i < result.length; i++) {
-    const studentIdInArray = await result[i].studentId;
-    // console.log(mapId)
-    const mapId = await studentIdInArray.map((id) => {
-      if (id == studentId) {
-        data.push(result[i]);
-      }
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const studentId = tokenData.id;
+    const data = [];
+    const assessmentDetails = [];
+    const result = await TeacherAssessment.findAll({
+      order: [["id", "DESC"]],
     });
+    for (let i = 0; i < result.length; i++) {
+      const studentIdInArray = await result[i].studentId;
+      // console.log(studentIdInArray);
+      const mapId = await studentIdInArray.map((id) => {
+        if (id == studentId) {
+          data.push(result[i]);
+        }
+      });
+    }
+    // console.log(result);
+    let currentDate = new Date().toJSON().slice(0, 10);
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].endDate >= currentDate) {
+        console.log(data[i].endDate);
+        assessmentDetails.push(data[i]);
+      }
+    }
+    // console.log(assessmentDetails);
+    return res.status(200).send({ success: true, data: assessmentDetails });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
   }
-  // console.log(data)
-
-  return res.status(200).send({ success: true, data: data });
 };
 
 // Api for pending assessment

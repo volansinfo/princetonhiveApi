@@ -12,6 +12,17 @@ const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
 const bcrypt = require("bcryptjs");
 var bulkData = [];
+async function findDepartmentId(name) {
+  var department = await Department.findOne({
+    where: {
+      departmentName: name,
+    },
+  });
+  // console.log(department);
+  if (department) {
+    return department.id;
+  }
+}
 
 const uploadCsv = async (req, res) => {
   bulkData = [];
@@ -222,7 +233,7 @@ const uploadCsv = async (req, res) => {
             panNo: bulkData[i].panNo,
             teacherId: teacherId,
             universityId: universityId,
-            department: bulkData[i].department,
+            department: await findDepartmentId(bulkData[i].department),
           };
 
           let user = await User.create(document);

@@ -6,7 +6,7 @@ const csv = require("fast-csv");
 const jwt = require("jsonwebtoken");
 const Role = db.role;
 const Op = db.Sequelize.Op;
-
+const Department = db.Department;
 const getUUID = require("./uuid.controller");
 const { globalConfig, user } = require("../models");
 const sendMail = require("./sendmail.controller");
@@ -24,15 +24,25 @@ const uploadCsv = async (req, res) => {
         id: teacherId,
       },
     });
+    // console.log(teacherExist);
+    const roles = await teacherExist.getRoles();
     const universityId = teacherExist?.universityId;
-    // console.log(universityId, "pankaj");
-    const teacherUuid = teacherExist.uuid.slice(0, 3);
-    if (teacherUuid != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to add bulk students",
-      });
+    // console.log(roles, "pankaj");
+    // const teacherUuid = teacherExist.uuid.slice(0, 3);
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "teacher") {
+        return res.status(401).send({
+          status: false,
+          message: "You don't have permission to add bulk students",
+        });
+      }
     }
+    // if (teacherUuid != "TEA") {
+    //   return res.status(401).send({
+    //     status: false,
+    //     message: "You don't have permission to add bulk students",
+    //   });
+    // }
 
     if (req.file == undefined) {
       return res
@@ -114,6 +124,11 @@ const uploadCsv = async (req, res) => {
               success: false,
               message: `Mobile number should be in numeric value`,
             });
+          } else if (!bulkData[i].department) {
+            return res.status(400).send({
+              success: false,
+              message: `Please enter department in file`,
+            });
           }
         }
 
@@ -173,6 +188,20 @@ const uploadCsv = async (req, res) => {
             numbers: true,
           });
 
+          for (let i = 0; i < bulkData.length; i++) {
+            var existDepartment = await Department.findOne({
+              where: {
+                departmentName: bulkData[i].department,
+              },
+            });
+            if (!existDepartment) {
+              return res.status(404).send({
+                status: false,
+                message: `Your enter department does not exist ${bulkData[i].department}`,
+              });
+            }
+          }
+
           let document = {
             fname: bulkData[i].fname,
             lname: bulkData[i].lname,
@@ -193,6 +222,7 @@ const uploadCsv = async (req, res) => {
             panNo: bulkData[i].panNo,
             teacherId: teacherId,
             universityId: universityId,
+            department: bulkData[i].department,
           };
 
           let user = await User.create(document);

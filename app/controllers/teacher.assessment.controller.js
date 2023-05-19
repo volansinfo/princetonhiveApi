@@ -61,12 +61,14 @@ exports.getAssessmentOngoing = async (req, res) => {
         id: userId,
       },
     });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
+    const roles = await permissionRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "teacher") {
+        return res.status(401).send({
+          status: false,
+          message: "You don't have permission to access the asssessment",
+        });
+      }
     }
     const assessmentData = await TeacherAssessment.findAll({
       where: {
@@ -80,16 +82,15 @@ exports.getAssessmentOngoing = async (req, res) => {
     for (let i = 0; i < assessmentData.length; i++) {
       const startDate = assessmentData[i].startDate;
       const endDate = assessmentData[i].endDate;
-      let convertStartDate = new Date(startDate);
-      let convertEndDate = new Date(endDate);
-      let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
-      let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
-      const currentTime = Math.floor(new Date().getTime() / 1000.0);
+      // let convertStartDate = new Date(startDate);
+      // let convertEndDate = new Date(endDate);
+      // let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+      // let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+      // const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
-      if (
-        currentTime >= convertStartDateEpoch &&
-        currentTime <= convertEndDateEpoch
-      ) {
+      let currentDate = new Date().toJSON().slice(0, 10);
+
+      if (currentDate >= startDate && currentDate <= endDate) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         ongoing.push(assessmentData[i]);
       }
@@ -99,7 +100,7 @@ exports.getAssessmentOngoing = async (req, res) => {
 
     const startIndex = page * limit;
     const endIndex = (page + 1) * limit;
-    console.log(ongoing);
+    // console.log(ongoing);
     const results = {};
     results.dataItems = ongoing.slice(startIndex, endIndex);
     results.totalItems = ongoing.length;
@@ -135,12 +136,14 @@ exports.getAssessmentUpcomming = async (req, res) => {
         id: userId,
       },
     });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
+    const roles = await permissionRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "teacher") {
+        return res.status(401).send({
+          status: false,
+          message: "You don't have permission to access the asssessment",
+        });
+      }
     }
     const assessmentData = await TeacherAssessment.findAll({
       where: { teacherId: JSON.stringify(permissionRoles.id), status: "1" },
@@ -224,16 +227,15 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     for (let i = 0; i < assessmentData.length; i++) {
       const startDate = assessmentData[i].startDate;
       const endDate = assessmentData[i].endDate;
-      let convertStartDate = new Date(startDate);
-      let convertEndDate = new Date(endDate);
-      let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
-      let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
-      const currentTime = Math.floor(new Date().getTime() / 1000.0);
+      // let convertStartDate = new Date(startDate);
+      // let convertEndDate = new Date(endDate);
+      // let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+      // let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+      // const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
-      if (
-        currentTime > convertStartDateEpoch &&
-        convertEndDateEpoch < currentTime
-      ) {
+      let currentDate = new Date().toJSON().slice(0, 10);
+
+      if (currentDate > startDate && endDate < currentDate) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         activeUpcomming.push(assessmentData[i]);
       }

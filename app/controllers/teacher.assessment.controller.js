@@ -1519,39 +1519,46 @@ async function qustionDetails(questionIds, fullUrl) {
 }
 
 exports.getStudentAndQuestionDetails = async (req, res) => {
-  const fullUrl =
-    req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
-  // console.log(fullUrl);
-  const token = req.headers["x-access-token"];
-  const decodeToken = jwt.decode(token);
-  const teacherId = decodeToken.id;
-  // console.log(typeof teacherId);
-  const getAssessmentByParams = await TeacherAssessment.findOne({
-    where: {
-      id: req.params.assessmentId,
-      teacherId: JSON.stringify(teacherId),
-    },
-  });
-  // console.log(getAssessmentByParams);
-  if (!getAssessmentByParams) {
-    return res.status(200).send({
-      status: false,
-      message: "Data does not found",
-      data: getAssessmentByParams == null ? [] : [],
+  try {
+    const fullUrl =
+      req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
+    // console.log(fullUrl);
+    const token = req.headers["x-access-token"];
+    const decodeToken = jwt.decode(token);
+    const teacherId = decodeToken.id;
+    // console.log(typeof teacherId);
+    const getAssessmentByParams = await TeacherAssessment.findOne({
+      where: {
+        id: req.params.assessmentId,
+        teacherId: JSON.stringify(teacherId),
+      },
     });
-  }
-  let questionDetails = await qustionDetails(
-    getAssessmentByParams?.questionId,
-    fullUrl
-  );
+    // console.log(getAssessmentByParams);
+    if (!getAssessmentByParams) {
+      return res.status(200).send({
+        status: false,
+        message: "Data does not found",
+        data: getAssessmentByParams == null ? [] : [],
+      });
+    }
+    let questionDetails = await qustionDetails(
+      getAssessmentByParams?.questionId,
+      fullUrl
+    );
 
-  let allStudentDetails = await studentDetails(getAssessmentByParams.studentId);
-  return res.status(200).send({
-    status: true,
-    data: {
-      assessmentDetails: getAssessmentByParams,
-      questionDetails,
-      allStudentDetails,
-    },
-  });
+    let allStudentDetails = await studentDetails(
+      getAssessmentByParams.studentId
+    );
+    return res.status(200).send({
+      status: true,
+      data: {
+        assessmentDetails: getAssessmentByParams,
+        questionDetails,
+        allStudentDetails,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error });
+  }
 };

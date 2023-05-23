@@ -3,6 +3,7 @@ module.exports = {
   USER: "postgres",
   PASSWORD: "1234",
   DB: "hivesteps_api",
+
   dialect: "postgres",
   pool: {
     max: 5,

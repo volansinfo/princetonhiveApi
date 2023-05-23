@@ -1548,20 +1548,6 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       fullUrl
     );
 
-    var QuestionAndDepart = [];
-    for (let i = 0; i < questionDetails.length; i++) {
-      let department = await Department.findByPk(
-        questionDetails[i].departmentId
-      );
-      QuestionAndDepart.push({
-        id: questionDetails[i].id,
-        questionName: questionDetails[i].questionName,
-        departmentName: department.departmentName,
-        questionImage: questionDetails[i].questionImage,
-        level: questionDetails[i].level,
-      });
-    }
-
     let allStudentDetails = await studentDetails(
       getAssessmentByParams.studentId
     );
@@ -1569,7 +1555,7 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       status: true,
       data: {
         assessmentDetails: getAssessmentByParams,
-        QuestionAndDepart,
+        questionDetails,
         allStudentDetails,
       },
     });

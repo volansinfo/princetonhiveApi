@@ -1483,17 +1483,17 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
 // }
 
 // for level
-// function levelNumber(level) {
-//   if (level == "0") {
-//     return "Beginner";
-//   } else if (level == "1") {
-//     return "Intermediate";
-//   } else if (level == "2") {
-//     return "Expert";
-//   } else {
-//     return "No level";
-//   }
-// }
+function levelNumber(level) {
+  if (level == "0") {
+    return "Beginner";
+  } else if (level == "1") {
+    return "Intermediate";
+  } else if (level == "2") {
+    return "Expert";
+  } else {
+    return "No level";
+  }
+}
 
 // find question details
 async function qustionDetails(questionIds, fullUrl) {
@@ -1561,7 +1561,7 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       status: true,
       data: {
         assessmentDetails: getAssessmentByParams,
-        // questionDetails,
+        questionDetails,
         // allStudentDetails,
       },
     });

@@ -1549,10 +1549,10 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
         data: getAssessmentByParams == null ? [] : [],
       });
     }
-    // let questionDetails = await qustionDetails(
-    //   getAssessmentByParams?.questionId,
-    //   fullUrl
-    // );
+    let questionDetails = await qustionDetails(
+      getAssessmentByParams?.questionId,
+      fullUrl
+    );
 
     let allStudentDetails = await studentDetails(
       getAssessmentByParams.studentId
@@ -1561,7 +1561,7 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       status: true,
       data: {
         assessmentDetails: getAssessmentByParams,
-        // questionDetails,
+        questionDetails,
         allStudentDetails,
       },
     });

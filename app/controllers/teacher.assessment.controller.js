@@ -1496,35 +1496,35 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
 // }
 
 // find question details
-// async function qustionDetails(questionIds, fullUrl) {
-//   try {
-//     const allQuestions = [];
+async function qustionDetails(questionIds, fullUrl) {
+  try {
+    const allQuestions = [];
 
-//     for (let i = 0; i < questionIds.length; i++) {
-//       let details = await Question.findOne({
-//         where: {
-//           id: parseInt(questionIds[i]),
-//         },
-//       });
-//       const findDepartment = await Department.findOne({
-//         where: {
-//           id: parseInt(details.departments),
-//         },
-//       });
+    for (let i = 0; i < questionIds.length; i++) {
+      let details = await Question.findOne({
+        where: {
+          id: parseInt(questionIds[i]),
+        },
+      });
+      const findDepartment = await Department.findOne({
+        where: {
+          id: parseInt(details.departments),
+        },
+      });
 
-//       allQuestions.push({
-//         id: details.id,
-//         questionName: details.questionName,
-//         departments: findDepartment.departmentName,
-//         questionImage: fullUrl + details.questionImgUrl,
-//         level: levelNumber(details.level),
-//       });
-//     }
-//     return allQuestions;
-//   } catch (error) {
-//     return res.status(500).send({ status: false, message: error });
-//   }
-// }
+      allQuestions.push({
+        id: details.id,
+        questionName: details.questionName,
+        departments: findDepartment.departmentName,
+        questionImage: fullUrl + details.questionImgUrl,
+        level: levelNumber(details.level),
+      });
+    }
+    return allQuestions;
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error });
+  }
+}
 
 exports.getStudentAndQuestionDetails = async (req, res) => {
   try {
@@ -1549,10 +1549,10 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
         data: getAssessmentByParams == null ? [] : [],
       });
     }
-    // let questionDetails = await qustionDetails(
-    //   getAssessmentByParams?.questionId,
-    //   fullUrl
-    // );
+    let questionDetails = await qustionDetails(
+      getAssessmentByParams?.questionId,
+      fullUrl
+    );
 
     // let allStudentDetails = await studentDetails(
     //   getAssessmentByParams.studentId

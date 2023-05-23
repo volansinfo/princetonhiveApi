@@ -1506,16 +1506,16 @@ async function qustionDetails(questionIds, fullUrl) {
           id: parseInt(questionIds[i]),
         },
       });
-      // const findDepartment = await Department.findOne({
-      //   where: {
-      //     id: parseInt(details.departments),
-      //   },
-      // });
+      const findDepartment = await Department.findOne({
+        where: {
+          id: details.departments,
+        },
+      });
 
       allQuestions.push({
         id: details.id,
         questionName: details.questionName,
-        // departments: findDepartment.departmentName,
+        departments: findDepartment.departmentName,
         questionImage: fullUrl + details.questionImgUrl,
         level: levelNumber(details.level),
       });

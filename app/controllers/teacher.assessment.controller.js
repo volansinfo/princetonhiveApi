@@ -1461,21 +1461,25 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
 
 // finding student details
 async function studentDetails(studentIds) {
-  const allStudents = [];
-  for (let i = 0; i < studentIds.length; i++) {
-    let details = await User.findOne({
-      where: {
-        id: parseInt(studentIds[i]),
-      },
-    });
-    allStudents.push({
-      id: details.id,
-      name: details.fname + " " + details.lname,
-      email: details.email,
-      mobileNumber: details.mnumber,
-    });
+  try {
+    const allStudents = [];
+    for (let i = 0; i < studentIds.length; i++) {
+      let details = await User.findOne({
+        where: {
+          id: parseInt(studentIds[i]),
+        },
+      });
+      allStudents.push({
+        id: details.id,
+        name: details.fname + " " + details.lname,
+        email: details.email,
+        mobileNumber: details.mnumber,
+      });
+    }
+    return allStudents;
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error });
   }
-  return allStudents;
 }
 
 // for level
@@ -1493,29 +1497,33 @@ function levelNumber(level) {
 
 // find question details
 async function qustionDetails(questionIds, fullUrl) {
-  const allQuestions = [];
+  try {
+    const allQuestions = [];
 
-  for (let i = 0; i < questionIds.length; i++) {
-    let details = await Question.findOne({
-      where: {
-        id: parseInt(questionIds[i]),
-      },
-    });
-    const findDepartment = await Department.findOne({
-      where: {
-        id: parseInt(details.departments),
-      },
-    });
+    for (let i = 0; i < questionIds.length; i++) {
+      let details = await Question.findOne({
+        where: {
+          id: parseInt(questionIds[i]),
+        },
+      });
+      const findDepartment = await Department.findOne({
+        where: {
+          id: parseInt(details.departments),
+        },
+      });
 
-    allQuestions.push({
-      id: details.id,
-      questionName: details.questionName,
-      departments: findDepartment.departmentName,
-      questionImage: fullUrl + details.questionImgUrl,
-      level: levelNumber(details.level),
-    });
+      allQuestions.push({
+        id: details.id,
+        questionName: details.questionName,
+        departments: findDepartment.departmentName,
+        questionImage: fullUrl + details.questionImgUrl,
+        level: levelNumber(details.level),
+      });
+    }
+    return allQuestions;
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error });
   }
-  return allQuestions;
 }
 
 exports.getStudentAndQuestionDetails = async (req, res) => {
@@ -1553,8 +1561,8 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       status: true,
       data: {
         assessmentDetails: getAssessmentByParams,
-        questionDetails,
-        allStudentDetails,
+        // questionDetails,
+        // allStudentDetails,
       },
     });
   } catch (error) {

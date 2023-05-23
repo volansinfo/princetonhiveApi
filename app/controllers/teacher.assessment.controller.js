@@ -1460,71 +1460,71 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
  */
 
 // finding student details
-async function studentDetails(studentIds) {
-  try {
-    const allStudents = [];
-    for (let i = 0; i < studentIds.length; i++) {
-      let details = await User.findOne({
-        where: {
-          id: parseInt(studentIds[i]),
-        },
-      });
-      allStudents.push({
-        id: details.id,
-        name: details.fname + " " + details.lname,
-        email: details.email,
-        mobileNumber: details.mnumber,
-      });
-    }
-    return allStudents;
-  } catch (error) {
-    return res.status(500).send({ status: false, message: error });
-  }
-}
+// async function studentDetails(studentIds) {
+//   try {
+//     const allStudents = [];
+//     for (let i = 0; i < studentIds.length; i++) {
+//       let details = await User.findOne({
+//         where: {
+//           id: parseInt(studentIds[i]),
+//         },
+//       });
+//       allStudents.push({
+//         id: details.id,
+//         name: details.fname + " " + details.lname,
+//         email: details.email,
+//         mobileNumber: details.mnumber,
+//       });
+//     }
+//     return allStudents;
+//   } catch (error) {
+//     return res.status(500).send({ status: false, message: error });
+//   }
+// }
 
 // for level
-function levelNumber(level) {
-  if (level == "0") {
-    return "Beginner";
-  } else if (level == "1") {
-    return "Intermediate";
-  } else if (level == "2") {
-    return "Expert";
-  } else {
-    return "No level";
-  }
-}
+// function levelNumber(level) {
+//   if (level == "0") {
+//     return "Beginner";
+//   } else if (level == "1") {
+//     return "Intermediate";
+//   } else if (level == "2") {
+//     return "Expert";
+//   } else {
+//     return "No level";
+//   }
+// }
 
 // find question details
-async function qustionDetails(questionIds, fullUrl) {
-  try {
-    const allQuestions = [];
+// async function qustionDetails(questionIds, fullUrl) {
+//   try {
+//     const allQuestions = [];
 
-    for (let i = 0; i < questionIds.length; i++) {
-      let details = await Question.findOne({
-        where: {
-          id: parseInt(questionIds[i]),
-        },
-      });
-      const findDepartment = await Department.findOne({
-        where: {
-          id: parseInt(details.departments),
-        },
-      });
+//     for (let i = 0; i < questionIds.length; i++) {
+//       let details = await Question.findOne({
+//         where: {
+//           id: parseInt(questionIds[i]),
+//         },
+//       });
+//       const findDepartment = await Department.findOne({
+//         where: {
+//           id: parseInt(details.departments),
+//         },
+//       });
 
-      allQuestions.push({
-        id: details.id,
-        questionName: details.questionName,
-        departments: findDepartment.departmentName,
-        questionImage: fullUrl + details.questionImgUrl,
-        level: levelNumber(details.level),
-      });
-    }
-    return allQuestions;
-  } catch (error) {
-    return res.status(500).send({ status: false, message: error });
-  }
-}
+//       allQuestions.push({
+//         id: details.id,
+//         questionName: details.questionName,
+//         departments: findDepartment.departmentName,
+//         questionImage: fullUrl + details.questionImgUrl,
+//         level: levelNumber(details.level),
+//       });
+//     }
+//     return allQuestions;
+//   } catch (error) {
+//     return res.status(500).send({ status: false, message: error });
+//   }
+// }
 
 exports.getStudentAndQuestionDetails = async (req, res) => {
   try {
@@ -1549,14 +1549,14 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
         data: getAssessmentByParams == null ? [] : [],
       });
     }
-    let questionDetails = await qustionDetails(
-      getAssessmentByParams?.questionId,
-      fullUrl
-    );
+    // let questionDetails = await qustionDetails(
+    //   getAssessmentByParams?.questionId,
+    //   fullUrl
+    // );
 
-    let allStudentDetails = await studentDetails(
-      getAssessmentByParams.studentId
-    );
+    // let allStudentDetails = await studentDetails(
+    //   getAssessmentByParams.studentId
+    // );
     return res.status(200).send({
       status: true,
       data: {

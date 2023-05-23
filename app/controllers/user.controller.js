@@ -141,13 +141,58 @@ exports.userBoard = async (req, res) => {
   }
 };
 
+async function UniversityName(universityId) {
+  let university = User.findOne({
+    where: {
+      id: universityId,
+    },
+  });
+  return university.name;
+}
+
 exports.adminBoard = async (req, res) => {
   var fullUrl =
     req.protocol + "://" + req.get("host") + "/princetonhive/img/user/";
   try {
+    const data = [];
     const allUser = await User.findAll({
       order: [["id", "DESC"]],
     });
+
+    // for (let i = 0; i < allUser.length; i++) {
+    //   console.log(allUser[i].universityId);
+    //   const universityIdwithName = await UniversityName(
+    //     allUser[i].universityId
+    //   );
+    //   console.log(universityIdwithName);
+    //   let university = await User.findAll({
+    //     where: {
+    //       id: allUser[i].universityId,
+    //     },
+    //   });
+    //   console.log(university);
+    //   data.push({
+    //     id: allUser[i].id,
+    //     fname: allUser[i].fname,
+    //     lname: allUser[i].lname,
+    //     profileImg: fullUrl + allUser[i].profileImg,
+    //     email: allUser[i].email,
+    //     mnumber: allUser[i].mnumber,
+    //     address: allUser[i].address,
+    //     city: allUser[i].city,
+    //     state: allUser[i].state,
+    //     pincode: allUser[i].pincode,
+    //     gender: allUser[i].gender,
+    //     dob: transformDate(allUser[i].dob),
+    //     country: allUser[i].country,
+    //     status: allUser[i].status,
+    //     uuid: allUser[i].uuid,
+    //     university: university.fname + " " + university.lname,
+    //     createdAt: allUser[i].createdAt,
+    //     updatedAt: allUser[i].updatedAt,
+    //   });
+    // }
+
     let fileInfos = [];
     allUser.forEach((file) => {
       if (file.profileImg !== null) {
@@ -360,18 +405,18 @@ exports.updateUserData = async (req, res) => {
       const result = await User.update(
         {
           fname: req.body.fname,
-          lname: req.body.lname,
+          lname: req.body.lname ? req.body.lname : "",
           profileImg: newFilename,
-          address: req.body.address,
-          city: req.body.city,
-          state: req.body.state,
-          pincode: req.body.pincode,
+          address: req.body.address ? req.body.address : "",
+          city: req.body.city ? req.body.city : "",
+          state: req.body.state ? req.body.state : "",
+          pincode: req.body.pincode ? req.body.pincode : "",
           gender: req.body.gender,
           dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
-          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
-          panNo: req.body.panNo,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : "",
+          panNo: req.body.panNo ? req.body.panNo : "",
           department: req.body.department,
         },
         {
@@ -457,18 +502,18 @@ exports.updateUserData = async (req, res) => {
       const result = await User.update(
         {
           fname: req.body.fname,
-          lname: req.body.lname,
+          lname: req.body.lname ? req.body.lname : "",
           profileImg: newFilename,
-          address: req.body.address,
-          city: req.body.city,
-          state: req.body.state,
-          pincode: req.body.pincode,
+          address: req.body.address ? req.body.address : "",
+          city: req.body.city ? req.body.city : "",
+          state: req.body.state ? req.body.state : "",
+          pincode: req.body.pincode ? req.body.pincode : "",
           gender: req.body.gender,
           dob: req.body.dob.split("-").reverse().join("-"),
           country: req.body.country,
           status: req.body.status,
-          aadharNo: req.body.aadharNo ? req.body.aadharNo : null,
-          panNo: req.body.panNo,
+          aadharNo: req.body.aadharNo ? req.body.aadharNo : "",
+          panNo: req.body.panNo ? req.body.panNo : "",
           department: req.body.department,
         },
         {

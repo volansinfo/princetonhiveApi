@@ -22,7 +22,7 @@ verifyToken = async (req, res, next) => {
         id: tokenData.id,
       },
     });
-
+    // console.log(jwt.verify(token, config.secret));
     if (user.tokenKey == token) {
       jwt.verify(token, config.secret, (err, decoded) => {
         if (err) {

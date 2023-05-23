@@ -61,12 +61,14 @@ exports.getAssessmentOngoing = async (req, res) => {
         id: userId,
       },
     });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
+    const roles = await permissionRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "teacher") {
+        return res.status(401).send({
+          status: false,
+          message: "You don't have permission to access the asssessment",
+        });
+      }
     }
     const assessmentData = await TeacherAssessment.findAll({
       where: {
@@ -80,16 +82,15 @@ exports.getAssessmentOngoing = async (req, res) => {
     for (let i = 0; i < assessmentData.length; i++) {
       const startDate = assessmentData[i].startDate;
       const endDate = assessmentData[i].endDate;
-      let convertStartDate = new Date(startDate);
-      let convertEndDate = new Date(endDate);
-      let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
-      let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
-      const currentTime = Math.floor(new Date().getTime() / 1000.0);
+      // let convertStartDate = new Date(startDate);
+      // let convertEndDate = new Date(endDate);
+      // let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+      // let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+      // const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
-      if (
-        currentTime >= convertStartDateEpoch &&
-        currentTime <= convertEndDateEpoch
-      ) {
+      let currentDate = new Date().toJSON().slice(0, 10);
+
+      if (currentDate >= startDate && currentDate <= endDate) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         ongoing.push(assessmentData[i]);
       }
@@ -99,7 +100,7 @@ exports.getAssessmentOngoing = async (req, res) => {
 
     const startIndex = page * limit;
     const endIndex = (page + 1) * limit;
-    console.log(ongoing);
+    // console.log(ongoing);
     const results = {};
     results.dataItems = ongoing.slice(startIndex, endIndex);
     results.totalItems = ongoing.length;
@@ -135,12 +136,14 @@ exports.getAssessmentUpcomming = async (req, res) => {
         id: userId,
       },
     });
-    const roles = permissionRoles.uuid.slice(0, 3);
-    if (roles != "TEA") {
-      return res.status(401).send({
-        status: false,
-        message: "You don't have permission to access the asssessment",
-      });
+    const roles = await permissionRoles.getRoles();
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name != "teacher") {
+        return res.status(401).send({
+          status: false,
+          message: "You don't have permission to access the asssessment",
+        });
+      }
     }
     const assessmentData = await TeacherAssessment.findAll({
       where: { teacherId: JSON.stringify(permissionRoles.id), status: "1" },
@@ -224,16 +227,15 @@ exports.getAssessmentPreviousActive = async (req, res) => {
     for (let i = 0; i < assessmentData.length; i++) {
       const startDate = assessmentData[i].startDate;
       const endDate = assessmentData[i].endDate;
-      let convertStartDate = new Date(startDate);
-      let convertEndDate = new Date(endDate);
-      let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
-      let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
-      const currentTime = Math.floor(new Date().getTime() / 1000.0);
+      // let convertStartDate = new Date(startDate);
+      // let convertEndDate = new Date(endDate);
+      // let convertStartDateEpoch = convertStartDate.getTime() / 1000.0;
+      // let convertEndDateEpoch = convertEndDate.getTime() / 1000.0;
+      // const currentTime = Math.floor(new Date().getTime() / 1000.0);
       // console.log(currentTime);
-      if (
-        currentTime > convertStartDateEpoch &&
-        convertEndDateEpoch < currentTime
-      ) {
+      let currentDate = new Date().toJSON().slice(0, 10);
+
+      if (currentDate > startDate && endDate < currentDate) {
         // console.log(convertStartDateEpoch, convertEndDateEpoch);
         activeUpcomming.push(assessmentData[i]);
       }
@@ -1191,26 +1193,37 @@ exports.teacherSearchQuery = async (req, res) => {
 // get api assessment for student
 
 exports.getAssessmentStudent = async (req, res) => {
-  const token = req.headers["x-access-token"];
-  const tokenData = jwt.decode(token);
-  const studentId = tokenData.id;
-  const data = [];
-
-  const result = await TeacherAssessment.findAll({
-    order: [["id", "DESC"]],
-  });
-  for (let i = 0; i < result.length; i++) {
-    const studentIdInArray = await result[i].studentId;
-    // console.log(mapId)
-    const mapId = await studentIdInArray.map((id) => {
-      if (id == studentId) {
-        data.push(result[i]);
-      }
+  try {
+    const token = req.headers["x-access-token"];
+    const tokenData = jwt.decode(token);
+    const studentId = tokenData.id;
+    const data = [];
+    const assessmentDetails = [];
+    const result = await TeacherAssessment.findAll({
+      order: [["id", "DESC"]],
     });
+    for (let i = 0; i < result.length; i++) {
+      const studentIdInArray = await result[i].studentId;
+      // console.log(studentIdInArray);
+      const mapId = await studentIdInArray.map((id) => {
+        if (id == studentId) {
+          data.push(result[i]);
+        }
+      });
+    }
+    // console.log(result);
+    let currentDate = new Date().toJSON().slice(0, 10);
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].endDate >= currentDate) {
+        console.log(data[i].endDate);
+        assessmentDetails.push(data[i]);
+      }
+    }
+    // console.log(assessmentDetails);
+    return res.status(200).send({ success: true, data: assessmentDetails });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
   }
-  // console.log(data)
-
-  return res.status(200).send({ success: true, data: data });
 };
 
 // Api for pending assessment
@@ -1448,21 +1461,25 @@ exports.getStudentDetailsAssinedAssessment = async (req, res) => {
 
 // finding student details
 async function studentDetails(studentIds) {
-  const allStudents = [];
-  for (let i = 0; i < studentIds.length; i++) {
-    let details = await User.findOne({
-      where: {
-        id: parseInt(studentIds[i]),
-      },
-    });
-    allStudents.push({
-      id: details.id,
-      name: details.fname + " " + details.lname,
-      email: details.email,
-      mobileNumber: details.mnumber,
-    });
+  try {
+    const allStudents = [];
+    for (let i = 0; i < studentIds.length; i++) {
+      let details = await User.findOne({
+        where: {
+          id: parseInt(studentIds[i]),
+        },
+      });
+      allStudents.push({
+        id: details.id,
+        name: details.fname + " " + details.lname,
+        email: details.email,
+        mobileNumber: details.mnumber,
+      });
+    }
+    return allStudents;
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error });
   }
-  return allStudents;
 }
 
 // for level
@@ -1480,65 +1497,76 @@ function levelNumber(level) {
 
 // find question details
 async function qustionDetails(questionIds, fullUrl) {
-  const allQuestions = [];
+  try {
+    const allQuestions = [];
 
-  for (let i = 0; i < questionIds.length; i++) {
-    let details = await Question.findOne({
-      where: {
-        id: parseInt(questionIds[i]),
-      },
-    });
-    const findDepartment = await Department.findOne({
-      where: {
-        id: parseInt(details.departments),
-      },
-    });
+    for (let i = 0; i < questionIds.length; i++) {
+      let details = await Question.findOne({
+        where: {
+          id: parseInt(questionIds[i]),
+        },
+      });
+      const findDepartment = await Department.findOne({
+        where: {
+          id: parseInt(details.departments),
+        },
+      });
 
-    allQuestions.push({
-      id: details.id,
-      questionName: details.questionName,
-      departments: findDepartment.departmentName,
-      questionImage: fullUrl + details.questionImgUrl,
-      level: levelNumber(details.level),
-    });
+      allQuestions.push({
+        id: details.id,
+        questionName: details.questionName,
+        departments: findDepartment.departmentName,
+        questionImage: fullUrl + details.questionImgUrl,
+        level: levelNumber(details.level),
+      });
+    }
+    return allQuestions;
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error });
   }
-  return allQuestions;
 }
 
 exports.getStudentAndQuestionDetails = async (req, res) => {
-  const fullUrl =
-    req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
-  // console.log(fullUrl);
-  const token = req.headers["x-access-token"];
-  const decodeToken = jwt.decode(token);
-  const teacherId = decodeToken.id;
-  // console.log(typeof teacherId);
-  const getAssessmentByParams = await TeacherAssessment.findOne({
-    where: {
-      id: req.params.assessmentId,
-      teacherId: JSON.stringify(teacherId),
-    },
-  });
-  // console.log(getAssessmentByParams);
-  if (!getAssessmentByParams) {
-    return res.status(200).send({
-      status: false,
-      message: "Data does not found",
-      data: getAssessmentByParams == null ? [] : [],
+  try {
+    const fullUrl =
+      req.protocol + "://" + req.get("host") + "/princetonhive/img/question/";
+    // console.log(fullUrl);
+    const token = req.headers["x-access-token"];
+    const decodeToken = jwt.decode(token);
+    const teacherId = decodeToken.id;
+    // console.log(typeof teacherId);
+    const getAssessmentByParams = await TeacherAssessment.findOne({
+      where: {
+        id: req.params.assessmentId,
+        teacherId: JSON.stringify(teacherId),
+      },
     });
-  }
-  let questionDetails = await qustionDetails(
-    getAssessmentByParams?.questionId,
-    fullUrl
-  );
+    // console.log(getAssessmentByParams);
+    if (!getAssessmentByParams) {
+      return res.status(200).send({
+        status: false,
+        message: "Data does not found",
+        data: getAssessmentByParams == null ? [] : [],
+      });
+    }
+    let questionDetails = await qustionDetails(
+      getAssessmentByParams?.questionId,
+      fullUrl
+    );
 
-  let allStudentDetails = await studentDetails(getAssessmentByParams.studentId);
-  return res.status(200).send({
-    status: true,
-    data: {
-      assessmentDetails: getAssessmentByParams,
-      questionDetails,
-      allStudentDetails,
-    },
-  });
+    let allStudentDetails = await studentDetails(
+      getAssessmentByParams.studentId
+    );
+    return res.status(200).send({
+      status: true,
+      data: {
+        assessmentDetails: getAssessmentByParams,
+        // questionDetails,
+        // allStudentDetails,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ status: false, message: error });
+  }
 };

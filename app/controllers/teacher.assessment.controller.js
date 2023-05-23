@@ -1478,7 +1478,7 @@ async function studentDetails(studentIds) {
     }
     return allStudents;
   } catch (error) {
-    return res.status(500).send({ status: false, message: error });
+    console.log(error);
   }
 }
 
@@ -1506,23 +1506,17 @@ async function qustionDetails(questionIds, fullUrl) {
           id: parseInt(questionIds[i]),
         },
       });
-      const findDepartment = await Department.findOne({
-        where: {
-          id: parseInt(details.departments),
-        },
-      });
-
       allQuestions.push({
         id: details.id,
         questionName: details.questionName,
-        departments: findDepartment.departmentName,
+        departmentId: details.departments,
         questionImage: fullUrl + details.questionImgUrl,
         level: levelNumber(details.level),
       });
     }
     return allQuestions;
   } catch (error) {
-    return res.status(500).send({ status: false, message: error });
+    console.log(error);
   }
 }
 
@@ -1554,6 +1548,20 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       fullUrl
     );
 
+    var QuestionAndDepart = [];
+    for (let i = 0; i < questionDetails.length; i++) {
+      let department = await Department.findByPk(
+        questionDetails[i].departmentId
+      );
+      QuestionAndDepart.push({
+        id: questionDetails[i].id,
+        questionName: questionDetails[i].questionName,
+        departmentName: department.departmentName,
+        questionImage: questionDetails[i].questionImage,
+        level: questionDetails[i].level,
+      });
+    }
+
     let allStudentDetails = await studentDetails(
       getAssessmentByParams.studentId
     );
@@ -1561,8 +1569,8 @@ exports.getStudentAndQuestionDetails = async (req, res) => {
       status: true,
       data: {
         assessmentDetails: getAssessmentByParams,
-        // questionDetails,
-        // allStudentDetails,
+        QuestionAndDepart,
+        allStudentDetails,
       },
     });
   } catch (error) {

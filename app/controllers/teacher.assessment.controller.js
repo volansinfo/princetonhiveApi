@@ -1505,17 +1505,31 @@ async function qustionDetails(questionIds, fullUrl) {
         where: {
           id: parseInt(questionIds[i]),
         },
+        include: [
+          {
+            model: Department,
+            required: true,
+            as: "hiv_departments",
+          },
+        ],
       });
-      const findDepartment = await Department.findOne({
-        where: {
-          id: details.departments,
-        },
-      });
+      // const findDepartment = await Department.findOne({
+      //   where: {
+      //     id: details.departments,
+      //   },
+      //   include: [
+      //     {
+      //       model: Department,
+      //       required: true,
+      //       as: "hiv_departments",
+      //     },
+      //   ],
+      // });
 
       allQuestions.push({
         id: details.id,
         questionName: details.questionName,
-        departments: findDepartment.departmentName,
+        departments: findDepartment?.departmentName,
         questionImage: fullUrl + details.questionImgUrl,
         level: levelNumber(details.level),
       });

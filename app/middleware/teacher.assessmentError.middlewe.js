@@ -451,37 +451,49 @@ const erroHandlingUpdate = async (req, res, next) => {
 
 const errorHandingContactUs = async (req, res, next) => {
   const data = req.body;
-  const { fullname, email, phoneNumber } = data
+  const { fullname, email, phoneNumber } = data;
   const isValidRequestBody = function (requestBody) {
     return Object.keys(requestBody).length > 0;
   };
 
   if (!isValidRequestBody(data)) {
-    return res.status(400).send({ status: false, msg: "Please enter data" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter data" });
   }
 
   if (!fullname) {
-    return res.status(400).send({ status: false, msg: "Please enter full name" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter full name" });
   } else if (!email) {
-    return res.status(400).send({ status: false, msg: "Please enter email" });
-  } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.trim())) {
-    return res.status(400).send({ status: false, msg: "Please enter valid email" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter email" });
+  } else if (
+    !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.trim())
+  ) {
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter valid email" });
   } else if (!phoneNumber) {
-    return res.status(400).send({ status: false, msg: "Please enter mobile number" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter mobile number" });
   } else if (isNaN(phoneNumber)) {
-    return res.status(400).send({ status: false, msg: "Mobile number must be in digits" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Mobile number must be in digits" });
   } else if (phoneNumber.length != 10) {
-    return res.status(400).send({ status: false, msg: "Please enter valid mobile number" });
+    return res
+      .status(400)
+      .send({ status: false, message: "Please enter valid mobile number" });
   }
   next();
-}
-
-
-
-
+};
 
 module.exports = {
   errorHandingTeacherAssessment,
   erroHandlingUpdate,
-  errorHandingContactUs
+  errorHandingContactUs,
 };

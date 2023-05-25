@@ -16,13 +16,15 @@ exports.questionAdd = async (req, res) => {
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
-    if (req.file.size < 600 * 1024) {
-      return res.status(400).send({
-        success: false,
-        message: "File too small, please select a file greater than 600kb",
-      });
-    }
-    const newFilename = `${Date.now()}_${req.file.originalname}`;
+    // if (req.file.size < 600 * 1024) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "File too small, please select a file greater than 600kb",
+    //   });
+    // }
+    const newFilename = `${Date.now()}_${req.file.originalname}`
+      .split(" ")
+      .join("");
 
     await sharp(req.file.buffer)
       .resize({ width: 500, height: 500 })

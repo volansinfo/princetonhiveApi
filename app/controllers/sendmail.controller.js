@@ -69,8 +69,8 @@ const sendMail = async (
       text: "Hello from the Hive Step side.",
       html: `Welcome to hive steps<br><br>
             Dear  ${username},<br><br>
-            Thanks for Sign-Up.We are delighted to welcome you to the company's internship program. We are delighted to have you join our team! We were happy to read about your interests and endeavours in the areas of (internship tasks) as well as your personal, academic, and professional objectives.<br><br>
-            We look forward to welcoming you soon!<br><br>
+            Congratulations! Your sign-up process is completed with mylearning.. We are thrilled to welcome you to our team. Thank you for signing up and joining our vibrant community of dedicated educators who are passionate about transforming the world of education.<br><br>
+            Since you have recently joined, share your user ID and password.<br><br>
             
             Login Credentials<br>
             Email : <b>${userEmail}</b><br>Password : <b> ${generatedPwd}</b>

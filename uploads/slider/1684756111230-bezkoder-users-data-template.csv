@@ -1,0 +1,3 @@
+fname,lname,email,gender,dob,mnumber,address,city,state,pincode,country,department
+wrong,user,wrong@yopmail.com,male,20/11/1990,5321476477,Adarsh nagar khora,Ghaziabad,Maharastra,223344,India,Art Department
+Right ,user,right@yopmail.com,female,15/10/1997,4789651021,BK Nagar,Goa,Goa,1144,India,Chemistry Department

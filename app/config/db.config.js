@@ -1,8 +1,8 @@
 module.exports = {
   HOST: "localhost",
   USER: "postgres",
-  PASSWORD: "CwCQYDVQQLdA@ssw0rd",
-  DB: "hivesteps_api_live",
+  PASSWORD: "Admin@#123456!",
+  DB: "mylanguage_api_live",
   dialect: "postgres",
   pool: {
     max: 5,

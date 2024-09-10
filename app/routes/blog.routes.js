@@ -42,6 +42,4 @@ module.exports = function (app) {
     controller.blogStatus
   );
 
-  app.get("/api/testing/domain", controller.getTestingDomain);
-
 };

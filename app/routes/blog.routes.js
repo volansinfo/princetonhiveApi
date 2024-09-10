@@ -41,4 +41,7 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isSupportOrAdmin],
     controller.blogStatus
   );
+
+  app.get("/api/testing/domain", controller.getTestingDomain);
+
 };

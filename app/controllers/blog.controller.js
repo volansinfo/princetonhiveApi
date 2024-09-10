@@ -380,3 +380,13 @@ exports.blogStatus = async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 };
+
+exports.getTestingDomain = async (req, res) => {
+  try {
+
+    res.status(200).send({ message: "API Worked !!" });
+
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};

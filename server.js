@@ -63,6 +63,10 @@ require("./app/routes/contactUs.routes")(app);
 require("./app/routes/centralLibrary.category.routes")(app);
 require("./app/routes/central.library.routes")(app);
 
+app.get("/api/testing/domain", (req, res) => {
+  res.send("API Tested Successfully!");
+});
+
 app.listen(port, () => {
   console.log(`Connection is setup at ${port}`);
 });
